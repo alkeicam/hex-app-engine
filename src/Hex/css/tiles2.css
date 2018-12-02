@@ -1,0 +1,394 @@
+
+html { 
+  background: url(https://dl.dropboxusercontent.com/u/13589251/Hex/background.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.dockbg {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 35px;
+    background: inherit;
+}
+
+.dock {
+    position: fixed;
+    text-align: center;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    height: 80px;
+    line-height: 80px;
+}
+
+.dock img {
+    display: inline-block;
+    vertical-align: bottom;
+    height: 50%;
+    padding: 0 5px;
+    /* + your animation properties */
+}
+
+.dock img.company-colors{
+    display: inline-block;
+    vertical-align: bottom;
+    height: 100%;
+    padding: 0 20px;
+    /* + your animation properties */
+}
+
+.dock .dock-unit {
+    display: inline-block;
+    vertical-align: bottom;
+    height: 40px;
+    width: 40px;
+    padding: 0 5px;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.dock .dock-unit-selected {
+    display: inline-block;
+    vertical-align: bottom;
+    height: 80px;
+    width: 80px;
+    padding: 0 5px;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.dock .dock-unit:hover {
+    display: inline-block;
+    vertical-align: bottom;
+    height: px;
+    width: 80px;
+    height: 80px;
+    padding: 0 5px;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+
+.dock img:hover {
+    height: 100%;
+}
+
+.hexmap {  
+  box-sizing: border-box; 
+
+}
+
+.hexmap .row { margin: -2.4% 0; text-align: center; }
+.hexmap .row:first-child { margin-top: 2.25%; }
+
+.unit-troop {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-100.png);
+}
+
+.unit-troop-100 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-100.png);
+}
+
+.unit-troop-90 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-90.png);
+}
+
+.unit-troop-80 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-80.png);
+}
+
+.unit-troop-70 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-70.png);
+}
+
+.unit-troop-60 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-60.png);
+}
+
+.unit-troop-50 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-50.png);
+}
+
+.unit-troop-40 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-40.png);
+}
+
+.unit-troop-30 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-30.png);
+}
+
+.unit-troop-20 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-20.png);
+}
+
+.unit-troop-10 {
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-10.png);
+}
+
+.unit-troop-0 {
+
+  background-image: url(https://dl.dropboxusercontent.com/u/13589251/Hex/unit-dead.png);
+}
+
+.unit-tank {
+  background-image: url(http://images.akamai.steamusercontent.com/ugc/792942079450883347/D8B104CBF7FCCF177D1AB6C817B03D3B67DF55F7/);
+}
+
+.hexagon .snaptarget {
+    position: absolute;
+    display: block;
+    z-index: 10;    
+    width: 5px;
+    height: 5px;
+    transform: translate(-700%,200%);
+}
+
+.unit {
+    position: absolute;
+    margin-left: -50%;
+    display: block;
+    z-index: 10;
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 45px;
+    height: 45px;
+    
+    transform: translate(20%,-40%) rotate(-45deg);
+}
+
+.unit2 {
+    position: absolute;    
+    display: block;
+    z-index:99;
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 45px;
+    height: 45px;
+    
+    
+}
+
+.unit-dead {
+  display: none;
+}
+
+.c1 {
+  width: 200px;
+  height: 100px;
+  display: inline-block;
+  overflow: hidden;  
+  transform: rotate(30deg) ;
+  background-color: rgba(10,144,255,.56);
+  background-size: cover;
+}
+.c2 {
+  width: 200px;
+  height: 100px;
+  display: inline-block;
+  overflow: hidden;  
+  transform: skewY(30deg);
+  background-color: rgba(120,144,255,.56);
+  background-size: cover; 
+}
+
+.c3 {
+  width: 200px;
+  height: 100px;
+  display: inline-block;
+  overflow: hidden;  
+  transform: scaleX(.866);
+  background-color: rgba(250,144,255,.56);
+  background-size: cover; 
+}
+.c4 {
+  width: 200px;
+  height: 100px;
+  display: inline-block;
+  overflow: hidden;  
+  transform: rotate(30deg) skewY(30deg);
+  background-color: rgba(250,144,255,.56);
+  background-size: cover; 
+}
+.c5 {
+  width: 200px;
+  height: 100px;
+  display: inline-block;
+  overflow: hidden;  
+  transform: rotate(30deg) skewY(30deg) scaleX(.866);
+  background-color: rgba(250,144,255,.56);
+  background-size: cover; 
+
+}
+.c6 {
+  width: 200px;
+  height: 100px;
+  display: inline-block;
+  overflow: hidden;  
+  transform: rotate(30deg) skewY(30deg) scaleX(.866) scaleX(1.155) skewY(-30deg) rotate(-30deg);
+  background-color: rgba(250,144,255,.56);
+  background-size: cover; 
+
+}
+
+.c7 {
+  width: 200px;
+  height: 100px;
+  display: inline-block;
+  overflow: hidden;  
+  transform: scaleX(1.155) skewY(-30deg) rotate(-30deg);
+  background-color: rgba(250,144,255,.56);
+  background-size: cover; 
+}
+
+.c8 {
+  width: 200px;
+  height: 100px;
+  display: inline-block;
+  overflow: hidden;  
+  
+  background-color: rgba(250,144,255,.56);
+  background-size: cover; 
+
+}
+
+
+
+.hexmap .row .hexagon {
+  
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  margin: 0 1%;
+  padding: 2%;
+  transform: rotate(30deg) skewY(30deg) scaleX(.866); /* .866 = sqrt(3)/2 */
+}
+.hexmap .row .hexagon:before, .hexmap .row .content:after {
+  display: block;
+  position: absolute; /* 86.6% = (sqrt(3)/2)*100% = .866*100% */
+  top: 6.7%; right: 0; bottom: 6.7%; left: 0; /* 6.7% = (100% -86.6%)/2 */
+  transform: scaleX(1.155) skewY(-30deg) rotate(-30deg); /* 1.155 = 2/sqrt(3) */
+  background-color: rgba(30,144,255,.56);
+  background-size: cover;
+  content: '';
+}
+.hexmap .row .content:after { content: attr(data-content); }
+
+.map-mountains:before {
+  background-image: 
+    url(http://0.s3.envato.com/files/148144870/03_snowy_mountains_south_america_thumb.jpg); 
+}
+.map-plains-river:before {
+  background-image: 
+    url(http://www.adirondack.net/images/map-thumbnail-2.jpg); 
+}
+
+.map-forest:before {
+  /*
+  background-image: 
+    url(https://0.s3.envato.com/files/7533440/00374%20-%20Forest%20seamless%20background.jpg);
+    */
+    background-image: 
+    url(http://www.golocalpdx.com/cache/images/cached/cache/images/remote/http_s3.amazonaws.com/art.golocalpdx.com/News/forest_2_80_80_90_c1.jpg);
+    
+}
+
+.highlight:before {
+  background-color: #FF0000;
+  background-blend-mode: color-dodge;
+}
+
+.map-forest-highlight:before { 
+    background-image: 
+    url(http://www.golocalpdx.com/cache/images/cached/cache/images/remote/http_s3.amazonaws.com/art.golocalpdx.com/News/forest_2_80_80_90_c1.jpg); 
+    background-color: red; 
+    background-blend-mode: over;   
+}
+.map-forest-highlight:after {
+  
+    
+}
+
+.map-desert:before {
+  /*
+  background-image: 
+    url(https://0.s3.envato.com/files/7533440/00374%20-%20Forest%20seamless%20background.jpg);
+    */
+    background-image: 
+    url(http://www.architectural-review.com/pictures/80x80/9/2/9/1241929_Arish___Rub_Al_Khali_desert.jpg);
+    
+}
+
+.map-city:before {
+  /*
+  background-image: 
+    url(https://0.s3.envato.com/files/7533440/00374%20-%20Forest%20seamless%20background.jpg);
+    */
+    background-image: 
+    url(http://www.architectsjournal.co.uk/pictures/80x80/1/8/3/1393183_45_141_Bay_Street_01_aerial_web.jpg);
+    
+}
+
+.map-river:before {
+  
+    background-image: 
+    url(http://www.visitredwoodcoast.com/images/otc/input/content/80/x/ncoE9BDCB8CCDD7C8E13.jpg);
+    
+}
+
+.map-road:before {
+  /*
+  
+    background-image: 
+    url(http://2.bp.blogspot.com/-eSpOSd2eBEY/U4Q41Pb4xVI/AAAAAAAAAZs/lu50ioceUSw/s80-c/hosur+real+estate.jpg);
+    */
+    /*
+    background-image: 
+    url(http://0.s3.envato.com/files/137445975/TruckForest_thumb.jpg);
+    */
+    /*
+    background-image: 
+    url(http://0.s3.envato.com/files/88848818/2.jpg);
+    */background-image: 
+    url(https://0.s3.envato.com/files/158161919/DSC_2315.jpg);
+    
+}
+
+
+.flag-red:after {
+  overflow: hidden;
+  top: 50%;
+  margin: -1.2em 0;
+  width: 100%; height: 2.4em;
+  color: white;
+  font: 1em/2.4 Century Gothic;
+}
+
+
+
+.hexmap .row .ribbon:after {
+  overflow: hidden;
+  top: 50%;
+  margin: -1.2em 0;
+  width: 100%; height: 2.4em;
+  color: white;
+  font: 1em/2.4 Century Gothic;
+}
+.hexmap .row .game:after {
+  margin: -.6em 0;
+  height: 1.2em;
+  background: rgba(25,25,112,.56);
+  color: lime;
+  font: 2em/1.2 monospace;
+  text-transform: uppercase;
+}
+.hexmap .row .longtext:after {
+  left: 25%; right: 25%;
+  background: none;
+  color: white;
+  text-align: justify;
+}

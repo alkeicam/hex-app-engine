@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>  <html class="ie ie6 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 7]>     <html class="ie ie7 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 8]>     <html class="ie ie8 lte9 lte8 no-js">      <![endif]-->
+<!--[if IE 9]>     <html class="ie ie9 lte9 no-js">           <![endif]-->
+<!--[if gt IE 9]>  <html class="no-js">                       <![endif]-->
+<!--[if !IE]><!--> <html class="no-js">                       <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Hex Only</title>
+
+    <!-- // IOS webapp icons // -->
+    
+    
+
+    <link rel="stylesheet" href="css/tiles2.css"/>
+    
+ 
+    <script src="js/libs/jquery-1.11.0.min.js"></script>
+    <script src="js/libs/jquery-ui-1.10.4.min.js"></script>
+    <script src="js/libs/gameutils.js"></script>
+    <script src="js/libs/gameengine.js"></script>
+    <script src="js/libs/game-ui.js"></script>
+    <script src="js/libs/gameengine-test.js"></script>
+
+    <script type="text/javascript">
+        $(document).on("click",".unit", function (event) {
+            alert("UNIT SELECTED: "+event.target.id);
+        });
+
+        /*
+        function jq( myid ) {
+ 
+            return "#" + myid.replace( /(:|\.|\[|\]|,)/g, "\\$1" );
+ 
+        }
+        */
+
+
+        $(function() { 
+
+            // // initialize game engine
+
+            // var hexArray = [];
+
+            // for(var x = -4;x<=4;x++){
+            //     for(var y=-1;y<=9;y++){
+            //         var hex = Hex(y,x,{                        
+            //             moveUnitsCost: 1,
+            //             displayStyle: "map-forest",
+            //             sightCost: 1,
+            //             defenceBonus: 0
+            //         });
+            //         hexArray.push(hex);
+            //     }
+            // };
+
+            // var startingHex = Hex(0,0, {                
+            //     moveUnitsCost: 1,
+            //     displayStyle: "map-forest",
+            //     sightCost: 1,
+            //     defenceBonus: 0
+            // });
+
+            // var unitsArray = [];
+
+            // for(var i=1;i<=8;i++){
+            //     var unitData = Unit({
+            //         unitId: i,
+            //         position: startingHex,
+            //         remainingMoveUnits: 2,
+            //         moveUnits: 1,
+            //         health: 5,
+            //         sight: 1,
+            //         range: 0,
+            //         rangedStrength: 0,
+            //         strength: 2,
+            //         displayStyle: "unit-troop",
+            //         experience: 0,
+            //         fAttackRange: function(){},
+            //         fSightRange: function(){},
+            //         fAttack: function(){},
+            //         fDefend: function(){}
+            //     });
+            //     unitsArray.push(unitData);
+            // }
+
+            // var gameEngineParams = {
+            //     hexMapTiles:  hexArray,
+            //     units: unitsArray
+            // };
+
+
+            // var gameEngine = GE(gameEngineParams);
+            
+            // // end initialize game engine
+
+            // $(".hexagon").droppable({
+            //     //accept: '#secd_line_icon li',
+            //     drop: function(event, ui) { 
+            //         var hexId = $(this).attr("id");
+            //         //alert("Dropped on hex: "+hexId);  
+            //         //alert(gameEngine.dictionaryToString(gameEngine.getHexNeighbours(hexId)));
+            //         var unitId = $(ui.draggable).attr("id");
+            //         var unit = gameEngine.getUnitData(unitId);
+            //         var hex = gameEngine.getHexData(hexId);
+            //         var departureHex = unit.position;
+            //         gameEngine.moveUnit(unit,hex);
+            //         var lineHexes = gameEngine.lineConnectingHexes(departureHex,hex);
+            //         //gameEngine.uiHighlightHexes(lineHexes);
+
+            //         var costam = {
+            //             nameIt: function (h1,h2){
+            //                 console.log("h1"+h1._hexId+" "+h2._hexId);
+            //                 return 1;
+            //             }
+            //         };
+
+            //         // var result = gameEngine.algorithmDijikstra(hexId,function(currentHexId, nextHexId){
+            //         //     return 1;
+            //         // }, null, 1);
+
+            //         var result = gameEngine.algorithmDijikstra(hex,costam.nameIt, costam, 1);
+
+            //         var amm = [];
+            //         for( var item in result.previousMap){
+            //             var hex = gameEngine.getHexData(item);                        
+            //             amm.push(hex);
+            //         }
+            //         gameEngine.uiHighlightHexes(amm);
+
+
+            //         function TTT(attackFunction, defendFunction, malina){
+            //             var aFunction;
+            //             var dFunction;
+
+            //             var malina;
+
+            //             if (window === this) {
+            //                 return new TTT(attackFunction, defendFunction,malina);
+            //             }
+
+            //             this.aFunction = attackFunction;
+            //             this.dFunction = defendFunction;
+            //             this.malina = malina;
+
+            //             return this;
+            //         };
+
+            //         TTT.prototype = {
+            //             attack : function (u1,u2){
+            //                 (this.aFunction)(u1,u2);
+            //                 (this.dFunction)(u1,u2);
+            //                 //(this.dFunction).call(this,u1,u2);
+            //             }
+            //         };
+
+            //         var t1 = TTT( function(u1,u2){
+            //             console.log("ATTACK FUNCTION: "+u1+" "+u2+" "+this.malina);
+            //         },function(u1,u2){
+            //             console.log("DEFEND FUNCTION: "+u1+" "+u2+" "+this.malina);
+            //         },"oto jest malina");
+
+            //         t1.attack("unit1","unit2");
+
+            //     },
+            //     accept: function(el) {
+            //         /* This is a filter function, you can perform logic here 
+            //            depending on the element being filtered: */
+            //         return true;
+            //     }
+            // });
+
+            // $( ".unit2" ).draggable({ snap: ".hexagon .snaptarget", snapMode: "both",revert: "invalid" });
+            // $( ".unit" ).draggable({ snap: ".hexagon .snaptarget", snapMode: "both",revert: "invalid" });
+
+
+
+            // var tUnit1 = Unit({
+            //     unitId: 1,
+            //     position: null,
+            //     moveUnits: 2,
+            //     remainingMoveUnits: 2,
+            //     health: 8,
+            //     sight: 1,
+            //     range: 1,
+            //     strength: 9,
+            //     rangedStrength: 0,
+            //     experience: 0,
+
+            //     fAttackRange: function(){
+
+
+                    
+
+            //     },
+            //     fSightRange: function (){
+
+            //     },
+            //     fAttack: function(unitHexData, targetUnit, targetUnitHexData){
+
+            //     },
+            //     fDefend:  function(unitHexData, targetUnit, targetUnitHexData){
+
+            //     }
+            // });
+
+            
+
+
+
+
+        });
+
+
+    </script>
+     
+</head>
+<body> 
+    
+    
+    <div id="1" class="unit2"></div>
+    <div id="2" class="unit2"></div>
+    <div id="3" class="unit2"></div>
+    <div id="4" class="unit2"></div>
+    <div id="5" class="unit2"></div>
+    <div id="6" class="unit2"></div>
+    <div id="7" class="unit2"></div>
+    <div id="8" class="unit2 flag-red"></div>
+
+    <!-- 5x5 map -->
+    <div class="hexmap">
+        <!-- content to be placed inside <body>…</body> -->
+        <div class='row'>            
+            <div id="0,0" class='hexagon'><div id="0,0" class="snaptarget"></div></div>
+            <div id="2,-1" class='hexagon'><div id="2,-1" class="snaptarget"></div></div>
+            <div id="4,-2" class='hexagon'><div id="4,-2" class="snaptarget"></div></div>
+            <div id="6,-3" class='hexagon'><div id="6,-3" class="snaptarget"></div></div>
+            <div id="8,-4" class='hexagon'><div id="8,-4" class="snaptarget"></div></div>
+        </div>
+        <div class='row'>            
+            <div id="-1,1" class='hexagon'><div id="-1,1" class="snaptarget"></div></div>
+            <div id="1,0" class='hexagon'><div id="1,0" class="snaptarget"></div></div>
+            <div id="3,-1" class='hexagon'><div id="3,-1" class="snaptarget"></div></div>
+            <div id="5,-2" class='hexagon'><div id="5,-2" class="snaptarget"></div></div>
+            <div id="7,-3" class='hexagon'><div id="7,-3" class="snaptarget"></div></div>
+            <div id="9,-4" class='hexagon'><div id="9,-4" class="snaptarget"></div></div>
+        </div>
+        <div class='row'>            
+            <div id="0,1" class='hexagon'><div id="0,1" class="snaptarget"></div></div>
+            <div id="2,0" class='hexagon'><div id="2,0" class="snaptarget"></div></div>
+            <div id="4,-1" class='hexagon'><div id="4,-1" class="snaptarget"></div></div>
+            <div id="6,-2" class='hexagon'><div id="6,-2" class="snaptarget"></div></div>
+            <div id="8,-3" class='hexagon'><div id="8,-3" class="snaptarget"></div></div>
+        </div>
+        <div class='row'>            
+            <div id="-1,2" class='hexagon'><div id="-1,2" class="snaptarget"></div></div>
+            <div id="1,1" class='hexagon'><div id="1,1" class="snaptarget"></div></div>
+            <div id="3,0" class='hexagon'><div id="3,0" class="snaptarget"></div></div>
+            <div id="5,-1" class='hexagon'><div id="5,-1" class="snaptarget"></div></div>
+            <div id="7,-2" class='hexagon'><div id="7,-2" class="snaptarget"></div></div>
+            <div id="9,-3" class='hexagon'><div id="9,-3" class="snaptarget"></div></div>
+        </div>
+        <div class='row'>            
+            <div id="0,2" class='hexagon'><div id="0,2" class="snaptarget"></div></div>
+            <div id="2,1" class='hexagon'><div id="2,1" class="snaptarget"></div></div>
+            <div id="4,0" class='hexagon'><div id="4,0" class="snaptarget"></div></div>
+            <div id="6,-1" class='hexagon'><div id="6,-1" class="snaptarget"></div></div>
+            <div id="8,-2" class='hexagon'><div id="8,-2" class="snaptarget"></div></div>
+        </div>
+        <div class='row'>            
+            <div id="-1,3" class='hexagon'><div id="-1,3" class="snaptarget"></div></div>
+            <div id="1,2" class='hexagon'><div id="1,2" class="snaptarget"></div></div>
+            <div id="3,1" class='hexagon'><div id="3,1" class="snaptarget"></div></div>
+            <div id="5,0" class='hexagon'><div id="5,0" class="snaptarget"></div></div>
+            <div id="7,-1" class='hexagon'><div id="7,-1" class="snaptarget"></div></div>
+            <div id="9,-2" class='hexagon'><div id="9,-2" class="snaptarget"></div></div>
+        </div>
+        <div class='row'>            
+            <div id="0,3" class='hexagon'><div id="0,3" class="snaptarget"></div></div>
+            <div id="2,2" class='hexagon'><div id="2,2" class="snaptarget"></div></div>
+            <div id="4,1" class='hexagon'><div id="4,1" class="snaptarget"></div></div>
+            <div id="6,0" class='hexagon'><div id="6,0" class="snaptarget"></div></div>
+            <div id="8,-1" class='hexagon'><div id="8,-1" class="snaptarget"></div></div>
+        </div>
+        <div class='row'>            
+            <div id="-1,4" class='hexagon'><div id="-1,4" class="snaptarget"></div></div>
+            <div id="1,3" class='hexagon'><div id="1,3" class="snaptarget"></div></div>
+            <div id="3,2" class='hexagon'><div id="3,2" class="snaptarget"></div></div>
+            <div id="5,1" class='hexagon'><div id="5,1" class="snaptarget"></div></div>
+            <div id="7,0" class='hexagon'><div id="7,0" class="snaptarget"></div></div>
+            <div id="9,-1" class='hexagon'><div id="9,-1" class="snaptarget"></div></div>
+        </div>
+        <div class='row'>            
+            <div id="0,4" class='hexagon'><div id="0,4" class="snaptarget"></div></div>
+            <div id="2,3" class='hexagon'><div id="2,3" class="snaptarget"></div></div>
+            <div id="4,2" class='hexagon'><div id="4,2" class="snaptarget"></div></div>
+            <div id="6,1" class='hexagon'><div id="6,1" class="snaptarget"></div></div>
+            <div id="8,0" class='hexagon map-mountains'><div id="8,0" class="snaptarget"></div></div>
+        </div>
+        
+        
+    </div>   
+
+    <div class="dockbg"></div>
+<div class="dock">
+    <!-- 
+    <img class="company-colors" src="https://dl.dropboxusercontent.com/u/13589251/Hex/user/colors-large.png">
+
+    <div id="dock-unit-id-2" class="dock-unit unit-troop-50"></div>
+
+    <div class="dock-unit unit-troop-50"></div>
+    <div class="dock-unit-selected unit-troop-100"></div>
+
+    
+    <img src="https://dl.dropboxusercontent.com/u/13589251/Hex/unit-trooper-50.png">
+    <img src="http://0.s3.envato.com/files/148144870/03_snowy_mountains_south_america_thumb.jpg">
+    <img src="http://0.s3.envato.com/files/148144870/03_snowy_mountains_south_america_thumb.jpg">
+    <img src="http://0.s3.envato.com/files/148144870/03_snowy_mountains_south_america_thumb.jpg">
+    <img src="http://0.s3.envato.com/files/148144870/03_snowy_mountains_south_america_thumb.jpg">
+    -->
+</div>                                 
+</body>
+</html>
