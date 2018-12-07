@@ -17,15 +17,23 @@
 
     <link rel="stylesheet" href="css/tiles2.css"/>
     
- 
+    <script type="module" src="js/libs/BattleOutcome.js"></script>
+    <script type="module" src="js/libs/Hex.js"></script>
+    <script type="module" src="js/libs/Unit.js"></script>
     <script src="js/libs/jquery-1.11.0.min.js"></script>
     <script src="js/libs/jquery-ui-1.10.4.min.js"></script>
     <script src="js/libs/gameutils.js"></script>
     <script src="js/libs/gameengine.js"></script>
     <script src="js/libs/game-ui.js"></script>
-    <script src="js/libs/gameengine-test.js"></script>
+    <script type="module" src="js/libs/gameengine-test.js"></script>
 
-    <script type="text/javascript">
+    <script type="module">
+        import {Test} from './js/libs/gameengine-test.js'
+        console.log(Test)
+        var test = new Test();
+    </script>
+
+    <script type="text/javascript">        
         $(document).on("click",".unit", function (event) {
             alert("UNIT SELECTED: "+event.target.id);
         });

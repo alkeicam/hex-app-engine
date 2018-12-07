@@ -1,4 +1,8 @@
-function Test(){
+import {Hex} from './Hex.js'
+import {Unit} from './Unit.js'
+
+
+export function Test(){
 	var testData;
 
 	if (window === this) {
@@ -20,7 +24,7 @@ Test.prototype = {
 
         for(var x = -4;x<=4;x++){
             for(var y=-1;y<=9;y++){
-                var hex = Hex(y,x,{                        
+                var hex = new Hex(y,x,{                        
                     //moveUnitsCost: Math.floor(Math.random() * (3 - 1 + 1)) + 1,
                     moveUnitsCost: 1,
                     displayStyle: "map-forest",
@@ -42,7 +46,7 @@ Test.prototype = {
         var unitsArray = [];
 
         for(var i=1;i<=8;i++){
-            var unitData = Unit({
+            var unitData = new Unit({
                 unitId: i,
                 position: startingHex,
                 remainingMoveUnits: 2,
