@@ -1,5 +1,7 @@
 import {Hex} from './Hex.js'
 import {Unit} from './Unit.js'
+import {GE} from './gameengine.js'
+import {GameUI} from './game-ui.js'
 
 
 export function Test(){
@@ -120,7 +122,7 @@ Test.prototype = {
             owner: "red"
         };
 
-        var gameUI = GameUI(gameUIParams);
+        var gameUI = new GameUI(gameUIParams);
         this.testData["gameUI"] = gameUI;
         
 
@@ -152,7 +154,7 @@ Test.prototype = {
 
         
 
-        var gameEngine = GE(gameEngineParams);
+        var gameEngine = new GE(gameEngineParams);
 
         this.testData["gameEngine"] = gameEngine;
 

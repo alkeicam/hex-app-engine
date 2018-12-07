@@ -1,3 +1,5 @@
+ import {BattleOutcome} from './BattleOutcome.js'
+
  function LOGGER(){
     var oldConsoleLog = null;
     var pub = {};
@@ -172,7 +174,7 @@ PriorityQueue.prototype = {
 	units - array of units
 }
 */
-function GE(params){
+export function GE(params){
 
 	var engineParams;
 
@@ -281,7 +283,7 @@ GE.prototype = {
 
 		var SAFETYMAXITERATIONS = 99999;
 
-		var frontier = PriorityQueue();
+		var frontier = new PriorityQueue();
 		frontier.push(hex._hexId,0);
 
 		var cameFrom = {};
@@ -378,7 +380,7 @@ GE.prototype = {
 			}
 		}
 		
-		var result = BattleOutcome({
+		var result = new BattleOutcome({
 			attackingUnit: attackUnit,
 			defendingUnit: defendUnit,
 			attackerDamageInflicted: (attackUnit.equals(strongerUnit))?damageToWeakerUnit:damageToStrongerUnit,
@@ -682,7 +684,7 @@ GE.prototype = {
 
 	
 
-		var gameEvent = GameEngineEvent({
+		var gameEvent = new GameEngineEvent({
 			originator: attackUnit,
 			battleOutcome: battleOutcome,
 			eventType: "BATTLE_PERFORMED"
@@ -769,7 +771,7 @@ GE.prototype = {
 			this.positionUnit(unit, destinationHex);
 
 
-			var gameEvent = GameEngineEvent({
+			var gameEvent = new GameEngineEvent({
 				originator: unit,				
 				eventType: "UNIT_UPDATE"
 			});
@@ -937,7 +939,7 @@ GE.prototype = {
 		  	// event.data.ctx.uiHighlightHexes(moveRange);
 		  	
 
-			var gameEvent = GameEngineEvent({
+			var gameEvent = new GameEngineEvent({
 				originator: event.data.u,				
 				eventType: "UNIT_SELECTED"
 			});

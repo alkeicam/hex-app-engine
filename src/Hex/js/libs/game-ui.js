@@ -1,5 +1,5 @@
 
-function GameUI(params){
+export function GameUI(params){
 	var gameUIParams;
 
 	if (window === this){
