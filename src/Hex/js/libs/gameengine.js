@@ -93,11 +93,11 @@ function Hex() {				//  (q,r, params) or (hexId, params)
 	var q;
 	var r;
 
-	var _hexId;					//
-	var _moveUnitsCost;			// float, positive, default 1
+	var _hexId;					// "q,r" - pair of hex position separated by "," comma
+	var _moveUnitsCost;			// default cost of moving via this hex, float, positive, default 1
 	var _displayStyle;			// string, map class, default map-forest
 	var _terrainType;			// string, unique terrain type, default PLAINS
-	var _sightCost;				// integer, positive, default 1
+	var _sightCost;				// float, positive, default 1
 	var _defenceBonus;			// percentage, float (+/-), default 0
 
 	if (window === this) {
