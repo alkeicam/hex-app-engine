@@ -466,7 +466,7 @@ GE.prototype = {
 			//this.uiUnitDie(weakerUnit);
 			var gameEvent = new UnitEvent(weakerUnit,"DIE",this.engineParams.company);
 			this.publishEvent(gameEvent);
-			
+
 			result.casualty = weakerUnit;
 		};
 		return result;
@@ -544,6 +544,10 @@ GE.prototype = {
 	getHexData: function (hexId){
 		var hex = this.hexMap[hexId];
 		return hex;
+	},
+
+	getHexMap: function(){
+		return this.hexMap;
 	},
 
 	/**

@@ -60,6 +60,7 @@ GameUIDock.prototype = {
 	handleGameEngineEvent: function(gameEngineEvent){
 		switch(gameEngineEvent.eventType){
 			case "UNIT_SELECTED":
+				this.deselectAllUnits();
 				this.selectUnit(gameEngineEvent.originator);
 			break;
 			case "BATTLE_PERFORMED":
@@ -95,6 +96,16 @@ GameUIDock.prototype = {
 			}
 		}
 
+	},
+	deselectAllUnits: function(){
+		// only one unit may be selected so deselect any other selected unit
+		var unitsArray = this.gameUIParams["units"];
+		for(var idx in unitsArray){
+			var otherUnit = unitsArray[idx];
+			if(otherUnit._owner==this.gameUIParams.company.owner()){
+				this.deselectUnit(otherUnit);
+			}
+		}		
 	},
 	
 	updateUnit: function(unit){

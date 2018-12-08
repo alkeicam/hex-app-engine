@@ -68,8 +68,6 @@ Renderer.prototype = {
 	},
 
 	_handleGameEngineEvent: function(gameEngineEvent){
-		
-
 		if(gameEngineEvent.eventType=="BATTLE_PERFORMED"){
 			var battleOutcome = gameEngineEvent.battleOutcome;
 			var attackUnit = battleOutcome.attackingUnit;
@@ -80,6 +78,12 @@ Renderer.prototype = {
 
 			this.uiUnitRerender(attackUnit);
 			this.uiUnitRerender(defendUnit);
+		}
+		if(gameEngineEvent.eventType=="UNIT_UPDATE"){
+			var unit = gameEngineEvent.originator;
+			// automatically select unit after update so field will be highlighted
+			this.uiSelectUnit(unit);
+			
 		}
 	},
 
@@ -214,13 +218,14 @@ Renderer.prototype = {
 			console.log("[uiAddUnitClickHandler] clicked unit ",unit);
 		});
 	},
+
 	/**
 	* Takes array of Hex objects and hihglights them on map
 	*/
 	uiHighlightHexes: function (hexArray){
 		// dehighlight all hexes
-		for( var idx in this.hexMap){
-			var hex = this.hexMap[idx];
+		for( var idx in this.rendererParams.gameEngine.getHexMap()){
+			var hex = this.rendererParams.gameEngine.getHexMap()[idx];
 			var element = $(GameUtils._safeIdSelector("#"+hex._hexId));
 			if(element.hasClass("highlight")){
 				element.removeClass("highlight");
