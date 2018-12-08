@@ -1,7 +1,9 @@
 import {Hex} from './Hex.js'
 import {Unit} from './Unit.js'
 import {GE} from './gameengine.js'
-import {GameUI} from './game-ui.js'
+import {GameUIDock} from './game-ui-dock.js'
+import {Renderer} from './Renderer.js'
+import {Company} from './Company.js'
 
 
 export function Test(){
@@ -19,7 +21,7 @@ Test.prototype = {
 		this.testData = {};
 		this.testData[""] = "";
 
-
+		var company = new Company("red","https://dl.dropboxusercontent.com/u/13589251/Hex/user/colors-large.png");
 
 		var hexArray = [];
 		var startingHex;
@@ -109,6 +111,7 @@ Test.prototype = {
                 },
                 fMoveRange: function(hexFrom, hexTo){
                 	return hexTo._moveUnitsCost;
+                	// dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
                 },
             });
             unitsArray.push(unitData);
@@ -118,38 +121,50 @@ Test.prototype = {
         // prepare gameUI
         var gameUIParams = {            
             units: unitsArray,            
-            companyColors: "https://dl.dropboxusercontent.com/u/13589251/Hex/user/colors-large.png",
-            owner: "red"
+            company: company
         };
 
-        var gameUI = new GameUI(gameUIParams);
-        this.testData["gameUI"] = gameUI;
+        var gameUI = new GameUIDock(gameUIParams);
+        this.testData["gameUIDock"] = gameUI;
         
-
-        
-
-
-
-        // prepare game engine
-
-        var eventHandlersMap = [];
-
-        var handler = {
+        var gameUIhandler = {
         	hObject: gameUI,
         	hFunction: gameUI.handleGameEngineEvent
         };
 
-        eventHandlersMap.push(handler);
+        
+
+        var rendererEventHandlersMap = [];
+        rendererEventHandlersMap.push(gameUIhandler)
+
+    	var renderer = new Renderer({
+    		eventHandlers: rendererEventHandlersMap, 
+    		hexClass: "hexagon",	// renderer, snapping
+            unitClass: "unit2",	// renderer, snapping
+            snapTargetClass: "snaptarget" // renderer, snapping
+    	}); 
+
+
+
+        // prepare game engine
+        var rendererHandler = {
+        	hObject: renderer,
+        	hFunction: renderer.handleGameEngineEvent
+        };
+        var eventHandlersMap = [];        
+        eventHandlersMap.push(gameUIhandler);
+        eventHandlersMap.push(rendererHandler);
+
+       
         
         var gameEngineParams = {
             hexMapTiles:  hexArray,
             units: unitsArray,
-            hexClass: "hexagon",
-            unitClass: "unit2",
-            snapTargetClass: "snaptarget",
-            companyColors: "https://dl.dropboxusercontent.com/u/13589251/Hex/user/colors-large.png",
-            owner: "red",
-            eventHandlers: eventHandlersMap
+            hexClass: "hexagon",	// renderer, snapping
+            unitClass: "unit2",	// renderer, snapping
+            snapTargetClass: "snaptarget", // renderer, snapping
+            eventHandlers: eventHandlersMap,
+            company: company
         };
 
         
@@ -157,6 +172,7 @@ Test.prototype = {
         var gameEngine = new GE(gameEngineParams);
 
         this.testData["gameEngine"] = gameEngine;
+        renderer.bindGameEngine(gameEngine);
 
         
 	},

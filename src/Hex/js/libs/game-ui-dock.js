@@ -1,9 +1,11 @@
-
-export function GameUI(params){
+/**
+*
+*/
+export function GameUIDock(params){
 	var gameUIParams;
 
 	if (window === this){
-		return new GameUI(params);
+		return new GameUIDock(params);
 	}
 	this._initialize(params);
 
@@ -11,13 +13,13 @@ export function GameUI(params){
 
 };
 
-GameUI.prototype = {
+GameUIDock.prototype = {
 	_initialize: function (params){
 
 		this.gameUIParams = {};
 
 		this.addCompanyColors(params["companyColors"]);
-		var owner = params["owner"];
+		var owner = params["company"].owner();
 
 		var unitsArray = params["units"]; 
 		for (var idx in unitsArray){
@@ -28,7 +30,7 @@ GameUI.prototype = {
 			}
 		}
 		this.gameUIParams = params;
-		console.log("Initialized GameUI with params {1}",params);
+		console.log("Initialized GameUIDock with params {1}",params);
 	},
 	addCompanyColors: function(companyColorURL){
 		$(".dock").prepend("<img class=\"company-colors\" src=\""+companyColorURL+"\">");
@@ -63,7 +65,7 @@ GameUI.prototype = {
 			case "BATTLE_PERFORMED":
 				var battleOutcome = gameEngineEvent.battleOutcome;
 
-				if(battleOutcome.attackingUnit._owner==this.gameUIParams.owner)
+				if(battleOutcome.attackingUnit._owner==this.gameUIParams.company.owner())
 					this.updateUnit(battleOutcome.attackingUnit);
 				else
 					this.updateUnit(battleOutcome.defendingUnit);
@@ -88,7 +90,7 @@ GameUI.prototype = {
 		var unitsArray = this.gameUIParams["units"];
 		for(var idx in unitsArray){
 			var otherUnit = unitsArray[idx];
-			if(otherUnit._owner==this.gameUIParams.owner && !otherUnit.equals(unit)){
+			if(otherUnit._owner==this.gameUIParams.company.owner() && !otherUnit.equals(unit)){
 				this.deselectUnit(otherUnit);
 			}
 		}
