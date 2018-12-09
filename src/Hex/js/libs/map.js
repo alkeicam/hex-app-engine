@@ -42,6 +42,45 @@ buildHexGrid.prototype = {
     return '<polygon id="hex'+this.instance+'" points="'+points.join(' ')+'"></polygon>';
 
   },
+  // should be called after hex polygon is in defs and unit pattern is in defs
+  createUnit: function(unitId, asset, r, q, direction, health){
+    var unitPattern = 'unit-{{asset}}-{{direction}}-{{health}}';
+    unitPattern = unitPattern.replace('{{asset}}',asset).replace('{{direction}}',direction).replace('{{health}}',health);
+
+    var unit = '<use id="{{unitId}}" x="{{x}}" y="{{y}}" fill="url(#{{unitPattern}})" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="unit" xlink:href="#hex'+this.instance+'" />';
+    unit = unit.replace('{{unitId}}',unitId).replace('{{x}}',r).replace('{{y}}',q).replace('{{unitPattern}}',unitPattern);
+
+    return unit;
+  },
+
+  createUnitPattern: function(asset, layer){    
+    var p = '', 
+    width = 127,
+    height = 222.25001,
+    i, j, iOffset, jOffset, x, y, viewBox, id;
+
+    iOffset = width/4;
+    jOffset = height/6;
+
+    for(i=0;i<4;i++){
+      for(j=0;j<6;j++){
+        x = i*iOffset;
+        y = j*jOffset;
+
+        viewBox = ''+x+' '+y+' '+width/4+' '+height/6;
+        id = 'unit-'+asset+'-'+j+'-'+(3-i);
+
+        p +=  '<pattern id="{{id}}" viewBox="{{viewbox}}" width="100%" height="100%">'    
+        p += '<use href="/assets/svg/unit-{{asset}}.svg#{{layer}}"></use>'    
+        p += '</pattern>'
+
+        p = p.replace('{{viewbox}}',viewBox).replace('{{asset}}',asset).replace('{{layer}}',layer).replace('{{id}}',id)
+      }
+    }
+
+    return p;
+    
+  },
 
   createPattern: function(){
 
@@ -55,6 +94,10 @@ buildHexGrid.prototype = {
     p += '<pattern id="star2" viewBox="31.75 0 31.75 37.041668" width="100%" height="100%">'
     p += '<use href="/assets/svg/r3svg.svg#layer1"></use>'
     p += '</pattern>'
+
+
+
+    p += this.createUnitPattern('cat12-tank','layer1');
 
     return p;
   },
@@ -89,7 +132,9 @@ buildHexGrid.prototype = {
           grid += hex2.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString);
       }
     }
-    
+    //(unitId, asset, r, q, direction, health)
+    grid += this.createUnit('unit-1','cat12-tank',0,0,0,3);
+
     return grid;
   },
 
