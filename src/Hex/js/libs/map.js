@@ -61,28 +61,32 @@ buildHexGrid.prototype = {
   
   createGrid: function(){
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="#hex'+this.instance+'" />',
-    var hex = '<use x="{{x}}" y="{{y}}" fill="url(#star)" '+(this.opts.debug==true?'stroke="blue"':'')+' class="hex" xlink:href="#hex'+this.instance+'" />',
-    hex2 = '<use x="{{x}}" y="{{y}}" fill="url(#star2)" '+(this.opts.debug==true?'stroke="blue"':'')+' class="hex" xlink:href="#hex'+this.instance+'" />',    
+    var hex = '<use x="{{x}}" y="{{y}}" fill="url(#star)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="hex" xlink:href="#hex'+this.instance+'" />',
+    hex2 = '<use x="{{x}}" y="{{y}}" fill="url(#star2)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+'  class="hex" xlink:href="#hex'+this.instance+'" />',    
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="/assets/svg/r1svg.svg#layer1"/>',        
     odd = false,
     size = this.opts.size + this.opts.spacing,
     grid = '',
     total = this.opts.rows * this.opts.cols,
     count = 0,
-    x, y, i, j, fill;
+    x, y, i, j, fill, debugString, jLimit;
 
     for ( i = 0; i < this.opts.rows; i++ ){
       odd = i % 2;
       y = i * (size * 0.87) + this.opts.offsetY;
-      for ( j = 0; j < this.opts.cols + (odd ? 1 : 0); j++ ){
-        x = j * size + (odd ? -size / 2 : 0 ) + this.opts.offsetX;
+      jLimit = this.opts.cols - (odd ? 0 : 1);
+      for ( j = 0; j < jLimit; j++ ){
+        x = j * size + (odd ? 0 : size / 2 ) + this.opts.offsetX;
+        //if(x<0) continue;
         count++;
+
+        debugString = ''+x+" "+y+" "+i+" "+j+" "+count+" "+size+" "+jLimit;
 
         fill = 'hsla('+Math.round((count / total) * 50)+', 80%, ' + Math.round((Math.random()*15) + 40) +'%, 1)';
         if(odd)
-          grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill);
+          grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString);
         else
-          grid += hex2.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill);
+          grid += hex2.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString);
       }
     }
     
