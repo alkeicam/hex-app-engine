@@ -56,7 +56,7 @@ buildHexGrid.prototype = {
   
   createGrid: function(){
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="#hex'+this.instance+'" />',
-    var hex = '<use x="{{x}}" y="{{y}}" fill="url(#star)" stroke="yellow" class="hex" xlink:href="#hex'+this.instance+'" />',    
+    var hex = '<use x="{{x}}" y="{{y}}" fill="url(#star)" stroke="blue" class="hex" xlink:href="#hex'+this.instance+'" />',    
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="/assets/svg/r1svg.svg#layer1"/>',        
     odd = false,
     size = this.opts.size + this.opts.spacing,
