@@ -9,23 +9,36 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Hex Only</title>
+    <title>Hex SVG</title>
 
     <!-- // IOS webapp icons // -->
     
     
 
-    <link rel="stylesheet" href="css/tiles2.css"/>
+    <link rel="stylesheet" href="css/map.css"/>
     
+<!--     <script type="module" src="js/libs/BattleOutcome.js"></script>
+    <script type="module" src="js/libs/Hex.js"></script>
+    <script type="module" src="js/libs/Unit.js"></script>
+ -->    
     <script src="js/libs/jquery-1.11.0.min.js"></script>
     <script src="js/libs/jquery-ui-1.10.4.min.js"></script>
     <script src="js/libs/gameutils.js"></script>
-
+    
 
     <script type="module">
         import {Test} from './js/libs/gameengine-test.js'
+        import {buildHexGrid} from './js/libs/map.js'
         console.log(Test)
         var test = new Test();
+
+        document.body.appendChild(buildHexGrid({
+          cols: 16,
+          rows: 4,
+          size: 100,
+          spacing: 1,
+          offsetX: 0, //58,
+        }));
     </script>
 
     <script type="text/javascript">        
@@ -222,7 +235,23 @@
      
 </head>
 <body> 
+    <svg viewBox="0 0 26 26" width="100" height="100">
+        <use href="/assets/svg/r1svg.svg#layer1"></use>
+    </svg>
+    <svg viewBox="0 0 26 26" width="100" height="100">
+        <use x="50" y="0" href="/assets/svg/r1svg.svg#layer1"></use>
+    </svg>
     
+    <svg viewBox="0 0 1920 456">
+        <defs>
+            <pattern  id="star" viewBox="0 0 26 26" width="100%" height="100%">
+                <use href="/assets/svg/r1svg.svg#layer1"></use>
+            </pattern>
+            <polygon id="hex194" points="8,89 8,29 59,0 110,30 110,89 59,118"></polygon>
+        </defs>
+        <use x="0" y="0" fill="url(#star)" class="hex" xlink:href="#hex194" />
+        
+    </svg>
     
     <div id="1" class="unit2"></div>
     <div id="2" class="unit2"></div>
