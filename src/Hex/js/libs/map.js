@@ -17,7 +17,8 @@ buildHexGrid.prototype = {
     spacing: 0,
     size: 300,
     offsetX: 0,
-    offsetY: 0
+    offsetY: 0,
+    debug: false
   },
 
   createPolygon: function(size,sides) {
@@ -47,8 +48,12 @@ buildHexGrid.prototype = {
                 
     var p = '<pattern id="star" viewBox="0 0 31.75 37.041668" width="100%" height="100%">'
     //var p = '<pattern id="star" >'
-    p += '<use href="/assets/svg/r2svg.svg#layer1"></use>'
+    p += '<use href="/assets/svg/r3svg.svg#layer1"></use>'
     //p += '<circle cx="10" cy="10" r="10" stroke="#393" fill="#393" />'
+    p += '</pattern>'
+
+    p += '<pattern id="star2" viewBox="31.75 0 31.75 37.041668" width="100%" height="100%">'
+    p += '<use href="/assets/svg/r3svg.svg#layer1"></use>'
     p += '</pattern>'
 
     return p;
@@ -56,7 +61,8 @@ buildHexGrid.prototype = {
   
   createGrid: function(){
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="#hex'+this.instance+'" />',
-    var hex = '<use x="{{x}}" y="{{y}}" fill="url(#star)" stroke="blue" class="hex" xlink:href="#hex'+this.instance+'" />',    
+    var hex = '<use x="{{x}}" y="{{y}}" fill="url(#star)" '+(this.opts.debug==true?'stroke="blue"':'')+' class="hex" xlink:href="#hex'+this.instance+'" />',
+    hex2 = '<use x="{{x}}" y="{{y}}" fill="url(#star2)" '+(this.opts.debug==true?'stroke="blue"':'')+' class="hex" xlink:href="#hex'+this.instance+'" />',    
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="/assets/svg/r1svg.svg#layer1"/>',        
     odd = false,
     size = this.opts.size + this.opts.spacing,
@@ -73,8 +79,10 @@ buildHexGrid.prototype = {
         count++;
 
         fill = 'hsla('+Math.round((count / total) * 50)+', 80%, ' + Math.round((Math.random()*15) + 40) +'%, 1)';
-        
-        grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill);
+        if(odd)
+          grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill);
+        else
+          grid += hex2.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill);
       }
     }
     
