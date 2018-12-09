@@ -45,9 +45,9 @@ buildHexGrid.prototype = {
   createPattern: function(){
 
                 
-    var p = '<pattern  id="star" width="100%" height="100%">'
+    var p = '<pattern id="star" viewBox="0 0 31.75 37.041668" width="100%" height="100%">'
     //var p = '<pattern id="star" >'
-    p += '<use href="/assets/svg/r1svg.svg#layer1"></use>'
+    p += '<use href="/assets/svg/r2svg.svg#layer1"></use>'
     //p += '<circle cx="10" cy="10" r="10" stroke="#393" fill="#393" />'
     p += '</pattern>'
 
@@ -56,7 +56,7 @@ buildHexGrid.prototype = {
   
   createGrid: function(){
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="#hex'+this.instance+'" />',
-    var hex = '<use x="{{x}}" y="{{y}}" fill="url(#star)" stroke="blue" class="hex" xlink:href="#hex'+this.instance+'" />',    
+    var hex = '<use x="{{x}}" y="{{y}}" fill="url(#star)" stroke="yellow" class="hex" xlink:href="#hex'+this.instance+'" />',    
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="/assets/svg/r1svg.svg#layer1"/>',        
     odd = false,
     size = this.opts.size + this.opts.spacing,
