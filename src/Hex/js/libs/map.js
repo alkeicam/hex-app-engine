@@ -97,7 +97,7 @@ buildHexGrid.prototype = {
     var div = document.createElement('div'),
     size = this.opts.size + this.opts.spacing;
 
-    div.innerHTML = '<svg width="'+(size * this.opts.cols)+'" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 '
+    div.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 '
     + (size * this.opts.cols) + ' '
     + (size * this.opts.rows * 0.95) +'">'
     
