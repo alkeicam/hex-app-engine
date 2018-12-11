@@ -39,7 +39,7 @@ buildHexGrid.prototype = {
         );
     }
 
-    return '<polygon id="hex'+this.instance+'" points="'+points.join(' ')+'"></polygon>';
+    return '<polygon class="hexagon ui-droppable snaptarget" id="hex'+this.instance+'" points="'+points.join(' ')+'"></polygon>';
 
   },
   // should be called after hex polygon is in defs and unit pattern is in defs
@@ -47,7 +47,7 @@ buildHexGrid.prototype = {
     var unitPattern = 'unit-{{asset}}-{{direction}}-{{health}}';
     unitPattern = unitPattern.replace('{{asset}}',asset).replace('{{direction}}',direction).replace('{{health}}',health);
 
-    var unit = '<use id="{{unitId}}" x="{{x}}" y="{{y}}" fill="url(#{{unitPattern}})" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="unit" xlink:href="#hex'+this.instance+'" />';
+    var unit = '<use id="{{unitId}}" x="{{x}}" y="{{y}}" fill="url(#{{unitPattern}})" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="unit2 ui-draggable" xlink:href="#hex'+this.instance+'" />';
     unit = unit.replace('{{unitId}}',unitId).replace('{{x}}',r).replace('{{y}}',q).replace('{{unitPattern}}',unitPattern);
 
     return unit;
@@ -101,18 +101,31 @@ buildHexGrid.prototype = {
 
     return p;
   },
+
+  calculateXYFromRQ: function(r,q){
+    var x,y, size, odd;
+
+    size = this.opts.size + this.opts.spacing
+    odd = q % 2;
+
+    y = q * (size * 0.87) + this.opts.offsetY;
+    x = r * size + (odd ? 0 : size / 2 ) + this.opts.offsetX;
+
+    return {x: x, y: y};
+  },
   
   createGrid: function(){
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="#hex'+this.instance+'" />',
-    var hex = '<use x="{{x}}" y="{{y}}" fill="url(#star)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="hex" xlink:href="#hex'+this.instance+'" />',
-    hex2 = '<use x="{{x}}" y="{{y}}" fill="url(#star2)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+'  class="hex" xlink:href="#hex'+this.instance+'" />',    
+    
+    var hex = '<use id="{{id}}" x="{{x}}" y="{{y}}" fill="url(#star)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="hex snaptarget" xlink:href="#hex'+this.instance+'" />',
+    hex2 = '<use id="{{id}}" x="{{x}}" y="{{y}}" fill="url(#star2)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+'  class="hex snaptarget" xlink:href="#hex'+this.instance+'" />',    
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="/assets/svg/r1svg.svg#layer1"/>',        
     odd = false,
     size = this.opts.size + this.opts.spacing,
     grid = '',
     total = this.opts.rows * this.opts.cols,
     count = 0,
-    x, y, i, j, fill, debugString, jLimit;
+    x, y, i, j, fill, debugString, jLimit, hexId;
 
     for ( i = 0; i < this.opts.rows; i++ ){
       odd = i % 2;
@@ -124,16 +137,20 @@ buildHexGrid.prototype = {
         count++;
 
         debugString = ''+x+" "+y+" "+i+" "+j+" "+count+" "+size+" "+jLimit;
-
+        hexId = ''+j+","+i;
         fill = 'hsla('+Math.round((count / total) * 50)+', 80%, ' + Math.round((Math.random()*15) + 40) +'%, 1)';
         if(odd)
-          grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString);
+          grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId);
         else
-          grid += hex2.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString);
+          grid += hex2.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId);
       }
     }
     //(unitId, asset, r, q, direction, health)
-    grid += this.createUnit('unit-1','cat12-tank',0,0,0,3);
+    var xy = this.calculateXYFromRQ(0,0);
+    grid += this.createUnit('unit-1','cat12-tank',xy.x,xy.y,0,3);
+
+    xy = this.calculateXYFromRQ(4,2);
+    grid += this.createUnit('unit-2','cat12-tank',xy.x,xy.y,3,1);
 
     return grid;
   },
@@ -142,7 +159,7 @@ buildHexGrid.prototype = {
     var div = document.createElement('div'),
     size = this.opts.size + this.opts.spacing;
 
-    div.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 '
+    div.innerHTML = '<svg id="svgroot" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 '
     + (size * this.opts.cols) + ' '
     + (size * this.opts.rows * 0.95) +'">'
     

@@ -166,11 +166,92 @@ Renderer.prototype = {
 		$(GameUtils._safeIdSelector("#"+hex._hexId)).addClass(hex._displayStyle);
 	},
 
+	_clientXYToSVGXY: function(clientX, clientY){
+		var root = document.getElementById("svgroot");
+		var uupos = root.createSVGPoint();
+		uupos.x = clientX;
+		uupos.y = clientY;
+		var ctm = root.getScreenCTM();
+		if(ctm = ctm.inverse())
+			uupos = uupos.matrixTransform(ctm);
+		return uupos;
+
+	},
+	_elementOfClassFromPoint: function(clientX, clientY, className){
+		var returnElement;
+		var elements = document.elementsFromPoint(clientX, clientY);
+		for(var element of elements){
+			if(element.classList&&element.classList.contains(className)){
+        		returnElement = element;
+        		break;
+        	}
+		}
+		return returnElement;
+	},
+
 	uiEnableUnitDragAndDropSupport: function(){
 		var gameEngine = this.rendererParams.gameEngine;
 		var renderer = this;
 
-		$("."+this.rendererParams.unitClass).draggable({ snap: "."+this.rendererParams.hexClass+" ."+this.rendererParams.snapTargetClass+"", snapMode: "both",revert: "invalid" });		
+		Draggable.create(".ui-draggable",{
+			onDragEnd:function() {
+				console.log("drag ended",this);
+				var snapElement = renderer._elementOfClassFromPoint(this.pointerEvent.clientX, this.pointerEvent.clientY,"snaptarget");
+				console.log(snapElement);
+
+				var matrixBeforeSnap = this.target.transform.baseVal[0].matrix;
+				console.log("Matrix old: ", matrixBeforeSnap);
+				var tX = this.target.x.baseVal.value;
+				var tY = this.target.y.baseVal.value;
+				var sX = snapElement.x.baseVal.value;
+				var sY = snapElement.y.baseVal.value;
+				var mX = sX-tX;
+				var mY = sY-tY;
+				matrixBeforeSnap.e = mX;
+				matrixBeforeSnap.f = mY;
+			}
+		});
+	},
+
+	uiEnableUnitDragAndDropSupportOld: function(){
+		var gameEngine = this.rendererParams.gameEngine;
+		var renderer = this;
+
+		$("."+this.rendererParams.unitClass).draggable(
+			{ 
+				snap: "."+renderer.rendererParams.hexClass+" ."+renderer.rendererParams.snapTargetClass+"", 
+				snapMode: "both",
+				revert: "invalid" 
+			}).bind('drag', function(event, ui){
+    			// update coordinates manually, since top/left style props don't work on SVG
+    			
+    			var m = event.target.getScreenCTM();
+    			var p = event.target.parentElement.createSVGPoint();
+				p.x = event.clientX;
+				p.y = event.clientY;
+				p = p.matrixTransform(m.inverse());
+
+				event.target.setAttribute('x', p.x);
+    			event.target.setAttribute('y', p.y);
+    			// event.target.setAttribute('x', ui.position.left);
+    			// event.target.setAttribute('y', ui.position.top);
+  			})
+  			.bind('drop', function(event, ui){
+    			// update coordinates manually, since top/left style props don't work on SVG
+    			
+    // 			var m = event.target.getScreenCTM();
+    // 			var p = event.target.parentElement.createSVGPoint();
+				// p.x = event.clientX;
+				// p.y = event.clientY;
+				// p = p.matrixTransform(m.inverse());
+
+				// event.target.setAttribute('x', p.x);
+    // 			event.target.setAttribute('y', p.y);
+    			// event.target.setAttribute('x', ui.position.left);
+
+    			// event.target.setAttribute('y', ui.position.top);
+    			console.log("dropped");
+  			});			
 
 		$("."+this.rendererParams.hexClass).droppable({
 	        //accept: '#secd_line_icon li',

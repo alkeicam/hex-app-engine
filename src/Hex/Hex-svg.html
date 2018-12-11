@@ -22,15 +22,19 @@
     <script type="module" src="js/libs/Unit.js"></script>
  -->    
     <script src="js/libs/jquery-1.11.0.min.js"></script>
-    <script src="js/libs/jquery-ui-1.10.4.min.js"></script>
+    <!-- <script src="js/libs/jquery-ui-1.10.4.min.js"></script> -->
     <script src="js/libs/gameutils.js"></script>
+    <script src="js/drag/TweenMax.min.js"></script>
+    <script src="js/drag/utils/Draggable.min.js"></script>
+
     
 
     <script type="module">
         import {Test} from './js/libs/gameengine-test.js'
         import {buildHexGrid} from './js/libs/map.js'
-        console.log(Test)
-        var test = new Test();
+        
+
+
 
         document.body.appendChild(buildHexGrid({
           cols: 16,
@@ -40,6 +44,31 @@
           offsetX: -6, //58,
           debug: true
         }));
+
+        console.log(Test)
+        var test = new Test();
+
+        function hoverElement(evt) {
+            console.log(evt.target);
+            var r = evt.target.getBBox();
+            var root = document.documentElement;
+            var uupos = root.createSVGPoint();
+            uupos.x = evt.clientX;
+            uupos.y = evt.clientY;
+            var ctm = evt.target.getScreenCTM();
+            if(ctm = ctm.inverse())
+                uupos = uupos.matrixTransform(ctm);
+            var rpos = root.createSVGRect();
+            rpos.x = evt.clientX;
+            rpos.y = evt.clientY;
+            rpos.width = rpos.height = 1;
+            var list = root.getIntersectionList(rpos, null);
+
+            console.log(list);
+        }
+
+        //document.documentElement.addEventListener("mousemove", hoverElement, false);
+
     </script>
 
     <script type="text/javascript">        
