@@ -18,8 +18,7 @@ buildHexGrid.prototype = {
     size: 300,
     offsetX: 0,
     offsetY: 0,
-    debug: false,
-    hexRatio: 0.87
+    debug: false
   },
 
   createPolygon: function(size,sides) {
@@ -34,11 +33,9 @@ buildHexGrid.prototype = {
 
     while (i--) {
       points.push(
-        Math.round(size + size * Math.cos(i * (Math.PI * 2) / sides))
-        +','+
         Math.round(size + size * Math.sin(i * (Math.PI * 2) / sides))
-        
-        
+        +','+
+        Math.round(size + size * Math.cos(i * (Math.PI * 2) / sides))
         );
     }
 
@@ -50,10 +47,8 @@ buildHexGrid.prototype = {
     var unitPattern = 'unit-{{asset}}-{{direction}}-{{health}}';
     unitPattern = unitPattern.replace('{{asset}}',asset).replace('{{direction}}',direction).replace('{{health}}',health);
 
-    var xy = this.calculateXYFromRQ(r,q);
-
     var unit = '<use id="{{unitId}}" x="{{x}}" y="{{y}}" fill="url(#{{unitPattern}})" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="unit2 ui-draggable" xlink:href="#hex'+this.instance+'" />';
-    unit = unit.replace('{{unitId}}',unitId).replace('{{x}}',xy.x).replace('{{y}}',xy.y).replace('{{unitPattern}}',unitPattern);
+    unit = unit.replace('{{unitId}}',unitId).replace('{{x}}',r).replace('{{y}}',q).replace('{{unitPattern}}',unitPattern);
 
     return unit;
   },
@@ -90,14 +85,14 @@ buildHexGrid.prototype = {
   createPattern: function(){
 
                 
-    var p = '<pattern id="star" viewBox="0 0 37.04 31.75" width="100%" height="100%">'
+    var p = '<pattern id="star" viewBox="0 0 31.75 37.041668" width="100%" height="100%">'
     //var p = '<pattern id="star" >'
-    p += '<use href="/assets/svg/r4svg.svg#layer1"></use>'
+    p += '<use href="/assets/svg/r3svg.svg#layer1"></use>'
     //p += '<circle cx="10" cy="10" r="10" stroke="#393" fill="#393" />'
     p += '</pattern>'
 
-    p += '<pattern id="star2" viewBox="37.04 0 37.04 31.75" width="100%" height="100%">'
-    p += '<use href="/assets/svg/r4svg.svg#layer1"></use>'
+    p += '<pattern id="star2" viewBox="31.75 0 31.75 37.041668" width="100%" height="100%">'
+    p += '<use href="/assets/svg/r3svg.svg#layer1"></use>'
     p += '</pattern>'
 
 
@@ -113,8 +108,8 @@ buildHexGrid.prototype = {
     size = this.opts.size + this.opts.spacing
     odd = q % 2;
 
-    x = q * (size * this.opts.hexRatio) + this.opts.offsetX;
-    y = r * size + (odd ? -size / 2 : 0 ) + this.opts.offsetY;
+    y = q * (size * 0.87) + this.opts.offsetY;
+    x = r * size + (odd ? 0 : size / 2 ) + this.opts.offsetX;
 
     return {x: x, y: y};
   },
@@ -132,20 +127,17 @@ buildHexGrid.prototype = {
     count = 0,
     x, y, i, j, fill, debugString, jLimit, hexId;
 
-    for ( i = 0; i < this.opts.cols; i++ ){
+    for ( i = 0; i < this.opts.rows; i++ ){
       odd = i % 2;
-      x = i * (size * this.opts.hexRatio) + this.opts.offsetX;
-      jLimit = this.opts.rows + (odd ? 1 : 0)
-
+      y = i * (size * 0.87) + this.opts.offsetY;
+      jLimit = this.opts.cols - (odd ? 0 : 1);
       for ( j = 0; j < jLimit; j++ ){
-        y = j * size + (odd ? -size / 2 : 0 ) + this.opts.offsetY;
+        x = j * size + (odd ? 0 : size / 2 ) + this.opts.offsetX;
         //if(x<0) continue;
         count++;
 
         debugString = ''+x+" "+y+" "+i+" "+j+" "+count+" "+size+" "+jLimit;
         hexId = ''+j+","+i;
-        if(j==3&&i==0)
-          console.log(x,y,i,j, count);
         fill = 'hsla('+Math.round((count / total) * 50)+', 80%, ' + Math.round((Math.random()*15) + 40) +'%, 1)';
         if(odd)
           grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId);
@@ -154,11 +146,11 @@ buildHexGrid.prototype = {
       }
     }
     //(unitId, asset, r, q, direction, health)
-    
-    grid += this.createUnit('1','cat12-tank',0,0,0,3);
+    var xy = this.calculateXYFromRQ(0,0);
+    grid += this.createUnit('1','cat12-tank',xy.x,xy.y,0,3);
 
-    
-    grid += this.createUnit('2','cat12-tank',1,4,3,1);
+    xy = this.calculateXYFromRQ(3,0);
+    grid += this.createUnit('2','cat12-tank',xy.x,xy.y,3,1);
 
     return grid;
   },
@@ -168,8 +160,8 @@ buildHexGrid.prototype = {
     size = this.opts.size + this.opts.spacing;
 
     div.innerHTML = '<svg id="svgroot" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 '
-    + (size * this.opts.cols * this.opts.hexRatio*1.02) + ' '
-    + (size * this.opts.rows) +'">'
+    + (size * this.opts.cols) + ' '
+    + (size * this.opts.rows * 0.95) +'">'
     
     + '<defs>'
     + this.createPattern()

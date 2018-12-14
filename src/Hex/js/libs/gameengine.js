@@ -567,22 +567,28 @@ GE.prototype = {
 
 		switch(direction){
 			case "N":
-				resultHexId = hexX+","+(hexY-1);
+				resultHexId = (hexX-1)+","+hexY;
 			break;
 			case "NE":
-				resultHexId = (hexX+1)+","+(hexY-1);
-			break;
-			case "SE":
-				resultHexId = (hexX+1)+","+(hexY);
-			break;
-			case "S":
-				resultHexId = (hexX)+","+(hexY+1);
-			break;
-			case "SW":
 				resultHexId = (hexX-1)+","+(hexY+1);
 			break;
+			case "E":
+				resultHexId = (hexX+1)+","+hexY;
+			break;
+			case "SE":
+				resultHexId = hexX+","+(hexY+1);
+			break;
+			case "S":
+				resultHexId = (hexX+1)+","+(hexY);
+			break;
+			case "SW":
+				resultHexId = (hexX)+","+(hexY-1);
+			break;
+			case "W":
+				resultHexId = (hexX-1)+","+hexY;
+			break;
 			case "NW":
-				resultHexId = (hexX-1)+","+(hexY);
+				resultHexId = (hexX-1)+","+(hexY-1);
 			break;
 			default:
 				return null;
@@ -600,7 +606,8 @@ GE.prototype = {
 	getHexNeighbours: function (hex){
 		var neighboursHexData = {};
 
-		var directions = ["N","NE","SE","S","SW","NW"];
+		//var directions = ["N","NE","SE","S","SW","NW"];
+		var directions = ["E","NE","SE","W","SW","NW"];
 
 		for (var direction in directions){
 			var neighbourHexData = this.getHexNeighbour(hex,directions[direction]);
@@ -772,7 +779,7 @@ GE.prototype = {
 		// find shortest path to destination hex to check if hex is reachable
 		var path = this.pathToHexForUnit(unit, destinationHex);
 		if(!path){
-			console.log("[moveUnit] ERROR unit: "+unit.toString()+" requested move to: "+destinationHex.toString()+" but no path found.");
+			console.log("[moveUnit] ERROR unit: "+unit.toString()+" requested move from:"+previousHexData.toString()+" to: "+destinationHex.toString()+" but no path found.");
 			return;
 		}
 		var consumedMoveUnits = 0;

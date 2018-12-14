@@ -189,26 +189,78 @@ Renderer.prototype = {
 		return returnElement;
 	},
 
+	_uiHandleBearingAfterDrag: function(target, targetElement){
+		var directions = {
+			"1,0": 0,
+			"1,-1": 1,
+			"-1,-1": 2,
+			"-1,0": 3,
+			"-1,1": 4,
+			"1,1": 5
+		};
+
+		var tX = target.x.baseVal.value;
+		var tY = target.y.baseVal.value;
+		var sX = targetElement.x.baseVal.value;
+		var sY = targetElement.y.baseVal.value;				
+		var mX = sX-tX;
+		var mY = sY-tY;
+		
+		if(!target.getAttribute('data-snap-pmx')){
+			var dmX = mX;
+			var dmY = mY;
+		}else{
+			var dmX = mX-target.getAttribute('data-snap-pmx');
+			var dmY = mY-target.getAttribute('data-snap-pmy');
+		}
+
+		target.setAttribute('data-snap-pmx', mX);
+		target.setAttribute('data-snap-pmy', mY);
+
+		var sgnX = Math.sign(dmX);
+		var sgnY = -Math.sign(dmY);
+
+		var result = directions[''+sgnX+","+sgnY];
+		var fillArray = target.getAttribute("fill").split("-");
+		fillArray[3] = result;
+		target.setAttribute("fill",fillArray.join("-"));
+		return result;
+	},
+
 	uiEnableUnitDragAndDropSupport: function(){
 		var gameEngine = this.rendererParams.gameEngine;
 		var renderer = this;
 
 		Draggable.create(".ui-draggable",{
 			onDragEnd:function() {
-				console.log("drag ended",this);
+				//console.log("drag ended",this);
 				var snapElement = renderer._elementOfClassFromPoint(this.pointerEvent.clientX, this.pointerEvent.clientY,"snaptarget");
-				console.log(snapElement);
-
+				//console.log(snapElement);
+				if(!snapElement)
+					return;
 				var matrixBeforeSnap = this.target.transform.baseVal[0].matrix;
-				console.log("Matrix old: ", matrixBeforeSnap);
+				//console.log("Matrix old: ", matrixBeforeSnap);
+
 				var tX = this.target.x.baseVal.value;
 				var tY = this.target.y.baseVal.value;
 				var sX = snapElement.x.baseVal.value;
-				var sY = snapElement.y.baseVal.value;
+				var sY = snapElement.y.baseVal.value;				
 				var mX = sX-tX;
 				var mY = sY-tY;
+				var direction = renderer._uiHandleBearingAfterDrag(this.target, snapElement);
+				console.log(mX,mY,direction);
 				matrixBeforeSnap.e = mX;
 				matrixBeforeSnap.f = mY;
+
+				var hexId = snapElement.getAttribute("id");	            
+	            var unitId = this.target.getAttribute("id");
+
+	            var unit = gameEngine.getUnitData(unitId);
+	            var hex = gameEngine.getHexData(hexId);
+	            
+	            
+	            gameEngine.moveUnit(unit,hex);
+
 			}
 		});
 	},
