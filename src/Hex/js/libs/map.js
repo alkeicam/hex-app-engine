@@ -1,5 +1,5 @@
-export function buildHexGrid(opts) {
-  if (!(this instanceof buildHexGrid)) { return new buildHexGrid(opts); }
+export function HexMap(opts) {
+  if (!(this instanceof HexMap)) { return new HexMap(opts); }
 
   for (var key in opts) {
     if ( opts.hasOwnProperty(key) ) { this.opts[key] = opts[key]; }
@@ -7,10 +7,10 @@ export function buildHexGrid(opts) {
   
   this.instance = Math.round(Math.random() * 2000);
 
-  return this.createSVG();
+  return this;
 }
 
-buildHexGrid.prototype = {
+HexMap.prototype = {
   opts: {
     cols: 6,
     rows: 6,

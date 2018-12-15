@@ -4,6 +4,7 @@ import {GE} from './gameengine.js'
 import {GameUIDock} from './game-ui-dock.js'
 import {Renderer} from './Renderer.js'
 import {Company} from './Company.js'
+import {HexMap} from './map.js'
 
 
 export function Test(){
@@ -367,6 +368,17 @@ Test.prototype = {
         //     unitsArray.push(unitData);
         // }
 
+        var hexMap = new HexMap({
+          cols: 7,
+          rows: 2,
+          size: 100,
+          spacing: 5,
+          offsetX: 0, //58,
+          offsetY: 45, //58,
+          debug: true
+        });
+        document.body.appendChild(hexMap.createSVG());
+
 
         // prepare gameUI
         var gameUIParams = {            
@@ -420,9 +432,11 @@ Test.prototype = {
         
 
         var gameEngine = new GE(gameEngineParams);
+        
 
         this.testData["gameEngine"] = gameEngine;
         renderer.bindGameEngine(gameEngine);
+        renderer.bindHexMap(hexMap);
 
         
 	},

@@ -24,49 +24,39 @@
     <script src="js/libs/jquery-3.3.1.min.js"></script>
     <!-- <script src="js/libs/jquery-ui-1.10.4.min.js"></script> -->
     <script src="js/libs/gameutils.js"></script>
-    <script src="js/drag/TweenMax.min.js"></script>
-    <script src="js/drag/utils/Draggable.min.js"></script>
-
+    <!-- <script src="js/drag/TweenMax.min.js"></script> -->
+    <!-- <script src="js/drag/utils/Draggable.min.js"></script> -->
+    <!-- <script src="js/libs/svg.min.js"></script>
+     <script src="js/libs/svg.draggable.min.js"></script> -->
+     <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+     <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+     <script src="https://d3js.org/d3-drag.v1.min.js"></script>
     
 
     <script type="module">
         import {Test} from './js/libs/gameengine-test.js'
-        import {buildHexGrid} from './js/libs/map.js'
-        
-
-
-
-        document.body.appendChild(buildHexGrid({
-          cols: 7,
-          rows: 2,
-          size: 100,
-          spacing: 5,
-          offsetX: 0, //58,
-          offsetY: 45, //58,
-          debug: false
-        }));
 
         console.log(Test)
         var test = new Test();
 
-        function hoverElement(evt) {
-            console.log(evt.target);
-            var r = evt.target.getBBox();
-            var root = document.documentElement;
-            var uupos = root.createSVGPoint();
-            uupos.x = evt.clientX;
-            uupos.y = evt.clientY;
-            var ctm = evt.target.getScreenCTM();
-            if(ctm = ctm.inverse())
-                uupos = uupos.matrixTransform(ctm);
-            var rpos = root.createSVGRect();
-            rpos.x = evt.clientX;
-            rpos.y = evt.clientY;
-            rpos.width = rpos.height = 1;
-            var list = root.getIntersectionList(rpos, null);
+        // function hoverElement(evt) {
+        //     console.log(evt.target);
+        //     var r = evt.target.getBBox();
+        //     var root = document.documentElement;
+        //     var uupos = root.createSVGPoint();
+        //     uupos.x = evt.clientX;
+        //     uupos.y = evt.clientY;
+        //     var ctm = evt.target.getScreenCTM();
+        //     if(ctm = ctm.inverse())
+        //         uupos = uupos.matrixTransform(ctm);
+        //     var rpos = root.createSVGRect();
+        //     rpos.x = evt.clientX;
+        //     rpos.y = evt.clientY;
+        //     rpos.width = rpos.height = 1;
+        //     var list = root.getIntersectionList(rpos, null);
 
-            console.log(list);
-        }
+        //     console.log(list);
+        // }
 
         //document.documentElement.addEventListener("mousemove", hoverElement, false);
 

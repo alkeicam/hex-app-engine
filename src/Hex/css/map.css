@@ -1,5 +1,5 @@
 body { padding: 1em 0; background: #000 }
 svg { max-width: 100%; height: auto; display: block; }
-.highlight {stroke-width:5; stroke: green; }
+.highlight {stroke-width:2; stroke: green; }
 /*.highlight {opacity: 0.6;}*/
 

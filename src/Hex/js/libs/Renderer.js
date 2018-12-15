@@ -41,7 +41,8 @@ Renderer.prototype = {
 			var handler = params.eventHandlers[idx];
 			this._addEventHandler(handler.hObject,handler.hFunction);
 		}
-		this.uiEnableUnitDragAndDropSupport();
+		// to na razie wykomentowane bo potrzebuje gameenginu wiec inicjalizuje D&D przy podpieciu gameenginu
+		//this.uiEnableUnitDragAndDropSupport();
 		console.log("Renderer initialized.",this.rendererParams);
 	},
 
@@ -97,7 +98,7 @@ Renderer.prototype = {
 			if(unitData._owner == unitEvent.company().owner()){
 				this._uiAddUnitFlag(unitData,unitEvent.company());
 			}
-			this.uiUnitRerender(unitData);
+			//this.uiUnitRerender(unitData);
 			this.uiAddUnitClickHandler(unitData);		
 		}
 		if(type=="DIE"){
@@ -110,6 +111,10 @@ Renderer.prototype = {
 		this.rendererParams.gameEngine = gameEngine;
 		// FIXME zaleznosc pomuedzy game engine a renderer
 		this.uiEnableUnitDragAndDropSupport();
+	},
+
+	bindHexMap: function (hexMap){
+		this.rendererParams.hexMap = hexMap;		
 	},
 
 
@@ -209,70 +214,131 @@ Renderer.prototype = {
 			
 		};
 
-		var tX = target.x.baseVal.value;
-		var tY = target.y.baseVal.value;
-		var sX = targetElement.x.baseVal.value;
-		var sY = targetElement.y.baseVal.value;				
-		var mX = sX-tX;
-		var mY = sY-tY;
 		
-		if(!target.getAttribute('data-snap-pmx')){
-			var dmX = mX;
-			var dmY = mY;
-		}else{
-			var dmX = mX-target.getAttribute('data-snap-pmx');
-			var dmY = mY-target.getAttribute('data-snap-pmy');
-		}
 
-		target.setAttribute('data-snap-pmx', mX);
-		target.setAttribute('data-snap-pmy', mY);
+		var tX = d3.select(target).attr('drag-start-x');;
+		var tY = d3.select(target).attr('drag-start-y');;
+		var sX = d3.select(targetElement).attr('x');
+		var sY = d3.select(targetElement).attr('y');
+
+
+		var dmX = sX-tX;
+		var dmY = sY-tY;
+				
 
 		var sgnX = Math.sign(dmX);
 		var sgnY = -Math.sign(dmY);
 		console.log(''+sgnX+","+sgnY);
 		var result = directions[''+sgnX+","+sgnY];
-		var fillArray = target.getAttribute("fill").split("-");
+		var fillArray = d3.select(target).attr("fill").split("-");
 		fillArray[3] = result;
-		target.setAttribute("fill",fillArray.join("-"));
+		d3.select(target).attr("fill",fillArray.join("-"));
 		return result;
+	},
+
+	uiDragStarted: function(){
+		console.log('Started',this,d3.event);
+		d3.select(this).attr('drag-start-x',this.x.baseVal.value);
+		d3.select(this).attr('drag-start-y',this.y.baseVal.value);
+	},
+
+	uiDragged: function(){
+		console.log(this,d3.event);
+		d3.select(this).attr("x", d3.event.x-this.getBBox().width/2).attr("y", d3.event.y-this.getBBox().height/2);
+	},
+
+	uiDragEnd: function(){
+		console.log(this,d3.event);
+		var snapElement = this._elementOfClassFromPoint(d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY,"snaptarget");
+		var snapX = d3.select(snapElement).attr("x");
+		var snapY = d3.select(snapElement).attr("y");
+		d3.select(this).attr("x", snapX).attr("y", snapY);
+
 	},
 
 	uiEnableUnitDragAndDropSupport: function(){
 		var gameEngine = this.rendererParams.gameEngine;
 		var renderer = this;
+		var unitsSVG = d3.selectAll('.ui-draggable');
+		console.log(unitsSVG);
+		unitsSVG.call(d3.drag()
+			.on("start", function(){
+				console.log('Started',this,d3.event);
+				d3.select(this).attr('drag-start-x',this.x.baseVal.value);
+				d3.select(this).attr('drag-start-y',this.y.baseVal.value);
+			}).on("drag", function(){
+				console.log(this,d3.event);
+				d3.select(this).attr("x", d3.event.x-this.getBBox().width/2).attr("y", d3.event.y-this.getBBox().height/2);
+			}).on("end",function(){
+				d3.select(this).attr('drag-start-x');
+				console.log(this,d3.event);
+				var snapElement = renderer._elementOfClassFromPoint(d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY,"snaptarget");
+				var snapX = d3.select(snapElement).attr("x");
+				var snapY = d3.select(snapElement).attr("y");
+				d3.select(this).attr("x", snapX).attr("y", snapY);
 
-		Draggable.create(".ui-draggable",{
-			onDragEnd:function() {
-				//console.log("drag ended",this);
-				var snapElement = renderer._elementOfClassFromPoint(this.pointerEvent.clientX, this.pointerEvent.clientY,"snaptarget");
-				//console.log(snapElement);
-				if(!snapElement)
-					return;
-				var matrixBeforeSnap = this.target.transform.baseVal[0].matrix;
-				//console.log("Matrix old: ", matrixBeforeSnap);
+				var direction = renderer._uiHandleBearingAfterDrag(this, snapElement);
 
-				var tX = this.target.x.baseVal.value;
-				var tY = this.target.y.baseVal.value;
-				var sX = snapElement.x.baseVal.value;
-				var sY = snapElement.y.baseVal.value;				
-				var mX = sX-tX;
-				var mY = sY-tY;
-				var direction = renderer._uiHandleBearingAfterDrag(this.target, snapElement);
-				console.log(mX,mY,direction);
-				matrixBeforeSnap.e = mX;
-				matrixBeforeSnap.f = mY;
+				var hexId = d3.select(snapElement).attr("id");
+				var unitId = d3.select(this).attr("id");
+				var hex = gameEngine.getHexData(hexId);
+				var unit = gameEngine.getUnitData(unitId);
 
-				var hexId = snapElement.getAttribute("id");	            
-	            var unitId = this.target.getAttribute("id");
+				gameEngine.moveUnit(unit,hex);
+				renderer.uiUnitRerender(unit);
+			}));
+		
+		// for (var unit of unitsSVG){
+		// 	console.log(unit);
+			
 
-	            var unit = gameEngine.getUnitData(unitId);
-	            var hex = gameEngine.getHexData(hexId);
+		// 	// unit.on('dragmove', function(e){
+  // 	// 		e.preventDefault()
+  // 	// 		this.move(e.detail.p.x, e.detail.p.y)
+  // 	// 		// events are still bound e.g. dragend will fire anyway
+		// 	// }).on('dragend', function(e){
+	 //  // 			console.log('drag end');
+	 //  // 			// events are still bound e.g. dragend will fire anyway
+		// 	// });
+		// };
+		
+
+		// Draggable.create(".ui-draggable",{
+		// 	onDragEnd:function() {
+		// 		//console.log("drag ended",this);
+		// 		var snapElement = renderer._elementOfClassFromPoint(this.pointerEvent.clientX, this.pointerEvent.clientY,"snaptarget");
+		// 		//console.log(snapElement);
+		// 		if(!snapElement)
+		// 			return;
+		// 		var matrixBeforeSnap = this.target.transform.baseVal[0].matrix;
+		// 		//console.log("Matrix old: ", matrixBeforeSnap);
+
+		// 		var tX = this.target.x.baseVal.value;
+		// 		var tY = this.target.y.baseVal.value;
+		// 		var sX = snapElement.x.baseVal.value;
+		// 		var sY = snapElement.y.baseVal.value;								
+
+		// 		var matrix = renderer.uiCalculateTransformMatrix({x: tX, y: tY},{x: sX, y: sY});
+
+		// 		var direction = renderer._uiHandleBearingAfterDrag(this.target, snapElement);
+		// 		console.log(matrix,direction);
+		// 		console.log('[onDragEnd] Before:',matrixBeforeSnap);
+		// 		matrixBeforeSnap.e = matrix.e;
+		// 		matrixBeforeSnap.f = matrix.f;
+		// 		console.log('[onDragEnd] After:',matrixBeforeSnap);
+
+		// 		var hexId = snapElement.getAttribute("id");	            
+	 //            var unitId = this.target.getAttribute("id");
+
+	 //            var unit = gameEngine.getUnitData(unitId);
+	 //            var hex = gameEngine.getHexData(hexId);
 	            
-	            
-	            gameEngine.moveUnit(unit,hex);
+	 //            console.log('After drop:',this.target);
+	 //            gameEngine.moveUnit(unit,hex);
+	 //            renderer.uiUnitRerender(unit);
 
-			}
-		});
+		// 	}
+		// });
 	},
 
 	uiEnableUnitDragAndDropSupportOld: function(){
@@ -362,6 +428,10 @@ Renderer.prototype = {
 		});
 	},
 
+	uiAddClass: function(element, className){
+		element.classList.add(className);
+	},
+
 	/**
 	* Takes array of Hex objects and hihglights them on map
 	*/
@@ -381,7 +451,7 @@ Renderer.prototype = {
 			var element2 = element[0];
 			if(element2)
 				//element2.addClass("highlight");
-				element2.classList.add('highlight')
+				this.uiAddClass(element2,'highlight');
 		}
 		
 
@@ -411,21 +481,38 @@ Renderer.prototype = {
 	uiUnitRerender: function (unit){
 
 		// handle display style		
-		var unitElement = $(GameUtils._safeIdSelector("#"+unit._unitId));
-		if(!unitElement.length)
+		var unitElement = $(GameUtils._safeIdSelector("#"+unit._unitId))[0];
+		if(!unitElement)
 			return;
 		GameUtils._uiElementClassesRemove(unitElement, "unit-");
 
-		unitElement.addClass(unit._currentDisplayStyle);
+		this.uiAddClass(unitElement,unit._currentDisplayStyle);
 
 		//handle unit position (rerender unit using its position)
 		var hex = unit.position;
 		if(hex){
-		// 	//
-		// 	var newPosition = this.uiCalculateElementPositionMiddleOfHex(unitElement, hex);
-		// 	unitElement.css(newPosition);
+
+			var xy = this.rendererParams.hexMap.calculateXYFromRQ(hex.r, hex.q);
+			
+			d3.select(unitElement).attr("x",xy.x).attr("y",xy.y);
+			
+			// console.log('[uiUnitRerender] Before rerender:',unitMatrix);
+			// unitMatrix.e = matrix.e;
+			// unitMatrix.f = matrix.f;
+			// console.log('[uiUnitRerender] After rerender:',unitMatrix);
+
 		}
 	},
+
+	uiCalculateTransformMatrix(fromXY, toXY){
+		var dx = toXY.x - fromXY.x;
+		var dy = toXY.y - fromXY.y;
+		var matrix = document.createElementNS("http://www.w3.org/2000/svg", "svg").createSVGMatrix();
+		matrix.e = dx;
+		matrix.f = dy;
+		return matrix;
+	},
+
 	_uiAddUnitFlag: function(unit, company){
 		
 		var unitElement = $("#"+GameUtils._safeIdSelector(unit._unitId));
