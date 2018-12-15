@@ -102,7 +102,7 @@ buildHexGrid.prototype = {
 
 
 
-    p += this.createUnitPattern('cat12-tank','layer1');
+    p += this.createUnitPattern('cat13-tank','layer1');
 
     return p;
   },
@@ -122,8 +122,8 @@ buildHexGrid.prototype = {
   createGrid: function(){
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="#hex'+this.instance+'" />',
     
-    var hex = '<use id="{{id}}" x="{{x}}" y="{{y}}" fill="url(#star)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="hex snaptarget" xlink:href="#hex'+this.instance+'" />',
-    hex2 = '<use id="{{id}}" x="{{x}}" y="{{y}}" fill="url(#star2)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+'  class="hex snaptarget" xlink:href="#hex'+this.instance+'" />',    
+    var hex = '<use id="{{id}}" x="{{x}}" y="{{y}}" fill="url(#star)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="hex snaptarget" xlink:href="#hex'+this.instance+'" />'+(this.opts.debug==true?'<text x="{{debugX}}" y="{{debugY}}" text-anchor="left" fill="white" font-size="5">(q,r)({{debugId}})</text>':''),
+    hex2 = '<use id="{{id}}" x="{{x}}" y="{{y}}" fill="url(#star2)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+'  class="hex snaptarget" xlink:href="#hex'+this.instance+'" />'+(this.opts.debug==true?'<text x="{{debugX}}" y="{{debugY}}" text-anchor="left" fill="white" font-size="5">(q,r)({{debugId}})</text>':''),    
     //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="/assets/svg/r1svg.svg#layer1"/>',        
     odd = false,
     size = this.opts.size + this.opts.spacing,
@@ -143,22 +143,24 @@ buildHexGrid.prototype = {
         count++;
 
         debugString = ''+x+" "+y+" "+i+" "+j+" "+count+" "+size+" "+jLimit;
-        hexId = ''+j+","+i;
+        var debugX = x+this.opts.offsetX/2;
+        var debugY = y+this.opts.offsetY/2;
+        hexId = ''+i+","+j;
         if(j==3&&i==0)
           console.log(x,y,i,j, count);
         fill = 'hsla('+Math.round((count / total) * 50)+', 80%, ' + Math.round((Math.random()*15) + 40) +'%, 1)';
         if(odd)
-          grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId);
+          grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId).replace('{{debugId}}',hexId).replace('{{debugX}}',debugX).replace('{{debugY}}',debugY);
         else
-          grid += hex2.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId);
+          grid += hex2.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId).replace('{{debugId}}',hexId).replace('{{debugX}}',debugX).replace('{{debugY}}',debugY);
       }
     }
     //(unitId, asset, r, q, direction, health)
     
-    grid += this.createUnit('1','cat12-tank',0,0,0,3);
+    //grid += this.createUnit('1','cat12-tank',0,0,0,3);
 
     
-    grid += this.createUnit('2','cat12-tank',1,4,3,1);
+    grid += this.createUnit('1','cat13-tank',1,1,0,1);
 
     return grid;
   },
@@ -168,8 +170,8 @@ buildHexGrid.prototype = {
     size = this.opts.size + this.opts.spacing;
 
     div.innerHTML = '<svg id="svgroot" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 '
-    + (size * this.opts.cols * this.opts.hexRatio*1.02) + ' '
-    + (size * this.opts.rows) +'">'
+    + (size * this.opts.cols * this.opts.hexRatio*1.1) + ' '
+    + (size * (this.opts.rows+1))*1.2+'">'
     
     + '<defs>'
     + this.createPattern()

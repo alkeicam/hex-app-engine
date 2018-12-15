@@ -21,7 +21,7 @@
     <script type="module" src="js/libs/Hex.js"></script>
     <script type="module" src="js/libs/Unit.js"></script>
  -->    
-    <script src="js/libs/jquery-1.11.0.min.js"></script>
+    <script src="js/libs/jquery-3.3.1.min.js"></script>
     <!-- <script src="js/libs/jquery-ui-1.10.4.min.js"></script> -->
     <script src="js/libs/gameutils.js"></script>
     <script src="js/drag/TweenMax.min.js"></script>
@@ -37,13 +37,13 @@
 
 
         document.body.appendChild(buildHexGrid({
-          cols: 16,
-          rows: 9,
+          cols: 7,
+          rows: 2,
           size: 100,
           spacing: 5,
           offsetX: 0, //58,
-          offsetY: 80, //58,
-          debug: true
+          offsetY: 45, //58,
+          debug: false
         }));
 
         console.log(Test)
@@ -283,7 +283,7 @@
         <use x="0" y="0" fill="url(#star)" class="hex" xlink:href="#hex194" />
         
     </svg> -->
-   
+<!--    
     <div id="1" class="unit2"></div>
     <div id="2" class="unit2"></div>
     <div id="3" class="unit2"></div>
@@ -291,11 +291,11 @@
     <div id="5" class="unit2"></div>
     <div id="6" class="unit2"></div>
     <div id="7" class="unit2"></div>
-    <div id="8" class="unit2 flag-red"></div>
+    <div id="8" class="unit2 flag-red"></div> -->
 
     <!-- 5x5 map -->
-    <div class="hexmap">
-        <!-- content to be placed inside <body>…</body> -->
+<!--     <div class="hexmap">
+        
         <div class='row'>            
             <div id="0,0" class='hexagon'><div id="0,0" class="snaptarget"></div></div>
             <div id="2,-1" class='hexagon'><div id="2,-1" class="snaptarget"></div></div>
@@ -365,7 +365,7 @@
         </div>
         
         
-    </div>   
+    </div>    -->
 
     <div class="dockbg"></div>
 <div class="dock">

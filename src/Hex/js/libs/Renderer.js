@@ -190,13 +190,23 @@ Renderer.prototype = {
 	},
 
 	_uiHandleBearingAfterDrag: function(target, targetElement){
+		// var directions = {
+		// 	"1,0": 0,
+		// 	"1,-1": 1,
+		// 	"-1,-1": 2,
+		// 	"-1,0": 3,
+		// 	"-1,1": 4,
+		// 	"1,1": 5
+		// };
 		var directions = {
-			"1,0": 0,
-			"1,-1": 1,
-			"-1,-1": 2,
-			"-1,0": 3,
-			"-1,1": 4,
-			"1,1": 5
+			"0,1": 0,
+			"1,1": 1,
+			"1,-1": 2,
+			"0,-1": 3,
+			"-1,-1": 4,
+			"-1,1": 5,
+			"1,0": 1
+			
 		};
 
 		var tX = target.x.baseVal.value;
@@ -219,7 +229,7 @@ Renderer.prototype = {
 
 		var sgnX = Math.sign(dmX);
 		var sgnY = -Math.sign(dmY);
-
+		console.log(''+sgnX+","+sgnY);
 		var result = directions[''+sgnX+","+sgnY];
 		var fillArray = target.getAttribute("fill").split("-");
 		fillArray[3] = result;
@@ -367,7 +377,11 @@ Renderer.prototype = {
 
 		for( var index in hexArray){
 			var hex = hexArray[index];
-			$(GameUtils._safeIdSelector("#"+hex._hexId)).addClass("highlight");
+			var element = $(GameUtils._safeIdSelector("#"+hex._hexId));
+			var element2 = element[0];
+			if(element2)
+				//element2.addClass("highlight");
+				element2.classList.add('highlight')
 		}
 		
 
@@ -404,12 +418,12 @@ Renderer.prototype = {
 
 		unitElement.addClass(unit._currentDisplayStyle);
 
-		// handle unit position
+		//handle unit position (rerender unit using its position)
 		var hex = unit.position;
 		if(hex){
-			//
-			var newPosition = this.uiCalculateElementPositionMiddleOfHex(unitElement, hex);
-			unitElement.css(newPosition);
+		// 	//
+		// 	var newPosition = this.uiCalculateElementPositionMiddleOfHex(unitElement, hex);
+		// 	unitElement.css(newPosition);
 		}
 	},
 	_uiAddUnitFlag: function(unit, company){

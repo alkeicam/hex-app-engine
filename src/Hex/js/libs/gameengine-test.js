@@ -26,22 +26,199 @@ Test.prototype = {
 		var hexArray = [];
 		var startingHex;
 
-        for(var x = -4;x<=4;x++){
-            for(var y=-1;y<=9;y++){
-                var hex = new Hex(y,x,{                        
-                    //moveUnitsCost: Math.floor(Math.random() * (3 - 1 + 1)) + 1,
-                    moveUnitsCost: 1,
-                    displayStyle: "map-forest",
-                    terrainType: "FOREST",
-                    sightCost: 1,
-                    defenceBonus: 0
-                });
-                if(x==0&&y==3){
-                	startingHex = hex;
-                }
-                hexArray.push(hex);
+        var mapSpecification = [];
+        mapSpecification = [
+            {
+                r: 0,
+                q: 0,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 0,
+                q: 1,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 0,
+                q: 2,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 0,
+                q: 3,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 0,
+                q: 4,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 0,
+                q: 5,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 0,
+                q: 6,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+
+            // 2nd row
+            {
+                r: 1,
+                q: 0,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 1,
+                q: 1,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 1,
+                q: 2,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 1,
+                q: 3,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 1,
+                q: 4,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 1,
+                q: 5,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 1,
+                q: 6,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+
+            // 3rd            
+            {
+                r: 2,
+                q: 1,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 2,
+                q: 3,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
+            },
+            {
+                r: 2,
+                q: 5,
+                moveUnitsCost: 1,
+                displayStyle: "map-forest",
+                terrainType: "FOREST",
+                sightCost: 1,
+                defenceBonus: 0
             }
+        ];
+
+        for(var hexSpecification of mapSpecification){
+            //var hexSpecification = mapSpecification[idx];
+            var hex = new Hex(hexSpecification.q,hexSpecification.r,{                                            
+                    moveUnitsCost: hexSpecification.moveUnitsCost,
+                    displayStyle: hexSpecification.displayStyle,
+                    terrainType: hexSpecification.terrainType,
+                    sightCost: hexSpecification.sightCost,
+                    defenceBonus: hexSpecification.defenceBonus
+                });
+            hexArray.push(hex);
         };
+
+        
+
+        
+
+        // for(var x = -4;x<=4;x++){
+        //     for(var y=-1;y<=9;y++){
+        //         var hex = new Hex(y,x,{                        
+        //             //moveUnitsCost: Math.floor(Math.random() * (3 - 1 + 1)) + 1,
+        //             moveUnitsCost: 1,
+        //             displayStyle: "map-forest",
+        //             terrainType: "FOREST",
+        //             sightCost: 1,
+        //             defenceBonus: 0
+        //         });
+        //         if(x==0&&y==3){
+        //         	startingHex = hex;
+        //         }
+        //         hexArray.push(hex);
+        //     }
+        // };
 
 
 
@@ -49,10 +226,10 @@ Test.prototype = {
 
         var unitsArray = [];
 
-        for(var i=1;i<=8;i++){
-            var unitData = new Unit({
-                unitId: i,
-                position: startingHex,
+        var unitsSpecification = [
+            {
+                unitId: 1,
+                position: hexArray[8],
                 remainingMoveUnits: 2,
                 moveUnits: 1,
                 health: 5,
@@ -61,61 +238,134 @@ Test.prototype = {
                 rangedStrength: 0,
                 strength: 2,
                 experience: 0,
-                owner: (i%2==0)?"red":"yellow",
+                owner: "yellow",
                 displayStyle: "unit-troop",
                 
                 fIsEligibleAttackPath: function(attackLineHex){
-                	
-                	
-                	if(attackLineHex.length==1)
-                		return true;
+                    
+                    
+                    if(attackLineHex.length==1)
+                        return true;
 
-                	var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
-                	for( var idx in   attackLineHex){
-                		var hex = attackLineHex[idx];
-                		if(hex._terrainType in obstacleTerrainTypes){
-                			return false;
-                		}                		
-                	}
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   attackLineHex){
+                        var hex = attackLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
 
-                	return true;
+                    return true;
                 },
                 fIsEligibleSightPath: function(sightLineHex){
-                	
-                	
-                	if(sightLineHex.length==1)
-                		return true;
+                    
+                    
+                    if(sightLineHex.length==1)
+                        return true;
 
-                	var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
-                	for( var idx in   sightLineHex){
-                		var hex = sightLineHex[idx];
-                		if(hex._terrainType in obstacleTerrainTypes){
-                			return false;
-                		}                		
-                	}
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   sightLineHex){
+                        var hex = sightLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
 
-                	return true;
+                    return true;
                 },
                 fAttack: function(unit){
-                	return 2*this._strength;
+                    return 2*this._strength;
                 },
                 fDefend: function(unit){
-                	return this._strength;
+                    return this._strength;
                 },
                 fExperience: function (opponentStrength,damageInflicted, damageReceived){
-                	var experienceGained = 0;
-                	if(damageInflicted>2*damageReceived){
-                		experienceGained = 1;
-                	}
-                	return experienceGained;
+                    var experienceGained = 0;
+                    if(damageInflicted>2*damageReceived){
+                        experienceGained = 1;
+                    }
+                    return experienceGained;
                 },
                 fMoveRange: function(hexFrom, hexTo){
-                	return hexTo._moveUnitsCost;
-                	// dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
+                    return hexTo._moveUnitsCost;
+                    // dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
                 },
-            });
+            },
+        ];
+
+        for(var unitSpecification of unitsSpecification){
+            var unitData = new Unit(unitSpecification);
             unitsArray.push(unitData);
-        }
+        };
+
+
+        // for(var i=1;i<=8;i++){
+        //     var unitData = new Unit({
+        //         unitId: i,
+        //         position: startingHex,
+        //         remainingMoveUnits: 2,
+        //         moveUnits: 1,
+        //         health: 5,
+        //         sight: 3,
+        //         range: 2,
+        //         rangedStrength: 0,
+        //         strength: 2,
+        //         experience: 0,
+        //         owner: (i%2==0)?"red":"yellow",
+        //         displayStyle: "unit-troop",
+                
+        //         fIsEligibleAttackPath: function(attackLineHex){
+                	
+                	
+        //         	if(attackLineHex.length==1)
+        //         		return true;
+
+        //         	var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+        //         	for( var idx in   attackLineHex){
+        //         		var hex = attackLineHex[idx];
+        //         		if(hex._terrainType in obstacleTerrainTypes){
+        //         			return false;
+        //         		}                		
+        //         	}
+
+        //         	return true;
+        //         },
+        //         fIsEligibleSightPath: function(sightLineHex){
+                	
+                	
+        //         	if(sightLineHex.length==1)
+        //         		return true;
+
+        //         	var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+        //         	for( var idx in   sightLineHex){
+        //         		var hex = sightLineHex[idx];
+        //         		if(hex._terrainType in obstacleTerrainTypes){
+        //         			return false;
+        //         		}                		
+        //         	}
+
+        //         	return true;
+        //         },
+        //         fAttack: function(unit){
+        //         	return 2*this._strength;
+        //         },
+        //         fDefend: function(unit){
+        //         	return this._strength;
+        //         },
+        //         fExperience: function (opponentStrength,damageInflicted, damageReceived){
+        //         	var experienceGained = 0;
+        //         	if(damageInflicted>2*damageReceived){
+        //         		experienceGained = 1;
+        //         	}
+        //         	return experienceGained;
+        //         },
+        //         fMoveRange: function(hexFrom, hexTo){
+        //         	return hexTo._moveUnitsCost;
+        //         	// dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
+        //         },
+        //     });
+        //     unitsArray.push(unitData);
+        // }
 
 
         // prepare gameUI
