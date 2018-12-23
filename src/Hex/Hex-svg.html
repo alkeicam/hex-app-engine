@@ -36,6 +36,7 @@
 
     <script type="module">
         import {Test} from './js/libs/gameengine-test.js'
+        import {Turn} from './js/libs/Turn.js'
 
         console.log(Test)
         var test = new Test();
@@ -60,6 +61,9 @@
         // }
 
         //document.documentElement.addEventListener("mousemove", hoverElement, false);
+        window.gameProxy = test.testData["gameEngine"];
+        window.Turn = Turn;
+        console.log(window.gameProxy);
 
     </script>
 

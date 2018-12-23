@@ -969,6 +969,29 @@ GE.prototype = {
         }
         return hexes;
     },
+
+    /**
+    * Returns true when unit belongs to the owner that owns current turn.
+    */
+    isActiveUnit: function(unit){
+    	return unit._owner == this.engineParams["turn"].activeParty;
+    },
+
+    /**
+    * Handles new turn.
+    * Resets units movement points
+    */
+    nextTurn: function(newTurn){    	
+    	this.engineParams["turn"] = newTurn;
+    	// restore maximum movement points for units whose turn is active
+    	for( var idx in this.getUnitsMap()){
+			var unit = this.getUnitsMap()[idx];			
+			if(unit._owner == newTurn.activeParty){
+				// units that belong to active party should have their movement restored
+				unit.restoreMovePoints();			
+			}
+		}
+    },
 	
 	_cubeLERP: function (cubeFrom, cubeTo, lerpParam){
 		return new Cube(cubeFrom.x + (cubeTo.x - cubeFrom.x) * lerpParam,

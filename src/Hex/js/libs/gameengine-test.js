@@ -5,6 +5,7 @@ import {GameUIDock} from './game-ui-dock.js'
 import {Renderer} from './Renderer.js'
 import {Company} from './Company.js'
 import {HexMap} from './map.js'
+import {Turn} from './Turn.js'
 
 
 export function Test(){
@@ -265,7 +266,7 @@ Test.prototype = {
                 unitId: "red-1",
                 position: hexArray[2],
                 remainingMoveUnits: 2,
-                moveUnits: 1,
+                moveUnits: 2,
                 health: 10,
                 sight: 3,
                 bearing: 0,
@@ -331,7 +332,7 @@ Test.prototype = {
                 unitId: "blue-1",
                 position: hexArray[15],
                 remainingMoveUnits: 2,
-                moveUnits: 1,
+                moveUnits: 2,
                 health: 10,
                 sight: 3,
                 bearing: 1,
@@ -523,7 +524,7 @@ Test.prototype = {
         eventHandlersMap.push(gameUIhandler);
         eventHandlersMap.push(rendererHandler);
 
-       
+       var startingTurn = new Turn(1,"red");
         
         var gameEngineParams = {
             hexMapTiles:  hexArray,
@@ -532,7 +533,8 @@ Test.prototype = {
             unitClass: "unit2",	// renderer, snapping
             snapTargetClass: "snaptarget", // renderer, snapping
             eventHandlers: eventHandlersMap,
-            company: company
+            company: company,
+            turn: startingTurn
         };
 
         

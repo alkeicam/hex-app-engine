@@ -160,6 +160,13 @@ Unit.prototype = {
 		return (this._fMoveRange)(hexFrom,hexTo);
 	},
 
+	/**
+	* Restore unit move points to its maximum.
+	*/
+	restoreMovePoints: function(){
+		this.remainingMoveUnits = this._moveUnits;
+	},
+
 	toString: function(){
 		return "Unit: [unitId: "+this._unitId+"]";
 	}

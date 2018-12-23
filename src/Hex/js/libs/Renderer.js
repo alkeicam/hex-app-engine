@@ -491,15 +491,22 @@ Renderer.prototype = {
 	},
 
 	/**
+	* Only unit which belongs to the Company that owne the turn will become active.
 	* when unit is selected:
 	* - the unit is highlighted
 	* - unit move range is highlighted
 	*/
 	uiSelectUnit: function(unit){
 		var moveRange = this.rendererParams.gameEngine.moveRangeForUnit(unit);
-		this.uiHighlightHexes(moveRange);
-		this.uiHighlightUnit(unit);
-		console.log("[uiSelectUnit] Selected unit {1} ",unit);
+		var isActive = this.rendererParams.gameEngine.isActiveUnit(unit);
+		if(isActive){
+			this.uiHighlightHexes(moveRange);
+			this.uiHighlightUnit(unit);
+			console.log("[uiSelectUnit] Selected unit: ",unit);	
+		}else{
+			console.log("[uiSelectUnit] Not selecting unit as the unit is not active.",unit);	
+		}
+		
 	},
 
 	uiUnitDie : function(unit){		
