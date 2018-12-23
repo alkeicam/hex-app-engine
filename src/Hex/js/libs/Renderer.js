@@ -74,8 +74,6 @@ Renderer.prototype = {
 			var attackUnit = battleOutcome.attackingUnit;
 			var defendUnit = battleOutcome.defendingUnit;
 
-			attackUnit.reapplyStyle();
-			defendUnit.reapplyStyle();
 
 			this.uiUnitRerender(attackUnit);
 			this.uiUnitRerender(defendUnit);
@@ -193,8 +191,14 @@ Renderer.prototype = {
 		}
 		return returnElement;
 	},
-
+	/**
+	* Returns unit bearing after moving from current unit position towards targetElement.
+	*
+	* target - html element representing unit
+	* targetElement - html element representing target hex
+	*/
 	_uiHandleBearingAfterDrag: function(target, targetElement){
+		console.log("[Renderer] _uiHandleBearingAfterDrag");
 		// var directions = {
 		// 	"1,0": 0,
 		// 	"1,-1": 1,
@@ -230,10 +234,9 @@ Renderer.prototype = {
 		var sgnY = -Math.sign(dmY);
 		console.log(''+sgnX+","+sgnY);
 		var result = directions[''+sgnX+","+sgnY];
-		var fillArray = d3.select(target).attr("fill").split("-");
-		fillArray[3] = result;
-		d3.select(target).attr("fill",fillArray.join("-"));
+
 		return result;
+
 	},
 
 	uiDragStarted: function(){
@@ -273,16 +276,29 @@ Renderer.prototype = {
 				d3.select(this).attr('drag-start-x');
 				console.log(this,d3.event);
 				var snapElement = renderer._elementOfClassFromPoint(d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY,"snaptarget");
+				
+				var hexId = d3.select(snapElement).attr("id");				
+				var hex = gameEngine.getHexData(hexId);
+
+				var unitId = d3.select(this).attr("id");
+				var unit = gameEngine.getUnitData(unitId);
+
+				if(unit.position.equals(hex)){
+					// no real move, do nothing
+					return;
+				}
+				if(!snapElement){
+					renderer.uiUnitRerender(unit);
+					return;
+				}
+
 				var snapX = d3.select(snapElement).attr("x");
 				var snapY = d3.select(snapElement).attr("y");
 				d3.select(this).attr("x", snapX).attr("y", snapY);
 
+				// handle unit bearing after move
 				var direction = renderer._uiHandleBearingAfterDrag(this, snapElement);
-
-				var hexId = d3.select(snapElement).attr("id");
-				var unitId = d3.select(this).attr("id");
-				var hex = gameEngine.getHexData(hexId);
-				var unit = gameEngine.getUnitData(unitId);
+				unit.bearing = direction;							
 
 				gameEngine.moveUnit(unit,hex);
 				renderer.uiUnitRerender(unit);
@@ -341,71 +357,71 @@ Renderer.prototype = {
 		// });
 	},
 
-	uiEnableUnitDragAndDropSupportOld: function(){
-		var gameEngine = this.rendererParams.gameEngine;
-		var renderer = this;
+	// uiEnableUnitDragAndDropSupportOld: function(){
+	// 	var gameEngine = this.rendererParams.gameEngine;
+	// 	var renderer = this;
 
-		$("."+this.rendererParams.unitClass).draggable(
-			{ 
-				snap: "."+renderer.rendererParams.hexClass+" ."+renderer.rendererParams.snapTargetClass+"", 
-				snapMode: "both",
-				revert: "invalid" 
-			}).bind('drag', function(event, ui){
-    			// update coordinates manually, since top/left style props don't work on SVG
+	// 	$("."+this.rendererParams.unitClass).draggable(
+	// 		{ 
+	// 			snap: "."+renderer.rendererParams.hexClass+" ."+renderer.rendererParams.snapTargetClass+"", 
+	// 			snapMode: "both",
+	// 			revert: "invalid" 
+	// 		}).bind('drag', function(event, ui){
+ //    			// update coordinates manually, since top/left style props don't work on SVG
     			
-    			var m = event.target.getScreenCTM();
-    			var p = event.target.parentElement.createSVGPoint();
-				p.x = event.clientX;
-				p.y = event.clientY;
-				p = p.matrixTransform(m.inverse());
+ //    			var m = event.target.getScreenCTM();
+ //    			var p = event.target.parentElement.createSVGPoint();
+	// 			p.x = event.clientX;
+	// 			p.y = event.clientY;
+	// 			p = p.matrixTransform(m.inverse());
 
-				event.target.setAttribute('x', p.x);
-    			event.target.setAttribute('y', p.y);
-    			// event.target.setAttribute('x', ui.position.left);
-    			// event.target.setAttribute('y', ui.position.top);
-  			})
-  			.bind('drop', function(event, ui){
-    			// update coordinates manually, since top/left style props don't work on SVG
+	// 			event.target.setAttribute('x', p.x);
+ //    			event.target.setAttribute('y', p.y);
+ //    			// event.target.setAttribute('x', ui.position.left);
+ //    			// event.target.setAttribute('y', ui.position.top);
+ //  			})
+ //  			.bind('drop', function(event, ui){
+ //    			// update coordinates manually, since top/left style props don't work on SVG
     			
-    // 			var m = event.target.getScreenCTM();
-    // 			var p = event.target.parentElement.createSVGPoint();
-				// p.x = event.clientX;
-				// p.y = event.clientY;
-				// p = p.matrixTransform(m.inverse());
+ //    // 			var m = event.target.getScreenCTM();
+ //    // 			var p = event.target.parentElement.createSVGPoint();
+	// 			// p.x = event.clientX;
+	// 			// p.y = event.clientY;
+	// 			// p = p.matrixTransform(m.inverse());
 
-				// event.target.setAttribute('x', p.x);
-    // 			event.target.setAttribute('y', p.y);
-    			// event.target.setAttribute('x', ui.position.left);
+	// 			// event.target.setAttribute('x', p.x);
+ //    // 			event.target.setAttribute('y', p.y);
+ //    			// event.target.setAttribute('x', ui.position.left);
 
-    			// event.target.setAttribute('y', ui.position.top);
-    			console.log("dropped");
-  			});			
+ //    			// event.target.setAttribute('y', ui.position.top);
+ //    			console.log("dropped");
+ //  			});			
 
-		$("."+this.rendererParams.hexClass).droppable({
-	        //accept: '#secd_line_icon li',
-	        drop: function(event, ui) { 
-	            var hexId = $(this).attr("id");	            
-	            var unitId = $(ui.draggable).attr("id");
+	// 	$("."+this.rendererParams.hexClass).droppable({
+	//         //accept: '#secd_line_icon li',
+	//         drop: function(event, ui) { 
+	//             var hexId = $(this).attr("id");	            
+	//             var unitId = $(ui.draggable).attr("id");
 
-	            var unit = gameEngine.getUnitData(unitId);
-	            var hex = gameEngine.getHexData(hexId);
+	//             var unit = gameEngine.getUnitData(unitId);
+	//             var hex = gameEngine.getHexData(hexId);
 	            
-	            var departureHex = unit.position;
-	            gameEngine.moveUnit(unit,hex);
-	            //var lineHexes = gameEngine.lineConnectingHexes(departureHex,hex);
-	            //gameEngine.uiHighlightHexes(lineHexes);
-	            //gameEngine.uiUnitRerender(unit);	           
-	            renderer.uiUnitRerender(unit);	           
+	//             var departureHex = unit.position;
+	//             gameEngine.moveUnit(unit,hex);
+	//             //var lineHexes = gameEngine.lineConnectingHexes(departureHex,hex);
+	//             //gameEngine.uiHighlightHexes(lineHexes);
+	//             //gameEngine.uiUnitRerender(unit);	           
+	//             renderer.uiUnitRerender(unit);	           
 
-	        },
-	        accept: function(el) {
-	            /* This is a filter function, you can perform logic here 
-	               depending on the element being filtered: */
-	            return true;
-	        }
-	    });
-	    console.log("[Draggable] Draggable support initialized.");
-	},
+	//         },
+	//         accept: function(el) {
+	//             /* This is a filter function, you can perform logic here 
+	//                depending on the element being filtered: */
+	//             return true;
+	//         }
+	//     });
+	//     console.log("[Draggable] Draggable support initialized.");
+	// },
 
 	uiAddUnitClickHandler: function (unit){
 		var unitElement = $(GameUtils._safeIdSelector("#"+unit._unitId));
@@ -457,16 +473,6 @@ Renderer.prototype = {
 
 	},
 
-	/**
-	* Takes array of Hex objects and toggles hihglights for them on map
-	*/
-	uiToggleHighlightHexes: function (hexArray){
-		for( var index in hexArray){
-			var hex = hexArray[index];
-			$(GameUtils._safeIdSelector("#"+hex._hexId)).toggleClass("highlight");
-		}
-	},
-
 	uiSelectUnit: function(unit){
 		var moveRange = this.rendererParams.gameEngine.moveRangeForUnit(unit);
 		this.uiHighlightHexes(moveRange);
@@ -478,30 +484,48 @@ Renderer.prototype = {
 		$(GameUtils._safeIdSelector("#"+unit._unitId)).remove();
 	},
 
+	_calculateHealthIndex: function (unit){
+		var healthIndicator =  Math.ceil(4*unit.health/10.0) - 1;
+		return healthIndicator;
+	},
+
+	/**
+	* Returns fill attribute value for given unit
+	*/
+	_calculateUnitFill: function(unit){
+		// rerender unit state (health)
+		var healthIndex = this._calculateHealthIndex(unit);
+
+		var fillPattern = 'url(#unit-{{flag}}-{{asset}}-{{direction}}-{{health}})';
+    	fillPattern = fillPattern.replace('{{asset}}',unit._displayStyle).replace('{{direction}}',unit.bearing).replace('{{health}}',healthIndex).replace('{{flag}}',unit._owner);
+    	return fillPattern;
+	},
+	/**
+	* Rerenders unit on map.
+	* Takes into consideration:
+	* - unit health
+	* - unit bearing
+	* - unit position
+	*
+	*/ 
 	uiUnitRerender: function (unit){
 
 		// handle display style		
 		var unitElement = $(GameUtils._safeIdSelector("#"+unit._unitId))[0];
 		if(!unitElement)
 			return;
-		GameUtils._uiElementClassesRemove(unitElement, "unit-");
+		
+		var fill = 	this._calculateUnitFill(unit);	
 
-		this.uiAddClass(unitElement,unit._currentDisplayStyle);
+		d3.select(unitElement).attr("fill",fill);
 
 		//handle unit position (rerender unit using its position)
 		var hex = unit.position;
 		if(hex){
-
 			var xy = this.rendererParams.hexMap.calculateXYFromRQ(hex.r, hex.q);
-			
 			d3.select(unitElement).attr("x",xy.x).attr("y",xy.y);
-			
-			// console.log('[uiUnitRerender] Before rerender:',unitMatrix);
-			// unitMatrix.e = matrix.e;
-			// unitMatrix.f = matrix.f;
-			// console.log('[uiUnitRerender] After rerender:',unitMatrix);
-
 		}
+		
 	},
 
 	uiCalculateTransformMatrix(fromXY, toXY){

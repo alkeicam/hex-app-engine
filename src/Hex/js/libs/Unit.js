@@ -23,6 +23,7 @@ export function Unit(params){
 	var _moveUnits;				// integer, positive
 	var remainingMoveUnits;		// integer, positive
 	var health;					// integer, positive	
+	var bearing;				// unit bearing, integer, positive
 	var _sight;					// integer, positive
 	var _range;					// attack range, integer, positive, when >1 then ranged unit
 	var _strength;				// melee attack strength,integer, positive, base strength
@@ -81,6 +82,7 @@ Unit.prototype = {
 		this.position = params["position"];
 		this._moveUnits = params["moveUnits"];
 		this.remainingMoveUnits = params["remainingMoveUnits"];
+		this.bearing = params["bearing"];
 		this.health = params["health"];
 		this._sight = params["sight"];
 		this._range = params["range"];
@@ -99,7 +101,6 @@ Unit.prototype = {
 
 		this._owner = params["owner"];
 
-		this.reapplyStyle();
 	},
 	/**
 	*  Returns true when given attack line is valid
@@ -159,23 +160,6 @@ Unit.prototype = {
 		return (this._fMoveRange)(hexFrom,hexTo);
 	},
 
-	reapplyStyle: function(){
-		var ratio = Math.ceil(100*this.health/10.0);
-
-		this._currentDisplayStyle = this._displayStyle+"-"+ratio;
-		// var   = this.__currentDisplayStyle
-		// if(ratio==0){
-		// 	this._displayStyle = this._displayStyle0;
-		// } else if(ratio<=25){
-		// 	this._displayStyle = this._displayStyle25;
-		// } else if(ratio<=50){
-		// 	this._displayStyle = this._displayStyle50;
-		// } else if(ratio<=75){
-		// 	this._displayStyle = this._displayStyle75;
-		// } else if(ratio<=100){
-		// 	this._displayStyle = this._displayStyle100;
-		// }
-	},
 	toString: function(){
 		return "Unit: [unitId: "+this._unitId+"]";
 	}

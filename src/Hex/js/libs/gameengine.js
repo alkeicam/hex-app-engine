@@ -922,9 +922,6 @@ GE.prototype = {
 	rangedAttack: function(attackUnit, defendUnit){				
 		var battleOutcome = this.attack(attackUnit, defendUnit,2,4);		
 
-		attackUnit.reapplyStyle();
-		defendUnit.reapplyStyle();
-
 		this.uiUnitRerender(attackUnit);
 		this.uiUnitRerender(defendUnit);
 

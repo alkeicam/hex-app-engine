@@ -11,6 +11,8 @@ export function HexMap(opts) {
 }
 
 HexMap.prototype = {
+  _unitsColorsArray: ["blue","red"],
+
   opts: {
     cols: 6,
     rows: 6,
@@ -19,7 +21,8 @@ HexMap.prototype = {
     offsetX: 0,
     offsetY: 0,
     debug: false,
-    hexRatio: 0.87
+    hexRatio: 0.87,
+    mapSpecification: null
   },
 
   createPolygon: function(size,sides) {
@@ -45,24 +48,57 @@ HexMap.prototype = {
     return '<polygon class="hexagon ui-droppable snaptarget" id="hex'+this.instance+'" points="'+points.join(' ')+'"></polygon>';
 
   },
+
+  createUnits: function(unitsSpecification){
+    var grid = '';
+
+    for(var i = 0; i<unitsSpecification.length; i++){
+      var unitSpecification = unitsSpecification[i];
+      var position = unitSpecification.position;
+      var healthIndicator =  Math.ceil(4*unitSpecification.health/10.0) - 1;
+
+
+      grid += this.createUnit(unitSpecification.unitId,unitSpecification.displayStyle,position.r,position.q,unitSpecification.bearing,healthIndicator, unitSpecification.owner);
+    }
+    
+
+    return grid;
+  },
+
   // should be called after hex polygon is in defs and unit pattern is in defs
-  createUnit: function(unitId, asset, r, q, direction, health){
-    var unitPattern = 'unit-{{asset}}-{{direction}}-{{health}}';
-    unitPattern = unitPattern.replace('{{asset}}',asset).replace('{{direction}}',direction).replace('{{health}}',health);
+  createUnit: function(unitId, asset, r, q, direction, health, flag){
+    var unitPattern = 'unit-{{flag}}-{{asset}}-{{direction}}-{{health}}';
+    unitPattern = unitPattern.replace('{{asset}}',asset).replace('{{direction}}',direction).replace('{{health}}',health).replace('{{flag}}',flag);
 
     var xy = this.calculateXYFromRQ(r,q);
 
-    var unit = '<use id="{{unitId}}" x="{{x}}" y="{{y}}" fill="url(#{{unitPattern}})" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="unit2 ui-draggable" xlink:href="#hex'+this.instance+'" />';
+    var unit = '<use id="{{unitId}}" x="{{x}}" y="{{y}}" fill="url(#{{unitPattern}})" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="unit2 ui-draggable" xlink:href="#hex'+this.instance+'" />';    
     unit = unit.replace('{{unitId}}',unitId).replace('{{x}}',xy.x).replace('{{y}}',xy.y).replace('{{unitPattern}}',unitPattern);
+    
+    
 
     return unit;
   },
 
-  createUnitPattern: function(asset, layer){    
+  createUnitsPattern: function(unitAssets){   
+    var unitsPattern = '';
+
+    for(var i = 0; i< unitAssets.assets.length; i++){
+      var asset = unitAssets.assets[i];
+      for(var j=0; j<this._unitsColorsArray.length; j++){
+        unitsPattern += this.createUnitPattern(asset.catalog, asset.displayId, asset.resource, this._unitsColorsArray[j]);  
+      }      
+    }
+    return unitsPattern;
+  },
+
+  createUnitPattern: function(catalog, displayId, resource, flag){    
     var p = '', 
     width = 127,
     height = 222.25001,
     i, j, iOffset, jOffset, x, y, viewBox, id;
+
+    var asset = catalog+"-"+displayId;
 
     iOffset = width/4;
     jOffset = height/6;
@@ -73,13 +109,24 @@ HexMap.prototype = {
         y = j*jOffset;
 
         viewBox = ''+x+' '+y+' '+width/4+' '+height/6;
-        id = 'unit-'+asset+'-'+j+'-'+(3-i);
+        id = 'unit-'+flag+'-'+asset+'-'+j+'-'+(3-i);
 
         p +=  '<pattern id="{{id}}" viewBox="{{viewbox}}" width="100%" height="100%">'    
-        p += '<use href="/assets/svg/unit-{{asset}}.svg#{{layer}}"></use>'    
-        p += '</pattern>'
+        p += '<use href="/assets/svg/{{resource}}"></use>'           
+        
 
-        p = p.replace('{{viewbox}}',viewBox).replace('{{asset}}',asset).replace('{{layer}}',layer).replace('{{id}}',id)
+        //var badgeCenter = {x: this.opts.size/2, y:10};
+        var badgeCenter = {x: x+this.opts.size/4, y:y+30};
+        var badgeSize = {width: 6, height: 6};
+
+        var badgePoints = '{{lx}},{{ly}} {{cx}},{{cy}} {{rx}},{{ry}}';
+        badgePoints = badgePoints.replace('{{lx}}',badgeCenter.x-badgeSize.width/2).replace('{{ly}}',badgeCenter.y).replace('{{cx}}',badgeCenter.x).replace('{{cy}}',badgeCenter.y+badgeSize.height).replace('{{rx}}',badgeCenter.x+badgeSize.width/2).replace('{{ry}}',badgeCenter.y);
+
+        var badge = '<polygon fill="{{fill}}" stroke="white" points="{{badgePoints}}" />';
+        badge = badge.replace('{{badgePoints}}',badgePoints).replace('{{fill}}',flag);
+        p += badge;
+        p += '</pattern>'
+        p = p.replace('{{viewbox}}',viewBox).replace('{{asset}}',asset).replace('{{resource}}',resource).replace('{{id}}',id).replace('{{fill}}',flag)
       }
     }
 
@@ -87,24 +134,35 @@ HexMap.prototype = {
     
   },
 
-  createPattern: function(){
+  createPatterns: function(mapAssets, unitAssets){
 
+    var patterns = '';
+
+    var pattern = '<pattern id="{{id}}" viewBox="{{viewbox}}" width="100%" height="100%">';
+    pattern += '<use href="/assets/svg/{{asset}}"></use>';
+    pattern += '</pattern>';
+
+    for(var i = 0; i< mapAssets.assets.length; i++){
+      var asset = mapAssets.assets[i];
+      patterns += pattern.replace('{{id}}',asset.catalog+'-'+asset.displayId).replace('{{viewbox}}',asset.viewbox).replace('{{asset}}',asset.resource);
+    }
                 
-    var p = '<pattern id="star" viewBox="0 0 37.04 31.75" width="100%" height="100%">'
-    //var p = '<pattern id="star" >'
-    p += '<use href="/assets/svg/r4svg.svg#layer1"></use>'
-    //p += '<circle cx="10" cy="10" r="10" stroke="#393" fill="#393" />'
-    p += '</pattern>'
+    // var p = '<pattern id="star" viewBox="0 0 37.04 31.75" width="100%" height="100%">'
+    // //var p = '<pattern id="star" >'
+    // p += '<use href="/assets/svg/r4svg.svg#layer1"></use>'
+    // //p += '<circle cx="10" cy="10" r="10" stroke="#393" fill="#393" />'
+    // p += '</pattern>'
 
-    p += '<pattern id="star2" viewBox="37.04 0 37.04 31.75" width="100%" height="100%">'
-    p += '<use href="/assets/svg/r4svg.svg#layer1"></use>'
-    p += '</pattern>'
+    // p += '<pattern id="star2" viewBox="37.04 0 37.04 31.75" width="100%" height="100%">'
+    // p += '<use href="/assets/svg/r4svg.svg#layer1"></use>'
+    // p += '</pattern>'
 
 
 
-    p += this.createUnitPattern('cat13-tank','layer1');
+    //patterns += this.createUnitPatterns('cat13-tank','layer1','red');
+    patterns += this.createUnitsPattern(unitAssets);
 
-    return p;
+    return patterns;
   },
 
   calculateXYFromRQ: function(r,q){
@@ -118,13 +176,19 @@ HexMap.prototype = {
 
     return {x: x, y: y};
   },
+
+  _findTileFromSpecificationForRQ: function(r,q,mapSpecification){
+    for (var c = 0; c<mapSpecification.tiles.length; c++){
+      var tile = mapSpecification.tiles[c];
+      if(tile.q == q && tile.r == r){
+        return tile;        
+      }
+    }
+  },
   
-  createGrid: function(){
-    //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="#hex'+this.instance+'" />',
-    
-    var hex = '<use id="{{id}}" x="{{x}}" y="{{y}}" fill="url(#star)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="hex snaptarget" xlink:href="#hex'+this.instance+'" />'+(this.opts.debug==true?'<text x="{{debugX}}" y="{{debugY}}" text-anchor="left" fill="white" font-size="5">(q,r)({{debugId}})</text>':''),
-    hex2 = '<use id="{{id}}" x="{{x}}" y="{{y}}" fill="url(#star2)" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+'  class="hex snaptarget" xlink:href="#hex'+this.instance+'" />'+(this.opts.debug==true?'<text x="{{debugX}}" y="{{debugY}}" text-anchor="left" fill="white" font-size="5">(q,r)({{debugId}})</text>':''),    
-    //var hex = '<use x="{{x}}" y="{{y}}" fill="{{fill}}" class="hex" xlink:href="/assets/svg/r1svg.svg#layer1"/>',        
+  createGrid: function(mapSpecification){
+    var hex = '<use id="{{id}}" x="{{x}}" y="{{y}}" fill="{{fill}}" '+(this.opts.debug==true?'stroke="blue"':'')+' '+(this.opts.debug==true?'data-debug="{{debug}}"':'')+' class="hex snaptarget" xlink:href="#hex'+this.instance+'" />'+(this.opts.debug==true?'<text x="{{debugX}}" y="{{debugY}}" text-anchor="left" fill="white" font-size="5">(q,r)({{debugId}})</text>':''),
+         
     odd = false,
     size = this.opts.size + this.opts.spacing,
     grid = '',
@@ -146,13 +210,12 @@ HexMap.prototype = {
         var debugX = x+this.opts.offsetX/2;
         var debugY = y+this.opts.offsetY/2;
         hexId = ''+i+","+j;
-        if(j==3&&i==0)
-          console.log(x,y,i,j, count);
-        fill = 'hsla('+Math.round((count / total) * 50)+', 80%, ' + Math.round((Math.random()*15) + 40) +'%, 1)';
-        if(odd)
-          grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId).replace('{{debugId}}',hexId).replace('{{debugX}}',debugX).replace('{{debugY}}',debugY);
-        else
-          grid += hex2.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId).replace('{{debugId}}',hexId).replace('{{debugX}}',debugX).replace('{{debugY}}',debugY);
+        fill = '';
+
+        var tile = this._findTileFromSpecificationForRQ(j,i,mapSpecification);
+        if(tile)
+          fill = 'url(#'+tile.displayStyle+')';              
+        grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId).replace('{{debugId}}',hexId).replace('{{debugX}}',debugX).replace('{{debugY}}',debugY);        
       }
     }
     //(unitId, asset, r, q, direction, health)
@@ -160,12 +223,90 @@ HexMap.prototype = {
     //grid += this.createUnit('1','cat12-tank',0,0,0,3);
 
     
-    grid += this.createUnit('1','cat13-tank',1,1,0,1);
+    
 
     return grid;
   },
 
+  _validateMapSpecification: function(mapSpecification){
+    var result = true;
+
+    mapSpecification.cols;
+    mapSpecification.rows;
+    var lastRowCols = Math.floor(mapSpecification.cols/2);
+    var expectedNumberOfHexes = mapSpecification.cols* mapSpecification.rows+lastRowCols;
+    if(mapSpecification.tiles.length!=expectedNumberOfHexes){
+      console.log("[map] ERROR - map specification number of tiles does not match cols and rows. Expected: "+expectedNumberOfHexes+" got:"+mapSpecification.tiles.length);
+      result = false;
+    }
+    // check if all hexes are provided
+    var missingHexesArray = [];
+    for(var row=0;row <= mapSpecification.rows;row++){
+
+      // additional, partial row
+      if(row==mapSpecification.rows){
+        for(var col=1; col<mapSpecification.cols; col=col+2){
+          var found = false;
+          for (var hex of mapSpecification.tiles){
+            if(hex.q == col && hex.r == row){
+              found = true;
+              break;
+            }
+          }
+          if(!found){
+            missingHexesArray.push({q: col, r: row});
+          }
+        }
+      }else{
+        for(var col=0; col<mapSpecification.cols; col++){
+                    
+          var found = false;
+          for (var hex of mapSpecification.tiles){
+            if(hex.q == col && hex.r == row){
+              found = true;
+              break;
+            }
+          }
+          if(!found){
+            missingHexesArray.push({q: col, r: row});
+          }            
+        }
+      }
+    }
+    if(missingHexesArray.length>0){
+      console.log("[map] ERROR - map specification is missing hex data: ",missingHexesArray);      
+      result = false;
+    }
+
+    return result;
+  },
+
+  _createErrorDiv: function(message){
+    var errorDiv = document.createElement('div');
+    d3.select(errorDiv).attr("style",'color: white');
+    errorDiv.innerHTML = message;
+    return errorDiv;
+  },
+
+  _extractOwners: function(unitsSpecification){
+    var flags = {};
+
+    for(var i = 0; i<unitsSpecification.length; i++){
+      var unitSpecification = unitsSpecification[i];
+      flags[unitSpecification.owner] = true;      
+    }
+  },
+
   createSVG: function(){
+    if(!this._validateMapSpecification(this.opts.mapSpecification)){
+      return this._createErrorDiv('Map specification error. Check console logs.');
+    }
+
+    this.opts.cols = this.opts.mapSpecification.cols;
+    this.opts.rows = this.opts.mapSpecification.rows;
+
+
+
     var div = document.createElement('div'),
     size = this.opts.size + this.opts.spacing;
 
@@ -174,11 +315,14 @@ HexMap.prototype = {
     + (size * (this.opts.rows+1))*1.2+'">'
     
     + '<defs>'
-    + this.createPattern()
+    + this.createPatterns(this.opts.mapAssets, this.opts.unitAssets)
     + this.createPolygon(this.opts.size)
     + '</defs>'
-    + this.createGrid()
+    + this.createGrid(this.opts.mapSpecification)
+    + this.createUnits(this.opts.unitsSpecification)
     + '</svg>';
+
+
 
     return div.children[0];
   }

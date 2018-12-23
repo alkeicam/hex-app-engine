@@ -27,14 +27,47 @@ Test.prototype = {
 		var hexArray = [];
 		var startingHex;
 
-        var mapSpecification = [];
-        mapSpecification = [
+        var mapAssets = {};
+        mapAssets = {
+            assets: [
+                {
+                    description: "Base catalog - desert tile with tent",
+                    catalog: "base",
+                    displayId: "desert-tent",
+                    resource: "base.svg#layer1",
+                    viewbox: "0 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - forrest",
+                    catalog: "base",
+                    displayId: "plains-forrest",
+                    resource: "base.svg#layer1",
+                    viewbox: "37.04 0 37.04 31.75"
+                }
+            ]
+        }
+
+        var unitAssets = {};
+        unitAssets = {
+            assets: [
+                {
+                    description: "Base catalog - modern tank",
+                    catalog: "base",
+                    displayId: "tank",
+                    resource: "unit-base-tank.svg#layer1"                    
+                }                
+            ]
+        }
+
+        var mapSpecification = {};
+
+        mapSpecification = {rows: 2 , cols: 7,tiles: [
             {
                 r: 0,
                 q: 0,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
-                terrainType: "FOREST",
+                displayStyle: "base-desert-tent",
+                terrainType: "DESERT",
                 sightCost: 1,
                 defenceBonus: 0
             },
@@ -42,7 +75,7 @@ Test.prototype = {
                 r: 0,
                 q: 1,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -51,7 +84,7 @@ Test.prototype = {
                 r: 0,
                 q: 2,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -60,7 +93,7 @@ Test.prototype = {
                 r: 0,
                 q: 3,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -69,7 +102,7 @@ Test.prototype = {
                 r: 0,
                 q: 4,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -78,7 +111,7 @@ Test.prototype = {
                 r: 0,
                 q: 5,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -87,7 +120,7 @@ Test.prototype = {
                 r: 0,
                 q: 6,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -98,8 +131,8 @@ Test.prototype = {
                 r: 1,
                 q: 0,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
-                terrainType: "FOREST",
+                displayStyle: "base-desert-tent",
+                terrainType: "DESERT",
                 sightCost: 1,
                 defenceBonus: 0
             },
@@ -107,8 +140,8 @@ Test.prototype = {
                 r: 1,
                 q: 1,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
-                terrainType: "FOREST",
+                displayStyle: "base-desert-tent",
+                terrainType: "DESERT",
                 sightCost: 1,
                 defenceBonus: 0
             },
@@ -116,8 +149,8 @@ Test.prototype = {
                 r: 1,
                 q: 2,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
-                terrainType: "FOREST",
+                displayStyle: "base-desert-tent",
+                terrainType: "DESERT",
                 sightCost: 1,
                 defenceBonus: 0
             },
@@ -125,7 +158,7 @@ Test.prototype = {
                 r: 1,
                 q: 3,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -134,7 +167,7 @@ Test.prototype = {
                 r: 1,
                 q: 4,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -143,7 +176,7 @@ Test.prototype = {
                 r: 1,
                 q: 5,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -152,7 +185,7 @@ Test.prototype = {
                 r: 1,
                 q: 6,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -163,8 +196,8 @@ Test.prototype = {
                 r: 2,
                 q: 1,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
-                terrainType: "FOREST",
+                displayStyle: "base-desert-tent",
+                terrainType: "DESERT",
                 sightCost: 1,
                 defenceBonus: 0
             },
@@ -172,7 +205,7 @@ Test.prototype = {
                 r: 2,
                 q: 3,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
@@ -181,14 +214,14 @@ Test.prototype = {
                 r: 2,
                 q: 5,
                 moveUnitsCost: 1,
-                displayStyle: "map-forest",
+                displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
                 defenceBonus: 0
             }
-        ];
+        ]};
 
-        for(var hexSpecification of mapSpecification){
+        for(var hexSpecification of mapSpecification.tiles){
             //var hexSpecification = mapSpecification[idx];
             var hex = new Hex(hexSpecification.q,hexSpecification.r,{                                            
                     moveUnitsCost: hexSpecification.moveUnitsCost,
@@ -230,17 +263,83 @@ Test.prototype = {
         var unitsSpecification = [
             {
                 unitId: 1,
-                position: hexArray[8],
+                position: hexArray[2],
                 remainingMoveUnits: 2,
                 moveUnits: 1,
                 health: 5,
                 sight: 3,
+                bearing: 0,
                 range: 2,
                 rangedStrength: 0,
                 strength: 2,
                 experience: 0,
-                owner: "yellow",
-                displayStyle: "unit-troop",
+                owner: "red",
+                displayStyle: "base-tank",
+                
+                fIsEligibleAttackPath: function(attackLineHex){
+                    
+                    
+                    if(attackLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   attackLineHex){
+                        var hex = attackLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fIsEligibleSightPath: function(sightLineHex){
+                    
+                    
+                    if(sightLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   sightLineHex){
+                        var hex = sightLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fAttack: function(unit){
+                    return 2*this._strength;
+                },
+                fDefend: function(unit){
+                    return this._strength;
+                },
+                fExperience: function (opponentStrength,damageInflicted, damageReceived){
+                    var experienceGained = 0;
+                    if(damageInflicted>2*damageReceived){
+                        experienceGained = 1;
+                    }
+                    return experienceGained;
+                },
+                fMoveRange: function(hexFrom, hexTo){
+                    return hexTo._moveUnitsCost;
+                    // dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
+                },
+            },
+            {
+                unitId: 2,
+                position: hexArray[15],
+                remainingMoveUnits: 2,
+                moveUnits: 1,
+                health: 7,
+                sight: 3,
+                bearing: 1,
+                range: 2,
+                rangedStrength: 0,
+                strength: 2,
+                experience: 0,
+                owner: "blue",
+                displayStyle: "base-tank",
                 
                 fIsEligibleAttackPath: function(attackLineHex){
                     
@@ -369,13 +468,17 @@ Test.prototype = {
         // }
 
         var hexMap = new HexMap({
-          cols: 7,
+          cols: 8,
           rows: 2,
           size: 100,
           spacing: 5,
           offsetX: 0, //58,
           offsetY: 45, //58,
-          debug: true
+          debug: true,
+          mapSpecification: mapSpecification,
+          unitsSpecification: unitsSpecification,
+          mapAssets: mapAssets,
+          unitAssets: unitAssets
         });
         document.body.appendChild(hexMap.createSVG());
 
