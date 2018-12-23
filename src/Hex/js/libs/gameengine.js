@@ -540,6 +540,12 @@ GE.prototype = {
 		return unit;
 	},
 	/**
+	* returns units map
+	*/
+	getUnitsMap: function(){
+		return this.unitsMap;
+	},
+	/**
 	* Returns Hex from engine
 	*/
 	getHexData: function (hexId){
@@ -739,7 +745,7 @@ GE.prototype = {
 		var defendUnitPosition = defendUnit.position;
 
 		var battleOutcome = this.attack(attackUnit, defendUnit,4,4);
-		if(battleOutcome.casualty.equals(defendUnit))
+		if(battleOutcome.casualty && battleOutcome.casualty.equals(defendUnit))
 			this.positionUnit(attackUnit,defendUnitPosition);
 
 		// attackUnit.reapplyStyle();
@@ -748,6 +754,8 @@ GE.prototype = {
 		// this.uiUnitRerender(attackUnit);
 		// this.uiUnitRerender(defendUnit);
 
+		// consume move points from attack
+		this.consumeMovePoints(attackUnit,1);
 	
 
 		var gameEvent = new GameEngineEvent({
@@ -787,6 +795,10 @@ GE.prototype = {
         return hexes;
 	},
 
+	consumeMovePoints: function (unit, pointsToConsume){
+		unit.remainingMoveUnits = unit.remainingMoveUnits - pointsToConsume;
+	},
+
 	/**
 	* Method handles unit movement.
 	* First it checks if the destinationHex is reachable for the unit taking into consideration unit remaining move points, unit characteristics and terrain cost.
@@ -824,10 +836,12 @@ GE.prototype = {
 			var neighbourHex = path[0];
 			for (var i = 1; i< path.length-1;i++){
 				var hex = path[i];
-				unitData.remainingMoveUnits = unitData.remainingMoveUnits-hex._moveUnitsCost;	
+				//unitData.remainingMoveUnits = unitData.remainingMoveUnits-hex._moveUnitsCost;	
 				consumedMoveUnits+=hex._moveUnitsCost;
 				neighbourHex = hex;
 			}
+			// consume move points from move
+			this.consumeMovePoints(unit,consumedMoveUnits);
 			// position unit at destination neighbour
 			this.positionUnit(unit, neighbourHex);
 			// now the attack

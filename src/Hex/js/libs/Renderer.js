@@ -77,12 +77,14 @@ Renderer.prototype = {
 
 			this.uiUnitRerender(attackUnit);
 			this.uiUnitRerender(defendUnit);
+
+			var unit = gameEngineEvent.originator;
+			this.uiSelectUnit(unit);
 		}
 		if(gameEngineEvent.eventType=="UNIT_UPDATE"){
 			var unit = gameEngineEvent.originator;
 			// automatically select unit after update so field will be highlighted
-			this.uiSelectUnit(unit);
-			
+			this.uiSelectUnit(unit);			
 		}
 	},
 
@@ -472,10 +474,31 @@ Renderer.prototype = {
 		
 
 	},
+	/**
+	* Hihglights unit.
+	* All other units are dehighlighted.
+	*/
+	uiHighlightUnit: function (unit){
+		//  dehighlight all units
+		for( var idx in this.rendererParams.gameEngine.getUnitsMap()){
+			var unit2 = this.rendererParams.gameEngine.getUnitsMap()[idx];
+			var selector2 = "#"+unit2._unitId;
+			d3.select(selector2).classed('unit-highlight',false);			
+		}
+		// and apply highlight to the unit
+		var selector = "#"+unit._unitId;
+		d3.select(selector).classed('unit-highlight',true);
+	},
 
+	/**
+	* when unit is selected:
+	* - the unit is highlighted
+	* - unit move range is highlighted
+	*/
 	uiSelectUnit: function(unit){
 		var moveRange = this.rendererParams.gameEngine.moveRangeForUnit(unit);
 		this.uiHighlightHexes(moveRange);
+		this.uiHighlightUnit(unit);
 		console.log("[uiSelectUnit] Selected unit {1} ",unit);
 	},
 
