@@ -502,8 +502,7 @@ Renderer.prototype = {
 		console.log("[uiSelectUnit] Selected unit {1} ",unit);
 	},
 
-	uiUnitDie : function(unit){
-		
+	uiUnitDie : function(unit){		
 		$(GameUtils._safeIdSelector("#"+unit._unitId)).remove();
 	},
 
@@ -538,8 +537,8 @@ Renderer.prototype = {
 		if(!unitElement)
 			return;
 		
+		// calculate unit icon (bearing, health)
 		var fill = 	this._calculateUnitFill(unit);	
-
 		d3.select(unitElement).attr("fill",fill);
 
 		//handle unit position (rerender unit using its position)

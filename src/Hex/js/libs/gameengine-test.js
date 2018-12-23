@@ -74,56 +74,56 @@ Test.prototype = {
             {
                 r: 0,
                 q: 1,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
             {
                 r: 0,
                 q: 2,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
             {
                 r: 0,
                 q: 3,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
             {
                 r: 0,
                 q: 4,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
             {
                 r: 0,
                 q: 5,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
             {
                 r: 0,
                 q: 6,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
 
             // 2nd row
@@ -157,38 +157,38 @@ Test.prototype = {
             {
                 r: 1,
                 q: 3,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
             {
                 r: 1,
                 q: 4,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
             {
                 r: 1,
                 q: 5,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
             {
                 r: 1,
                 q: 6,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
 
             // 3rd            
@@ -204,20 +204,20 @@ Test.prototype = {
             {
                 r: 2,
                 q: 3,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             },
             {
                 r: 2,
                 q: 5,
-                moveUnitsCost: 1,
+                moveUnitsCost: 2,
                 displayStyle: "base-plains-forrest",
                 terrainType: "FOREST",
                 sightCost: 1,
-                defenceBonus: 0
+                defenceBonus: 0.7
             }
         ]};
 
@@ -312,6 +312,7 @@ Test.prototype = {
                     return 2*this._strength;
                 },
                 fDefend: function(unit){
+                    // this unit does not receive defence bonus from terrain
                     return this._strength;
                 },
                 fExperience: function (opponentStrength,damageInflicted, damageReceived){
@@ -377,7 +378,9 @@ Test.prototype = {
                     return 2*this._strength;
                 },
                 fDefend: function(unit){
-                    return this._strength;
+                    var defendHex = this.position;
+                    // this unit receives defence bonus from terrain
+                    return (this._strength)*(1+defendHex._defenceBonus);
                 },
                 fExperience: function (opponentStrength,damageInflicted, damageReceived){
                     var experienceGained = 0;
