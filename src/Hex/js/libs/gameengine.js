@@ -409,10 +409,7 @@ GE.prototype = {
 	/**
 	* Returns: BattleOutcome
 	*/
-	attack: function(attackUnit, defendUnit, baseDamage, baseDamageSpread){
-		// attack costs one move unit
-		attackUnit.remainingMoveUnits = attackUnit.remainingMoveUnits-1;
-
+	attack: function(attackUnit, defendUnit, baseDamage, baseDamageSpread){		
 		var attackStrength = attackUnit.attack(defendUnit);
 		var defendStrength = defendUnit.defend(attackUnit);
 
@@ -755,7 +752,7 @@ GE.prototype = {
 		// this.uiUnitRerender(defendUnit);
 
 		// consume move points from attack
-		this.consumeMovePoints(attackUnit,1);
+		this.consumeMovePoints(attackUnit,-1);
 	
 
 		var gameEvent = new GameEngineEvent({
@@ -795,8 +792,17 @@ GE.prototype = {
         return hexes;
 	},
 
+	/**
+	* Consumes unit move points.
+	* When negative value is passed then all remaining points are removed
+	*/
 	consumeMovePoints: function (unit, pointsToConsume){
-		unit.remainingMoveUnits = unit.remainingMoveUnits - pointsToConsume;
+		if(pointsToConsume>=0)
+			unit.remainingMoveUnits = unit.remainingMoveUnits - pointsToConsume;
+		else{
+			// for negative consume all remaining move points
+			unit.remainingMoveUnits = 0;
+		}
 	},
 
 	/**
