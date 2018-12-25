@@ -44,6 +44,10 @@ Renderer.prototype = {
 		// to na razie wykomentowane bo potrzebuje gameenginu wiec inicjalizuje D&D przy podpieciu gameenginu
 		//this.uiEnableUnitDragAndDropSupport();
 		console.log("Renderer initialized.",this.rendererParams);
+
+		var notifications = ["Pierwsza notyfikacja","Druga notyfikacja", "Trzecia nofytikacja troche dluzsza","I czwara lorem ipsum bardzo długi długi tekst może zakręci się o matko nadal się mieści co za szok","I czwara lorem ipsum bardzo długi długi tekst może zakręci się o matko nadal się mieści co za szok"];
+
+		
 	},
 
 	handleGameEngineEvent: function(gameEngineEvent){
@@ -68,6 +72,84 @@ Renderer.prototype = {
 		$(GameUtils._safeIdSelector("#"+hexData._hexId)).addClass(hexData._displayStyle);
 	},
 
+	_uiShowNotifications: function(messages, duration){
+		for(var i = 0; i<messages.length; i++ ){
+			this._uiShowNotification(messages[i], duration+(i*200), i*20);
+		}
+	},
+
+	_uiSplitString: function(message, lineLength){
+		var regexString = '.{<<param>>}\w*\W*|.*';
+		regexString = regexString.replace('<<param>>',lineLength);
+		var regex = new RegExp(regexString,"g") //g
+		//var linesArray = message.match(/.{60}\w*\W*|.*/g);
+		var linesArray = message.match(regex);
+		// var messageLength = message.length;
+		// var noOfLines = Math.ceil(messageLength/lineLength);
+		// for(var i = 0; i<noOfLines;i++){
+		// 	var potentialLine = message.substring(i*lineLength, (i+1)*lineLength);
+			
+		// 	var charAtEnd = potentialLine.charAt(potentialLine.length-1);
+		// 	if(/\s/.test(charAtEnd)){				
+		// 		linesArray.push(potentialLine);
+		// 	}else{
+
+		// 	}
+		// 	var line = message.substring(i*lineLength, (i+1)*lineLength);
+			
+		// }
+		return linesArray;
+	},
+
+	_uiShowNotification: function(message, duration, offset){
+		//var notification = d3.select('#svgroot').append('g').attr('id','notification');		
+		var notificationNode;
+
+		var that = this;
+
+
+
+		d3.xml("/assets/svg/game-ui.svg#notification").mimeType("image/svg+xml").get(function(error, xml) {
+			if (error) throw error;
+			//document.body.appendChild(xml.documentElement);
+
+			var el1 = xml.documentElement;
+			var notificationHolder = d3.select(el1).select('#notification');
+			notificationHolder
+			var messageHolder = d3.select(el1).select('#notification #message');
+			var messageOne = d3.select(el1).select('#notification #message #msg1');
+			var messageTwo = d3.select(el1).select('#notification #message #msg2');
+
+			var linesArray = that._uiSplitString(message, 75);
+			messageOne.text(linesArray[0]);
+			messageTwo.text(linesArray[1]);
+
+			//notificationNode = d3.select('#svgroot').node();
+
+			var outerNotificationHolder = d3.select('#svgroot').append('svg');
+			outerNotificationHolder.attr('y',outerNotificationHolder.attr('y')-offset);
+			notificationNode = outerNotificationHolder.node();
+
+			notificationNode.appendChild(notificationHolder.node());			
+
+			if(duration>0){
+				setTimeout(function(){
+					d3.select('#notification').remove();
+				},duration);
+			}
+			
+			
+		});
+		// notification.attr('href','/assets/svg/game-ui.svg#notification?lineOne=value1').attr('id','notification');
+		// var lineOne = d3.select('#notification #message #msg1');
+		// var lineTwo = d3.select('#notification #message #msg2');
+
+
+		// setTimeout(function(){
+		//      d3.select('#notification').remove();
+		// },15000);
+	},
+
 	_handleGameEngineEvent: function(gameEngineEvent){
 		if(gameEngineEvent.eventType=="BATTLE_PERFORMED"){
 			var battleOutcome = gameEngineEvent.battleOutcome;
@@ -80,6 +162,8 @@ Renderer.prototype = {
 
 			var unit = gameEngineEvent.originator;
 			this.uiSelectUnit(unit);
+
+			
 		}
 		if(gameEngineEvent.eventType=="UNIT_UPDATE"){
 			var unit = gameEngineEvent.originator;
