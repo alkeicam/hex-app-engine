@@ -18,7 +18,8 @@
 * - unit current  display style (css class ) for ui engine to render unit (to control unit visualization when damaged )
 */
 export function Unit(params){
-	var _unitId;				// 
+	var _unitId;	
+	var unitName;			// 
 	var position; 				// Hex
 	var _moveUnits;				// integer, positive
 	var remainingMoveUnits;		// integer, positive
@@ -78,6 +79,7 @@ Unit.prototype = {
 	*}
 	*/
 	initializeUnit: function(params){
+		this.unitName = params["unitName"];
 		this._unitId = params["unitId"];
 		this.position = params["position"];
 		this._moveUnits = params["moveUnits"];

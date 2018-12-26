@@ -45,9 +45,9 @@ Renderer.prototype = {
 		//this.uiEnableUnitDragAndDropSupport();
 		console.log("Renderer initialized.",this.rendererParams);
 
-		var notifications = ["Pierwsza notyfikacja","Druga notyfikacja", "Trzecia nofytikacja troche dluzsza","I czwara lorem ipsum bardzo długi długi tekst może zakręci się o matko nadal się mieści co za szok","I czwara lorem ipsum bardzo długi długi tekst może zakręci się o matko nadal się mieści co za szok"];
+		// var notifications = ["Pierwsza notyfikacja","Druga notyfikacja", "Trzecia nofytikacja troche dluzsza","I czwara lorem ipsum bardzo długi długi tekst może zakręci się o matko nadal się mieści co za szok","I czwara lorem ipsum bardzo długi długi tekst może zakręci się o matko nadal się mieści co za szok"];
 
-		
+		// this._uiShowNotifications(notifications);
 	},
 
 	handleGameEngineEvent: function(gameEngineEvent){
@@ -73,8 +73,10 @@ Renderer.prototype = {
 	},
 
 	_uiShowNotifications: function(messages, duration){
+		var calculatedDuration = duration?duration:5500;
+
 		for(var i = 0; i<messages.length; i++ ){
-			this._uiShowNotification(messages[i], duration+(i*200), i*20);
+			this._uiShowNotification(messages[i], calculatedDuration+(i*200), i*20);
 		}
 	},
 
@@ -84,20 +86,6 @@ Renderer.prototype = {
 		var regex = new RegExp(regexString,"g") //g
 		//var linesArray = message.match(/.{60}\w*\W*|.*/g);
 		var linesArray = message.match(regex);
-		// var messageLength = message.length;
-		// var noOfLines = Math.ceil(messageLength/lineLength);
-		// for(var i = 0; i<noOfLines;i++){
-		// 	var potentialLine = message.substring(i*lineLength, (i+1)*lineLength);
-			
-		// 	var charAtEnd = potentialLine.charAt(potentialLine.length-1);
-		// 	if(/\s/.test(charAtEnd)){				
-		// 		linesArray.push(potentialLine);
-		// 	}else{
-
-		// 	}
-		// 	var line = message.substring(i*lineLength, (i+1)*lineLength);
-			
-		// }
 		return linesArray;
 	},
 
@@ -107,11 +95,8 @@ Renderer.prototype = {
 
 		var that = this;
 
-
-
 		d3.xml("/assets/svg/game-ui.svg#notification").mimeType("image/svg+xml").get(function(error, xml) {
-			if (error) throw error;
-			//document.body.appendChild(xml.documentElement);
+			if (error) throw error;	
 
 			var el1 = xml.documentElement;
 			var notificationHolder = d3.select(el1).select('#notification');
@@ -120,11 +105,9 @@ Renderer.prototype = {
 			var messageOne = d3.select(el1).select('#notification #message #msg1');
 			var messageTwo = d3.select(el1).select('#notification #message #msg2');
 
-			var linesArray = that._uiSplitString(message, 75);
+			var linesArray = that._uiSplitString(message, 50);
 			messageOne.text(linesArray[0]);
 			messageTwo.text(linesArray[1]);
-
-			//notificationNode = d3.select('#svgroot').node();
 
 			var outerNotificationHolder = d3.select('#svgroot').append('svg');
 			outerNotificationHolder.attr('y',outerNotificationHolder.attr('y')-offset);
@@ -140,14 +123,6 @@ Renderer.prototype = {
 			
 			
 		});
-		// notification.attr('href','/assets/svg/game-ui.svg#notification?lineOne=value1').attr('id','notification');
-		// var lineOne = d3.select('#notification #message #msg1');
-		// var lineTwo = d3.select('#notification #message #msg2');
-
-
-		// setTimeout(function(){
-		//      d3.select('#notification').remove();
-		// },15000);
 	},
 
 	_handleGameEngineEvent: function(gameEngineEvent){
@@ -162,8 +137,13 @@ Renderer.prototype = {
 
 			var unit = gameEngineEvent.originator;
 			this.uiSelectUnit(unit);
+			var messages = [];
+			messages.push("Attacking unit "+attackUnit.unitName+" has inflicted "+battleOutcome.attackerDamageInflicted+" damage.");
 
 			
+			if(defendUnit.health == 0 )
+				messages.push("Enemy unit "+defendUnit.unitName+" has died.");					
+			this._uiShowNotifications(messages);
 		}
 		if(gameEngineEvent.eventType=="UNIT_UPDATE"){
 			var unit = gameEngineEvent.originator;
@@ -325,26 +305,6 @@ Renderer.prototype = {
 
 	},
 
-	uiDragStarted: function(){
-		console.log('Started',this,d3.event);
-		d3.select(this).attr('drag-start-x',this.x.baseVal.value);
-		d3.select(this).attr('drag-start-y',this.y.baseVal.value);
-	},
-
-	uiDragged: function(){
-		console.log(this,d3.event);
-		d3.select(this).attr("x", d3.event.x-this.getBBox().width/2).attr("y", d3.event.y-this.getBBox().height/2);
-	},
-
-	uiDragEnd: function(){
-		console.log(this,d3.event);
-		var snapElement = this._elementOfClassFromPoint(d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY,"snaptarget");
-		var snapX = d3.select(snapElement).attr("x");
-		var snapY = d3.select(snapElement).attr("y");
-		d3.select(this).attr("x", snapX).attr("y", snapY);
-
-	},
-
 	uiEnableUnitDragAndDropSupport: function(){
 		var gameEngine = this.rendererParams.gameEngine;
 		var renderer = this;
@@ -352,42 +312,66 @@ Renderer.prototype = {
 		console.log(unitsSVG);
 		unitsSVG.call(d3.drag()
 			.on("start", function(){
-				console.log('Started',this,d3.event);
-				d3.select(this).attr('drag-start-x',this.x.baseVal.value);
-				d3.select(this).attr('drag-start-y',this.y.baseVal.value);
-			}).on("drag", function(){
-				console.log(this,d3.event);
-				d3.select(this).attr("x", d3.event.x-this.getBBox().width/2).attr("y", d3.event.y-this.getBBox().height/2);
-			}).on("end",function(){
-				d3.select(this).attr('drag-start-x');
-				console.log(this,d3.event);
-				var snapElement = renderer._elementOfClassFromPoint(d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY,"snaptarget");
-				
-				var hexId = d3.select(snapElement).attr("id");				
-				var hex = gameEngine.getHexData(hexId);
-
 				var unitId = d3.select(this).attr("id");
 				var unit = gameEngine.getUnitData(unitId);
-
-				if(unit.position.equals(hex)){
-					// no real move, do nothing
-					return;
+				var isActive = gameEngine.isActiveUnit(unit);
+				if(isActive){
+					console.log('Started',this,d3.event);
+					d3.select(this).attr('drag-start-x',this.x.baseVal.value);
+					d3.select(this).attr('drag-start-y',this.y.baseVal.value);	
 				}
-				if(!snapElement){
+			}).on("drag", function(){
+				var unitId = d3.select(this).attr("id");
+				var unit = gameEngine.getUnitData(unitId);
+				var isActive = gameEngine.isActiveUnit(unit);
+				if(isActive){
+					console.log(this,d3.event);
+					d3.select(this).attr("x", d3.event.x-this.getBBox().width/2).attr("y", d3.event.y-this.getBBox().height/2);	
+				}				
+			}).on("end",function(){
+				var unitId = d3.select(this).attr("id");
+				var unit = gameEngine.getUnitData(unitId);
+				var isActive = gameEngine.isActiveUnit(unit);
+
+				if(isActive){
+					d3.select(this).attr('drag-start-x');
+					console.log(this,d3.event);
+
+					var event = d3.event;
+					var snapElement;
+					if(event.sourceEvent instanceof TouchEvent){
+						snapElement = renderer._elementOfClassFromPoint(d3.event.sourceEvent.changedTouches[0].clientX, d3.event.sourceEvent.changedTouches[0].clientY,"snaptarget");
+					}else{
+						snapElement = renderer._elementOfClassFromPoint(d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY,"snaptarget");
+					}
+					
+					
+					var hexId = d3.select(snapElement).attr("id");				
+					var hex = gameEngine.getHexData(hexId);
+
+					var unitId = d3.select(this).attr("id");
+					var unit = gameEngine.getUnitData(unitId);
+
+					if(unit.position.equals(hex)){
+						// no real move, do nothing
+						return;
+					}
+					if(!snapElement){
+						renderer.uiUnitRerender(unit);
+						return;
+					}
+
+					var snapX = d3.select(snapElement).attr("x");
+					var snapY = d3.select(snapElement).attr("y");
+					d3.select(this).attr("x", snapX).attr("y", snapY);
+
+					// handle unit bearing after move
+					var direction = renderer._uiHandleBearingAfterDrag(this, snapElement);
+					unit.bearing = direction;							
+
+					gameEngine.moveUnit(unit,hex);
 					renderer.uiUnitRerender(unit);
-					return;
 				}
-
-				var snapX = d3.select(snapElement).attr("x");
-				var snapY = d3.select(snapElement).attr("y");
-				d3.select(this).attr("x", snapX).attr("y", snapY);
-
-				// handle unit bearing after move
-				var direction = renderer._uiHandleBearingAfterDrag(this, snapElement);
-				unit.bearing = direction;							
-
-				gameEngine.moveUnit(unit,hex);
-				renderer.uiUnitRerender(unit);
 			}));
 		
 		// for (var unit of unitsSVG){

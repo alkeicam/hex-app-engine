@@ -266,6 +266,7 @@ Test.prototype = {
                 unitId: "red-1",
                 position: hexArray[2],
                 remainingMoveUnits: 2,
+                unitName: 'Modern Tank',
                 moveUnits: 2,
                 health: 10,
                 sight: 3,
@@ -330,6 +331,7 @@ Test.prototype = {
             },
             {
                 unitId: "blue-1",
+                unitName: 'Modern Tank',
                 position: hexArray[15],
                 remainingMoveUnits: 2,
                 moveUnits: 2,
