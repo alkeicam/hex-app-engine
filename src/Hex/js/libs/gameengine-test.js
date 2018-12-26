@@ -546,9 +546,7 @@ Test.prototype = {
 
         this.testData["gameEngine"] = gameEngine;
         renderer.bindGameEngine(gameEngine);
-        renderer.bindHexMap(hexMap);
-
-        
+        renderer.bindHexMap(hexMap);                
 	},
 
 	testHexInitialize: function(){

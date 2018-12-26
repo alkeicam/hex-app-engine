@@ -3,6 +3,7 @@ import {Hex} from './Hex.js'
 import {Unit} from './Unit.js'
 import {HexEvent} from './HexEvent.js'
 import {UnitEvent} from './UnitEvent.js'
+import {TurnEvent} from './TurnEvent.js'
 import {GameEngineEvent} from './GameEngineEvent.js'
 
  function LOGGER(){
@@ -295,7 +296,8 @@ GE.prototype = {
 			// this.uiAddUnitClickHandler(unitData);
 		}	
 
-
+		var turnEvent = new TurnEvent(engineParams.turn);
+		this.publishEvent(turnEvent);
 		
 		this.renderer = engineParams.renderer;
 
@@ -991,6 +993,10 @@ GE.prototype = {
 				unit.restoreMovePoints();			
 			}
 		}
+
+		var event = new TurnEvent(newTurn);
+		this.publishEvent(event);
+
     },
 	
 	_cubeLERP: function (cubeFrom, cubeTo, lerpParam){

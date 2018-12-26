@@ -1,5 +1,5 @@
 /**
-* Represents a event originated in Game Engine for some Hex in the game.
+* Represents a event originated in Game Engine for some Unit in the game.
 */
 export function UnitEvent(unit, type, company){
 	var _unit;

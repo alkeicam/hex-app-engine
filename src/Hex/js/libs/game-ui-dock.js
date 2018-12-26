@@ -1,3 +1,5 @@
+import {TurnEvent} from './TurnEvent.js'
+
 /**
 *
 */
@@ -58,26 +60,38 @@ GameUIDock.prototype = {
 		return "dock-unit-selected";
 	},
 	handleGameEngineEvent: function(gameEngineEvent){
-		switch(gameEngineEvent.eventType){
-			case "UNIT_SELECTED":
-				this.deselectAllUnits();
-				this.selectUnit(gameEngineEvent.originator);
-			break;
-			case "BATTLE_PERFORMED":
-				var battleOutcome = gameEngineEvent.battleOutcome;
+		if(gameEngineEvent instanceof TurnEvent){			
+			// remove all colors
+			d3.select('.company-colors').classed("company-colors-red",false);
+			d3.select('.company-colors').classed("company-colors-blue",false);
+			//
+			var color = gameEngineEvent.turn().activeParty;
+			var turnNo = gameEngineEvent.turn().no;
+			var colorClass = "company-colors-" + color;			
+			d3.select('.company-colors').classed(colorClass,true);
+			d3.select('.turn-no').text(turnNo);
+		}else{
+			switch(gameEngineEvent.eventType){
+				case "UNIT_SELECTED":
+					this.deselectAllUnits();
+					this.selectUnit(gameEngineEvent.originator);
+				break;
+				case "BATTLE_PERFORMED":
+					var battleOutcome = gameEngineEvent.battleOutcome;
 
-				if(battleOutcome.attackingUnit._owner==this.gameUIParams.company.owner())
-					this.updateUnit(battleOutcome.attackingUnit);
-				else
-					this.updateUnit(battleOutcome.defendingUnit);
-			break;
-			case "UNIT_UPDATE":
-				this.updateUnit(gameEngineEvent.originator);
-			break;
-			default:
-				console.log("[handleGameEngineEvent] Unknown event received ",this,gameEngineEvent);
-			break;
-		}
+					if(battleOutcome.attackingUnit._owner==this.gameUIParams.company.owner())
+						this.updateUnit(battleOutcome.attackingUnit);
+					else
+						this.updateUnit(battleOutcome.defendingUnit);
+				break;
+				case "UNIT_UPDATE":
+					this.updateUnit(gameEngineEvent.originator);
+				break;
+				default:
+					console.log("[handleGameEngineEvent] Unknown event received ",this,gameEngineEvent);
+				break;
+			}
+		}	
 		console.log("Received event",gameEngineEvent);
 	},
 	selectUnit: function(unit){
