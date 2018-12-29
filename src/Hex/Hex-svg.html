@@ -67,6 +67,9 @@
         window.Turn = Turn;
         console.log(window.gameProxy);
 
+        function nextTurn(){
+
+        }
     </script>
 
     <script type="text/javascript">        
@@ -360,10 +363,33 @@
             <div id="6,1" class='hexagon'><div id="6,1" class="snaptarget"></div></div>
             <div id="8,0" class='hexagon map-mountains'><div id="8,0" class="snaptarget"></div></div>
         </div>
-        
+        13  45  78  
         
     </div>    -->
-    <div class="game-bar"><div class="company-colors"></div><div class="turn-info">TURN <span class='turn-no'></span></div></div>
+    <div class="game-bar"><div class="company-colors"></div><div class="turn-info">TURN <span class='turn-no'></span></div>
+        <div class="turn-changer">
+            <input name="nextTurnButton" 
+            class="turn-next-button"
+           type="button" 
+           value="Next Turn" 
+           onclick="gameProxy.nextTurn()" />
+        </div>
+    </div>
+
+    <div class="game-dock">
+        <div class="game-dock-unit">
+            <svg class="game-dock-unit-icon" viewBox="0 0 31.75 30.5">
+                <use xlink:href=""></use>
+            </svg>
+        </div>
+        <div class="game-dock-unit-details">
+            <div class="game-dock-unit-name"></div>
+            <div><span class="game-dock-unit-strength"></span><span> MELEE STRENGTH</span></div>
+            <div class="game-dock-unit-movement"><span class="current"></span><span class="total"></span><span> MOVEMENT</span></div>
+            <div class="game-dock-unit-health"><div class="game-dock-unit-health-current"></div></div>
+        </div>
+
+    </div>
         <!-- 
     <img class="company-colors" src="https://dl.dropboxusercontent.com/u/13589251/Hex/user/colors-large.png">
 
@@ -379,8 +405,8 @@
     <img src="http://0.s3.envato.com/files/148144870/03_snowy_mountains_south_america_thumb.jpg">
     <img src="http://0.s3.envato.com/files/148144870/03_snowy_mountains_south_america_thumb.jpg">
     -->
-        <div class="dockbg"></div>
-<div class="dock">
+        <div class="dockbg" style="display: none"></div>
+        <div class="dock" style="display: none">
 
 </div>                                 
 </body>

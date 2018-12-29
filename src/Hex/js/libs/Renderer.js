@@ -1,6 +1,7 @@
 import {HexEvent} from './HexEvent.js'
 import {UnitEvent} from './UnitEvent.js'
 import {GameEngineEvent} from './GameEngineEvent.js'
+import {TurnEvent} from './TurnEvent.js'
 
 export function Renderer(params){
 	var rendererParams;
@@ -58,6 +59,10 @@ Renderer.prototype = {
 		if(gameEngineEvent instanceof UnitEvent){
 			console.log("Handling event",gameEngineEvent);
 			this._handleUnitEvent(gameEngineEvent)
+		}
+		if(gameEngineEvent instanceof TurnEvent){	
+			this._handleTurnEvent(gameEngineEvent);
+			
 		}
 		if(gameEngineEvent instanceof GameEngineEvent){
 			console.log("Handling event",gameEngineEvent);
@@ -150,6 +155,11 @@ Renderer.prototype = {
 			// automatically select unit after update so field will be highlighted
 			this.uiSelectUnit(unit);			
 		}
+	},
+
+	_handleTurnEvent: function(turnEvent){
+		// deselect all units on turn change
+		this.uiDehighlightAllUnits();
 	},
 
 	_handleUnitEvent: function(unitEvent){
@@ -542,17 +552,25 @@ Renderer.prototype = {
 		
 
 	},
+
+	uiDehighlightAllUnits: function(){
+		// make sure that everything is initialized (for initial turn we do not want to dehiglight)
+		if(this.rendererParams.gameEngine){
+			//  dehighlight all units		
+			for( var idx in this.rendererParams.gameEngine.getUnitsMap()){
+				var unit2 = this.rendererParams.gameEngine.getUnitsMap()[idx];
+				var selector2 = "#"+unit2._unitId;
+				d3.select(selector2).classed('unit-highlight',false);			
+			}
+		}
+	},
+
 	/**
 	* Hihglights unit.
 	* All other units are dehighlighted.
 	*/
 	uiHighlightUnit: function (unit){
-		//  dehighlight all units
-		for( var idx in this.rendererParams.gameEngine.getUnitsMap()){
-			var unit2 = this.rendererParams.gameEngine.getUnitsMap()[idx];
-			var selector2 = "#"+unit2._unitId;
-			d3.select(selector2).classed('unit-highlight',false);			
-		}
+		this.uiDehighlightAllUnits();
 		// and apply highlight to the unit
 		var selector = "#"+unit._unitId;
 		d3.select(selector).classed('unit-highlight',true);
@@ -582,7 +600,7 @@ Renderer.prototype = {
 	},
 
 	_calculateHealthIndex: function (unit){
-		var healthIndicator =  Math.ceil(4*unit.health/10.0) - 1;
+		var healthIndicator =  Math.floor(4*unit.health/10.0) - 1;
 		return healthIndicator;
 	},
 

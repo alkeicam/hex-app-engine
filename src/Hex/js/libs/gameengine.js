@@ -979,11 +979,19 @@ GE.prototype = {
     	return unit._owner == this.engineParams["turn"].activeParty;
     },
 
+    nextTurn: function(){
+    	var currentTurn = this.engineParams["turn"];
+    	var nextTurnColor = currentTurn.activeParty == "red" ? "blue":"red";
+    	var nextTurnNo = nextTurnColor == "red" ? currentTurn.no+1: currentTurn.no;
+
+    	var newTurn = new Turn(nextTurnNo,nextTurnColor);
+    	this.nextTurnWithTurn(newTurn);
+    },
     /**
     * Handles new turn.
     * Resets units movement points
     */
-    nextTurn: function(newTurn){    	
+    nextTurnWithTurn: function(newTurn){    	
     	this.engineParams["turn"] = newTurn;
     	// restore maximum movement points for units whose turn is active
     	for( var idx in this.getUnitsMap()){

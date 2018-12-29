@@ -276,7 +276,7 @@ Test.prototype = {
                 strength: 2,
                 experience: 0,
                 owner: "red",
-                displayStyle: "base-tank",
+                displayStyle: "base-tank",  // should match unit assets catalog, displayId
                 
                 fIsEligibleAttackPath: function(attackLineHex){
                     
@@ -492,7 +492,8 @@ Test.prototype = {
         // prepare gameUI
         var gameUIParams = {            
             units: unitsArray,            
-            company: company
+            company: company,
+            unitAssets: unitAssets
         };
 
         var gameUI = new GameUIDock(gameUIParams);

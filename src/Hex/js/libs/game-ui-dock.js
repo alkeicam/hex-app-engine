@@ -5,6 +5,7 @@ import {TurnEvent} from './TurnEvent.js'
 */
 export function GameUIDock(params){
 	var gameUIParams;
+	var currentTurn;
 
 	if (window === this){
 		return new GameUIDock(params);
@@ -60,7 +61,8 @@ GameUIDock.prototype = {
 		return "dock-unit-selected";
 	},
 	handleGameEngineEvent: function(gameEngineEvent){
-		if(gameEngineEvent instanceof TurnEvent){			
+		if(gameEngineEvent instanceof TurnEvent){	
+			this.currentTurn = 	gameEngineEvent.turn();	
 			// remove all colors
 			d3.select('.company-colors').classed("company-colors-red",false);
 			d3.select('.company-colors').classed("company-colors-blue",false);
@@ -70,22 +72,25 @@ GameUIDock.prototype = {
 			var colorClass = "company-colors-" + color;			
 			d3.select('.company-colors').classed(colorClass,true);
 			d3.select('.turn-no').text(turnNo);
+
+			this.dockDeselectUnit();
 		}else{
 			switch(gameEngineEvent.eventType){
-				case "UNIT_SELECTED":
-					this.deselectAllUnits();
-					this.selectUnit(gameEngineEvent.originator);
+				case "UNIT_SELECTED":					
+					this.dockSelectUnit(gameEngineEvent.originator);
 				break;
 				case "BATTLE_PERFORMED":
 					var battleOutcome = gameEngineEvent.battleOutcome;
 
-					if(battleOutcome.attackingUnit._owner==this.gameUIParams.company.owner())
-						this.updateUnit(battleOutcome.attackingUnit);
-					else
-						this.updateUnit(battleOutcome.defendingUnit);
+					if(battleOutcome.attackingUnit._owner==this.currentTurn.activeParty){						
+						this.dockSelectUnit(battleOutcome.attackingUnit);
+					}
+					else{												
+						this.dockSelectUnit(battleOutcome.defendingUnit);
+					}
 				break;
-				case "UNIT_UPDATE":
-					this.updateUnit(gameEngineEvent.originator);
+				case "UNIT_UPDATE":					
+					this.dockSelectUnit(gameEngineEvent.originator);
 				break;
 				default:
 					console.log("[handleGameEngineEvent] Unknown event received ",this,gameEngineEvent);
@@ -94,6 +99,43 @@ GameUIDock.prototype = {
 		}	
 		console.log("Received event",gameEngineEvent);
 	},
+
+	_findAssetMatchingUnit: function(unit){
+		var assets = this.gameUIParams.unitAssets.assets;
+		for(var i = 0; i<assets.length; i++){
+			var asset = this.gameUIParams.unitAssets.assets[i];
+			if(asset.catalog+"-"+asset.displayId == unit._displayStyle)
+				return asset;
+		}		
+	},
+
+	dockDeselectUnit: function(){
+		d3.select('.game-dock').style("visibility", "hidden");
+	},
+
+	dockSelectUnit: function (unit){
+		var asset = this._findAssetMatchingUnit(unit);
+		if(asset){
+			d3.select('.game-dock').style("visibility", "visible");
+			
+			d3.select('.game-dock-unit-icon use').attr('xlink:href','/assets/svg/'+asset.resource);
+			d3.select('.game-dock-unit-name').text(unit.unitName);
+			d3.select('.game-dock-unit-strength').text(unit._strength);
+			d3.select('.game-dock-unit-movement .current').text(unit.remainingMoveUnits+"/");
+			d3.select('.game-dock-unit-movement .total').text(unit._moveUnits);
+			var healthStyle = Math.ceil(100*unit.health/10);
+			var colorIndex = Math.floor(healthStyle/25)-1;
+			healthStyle += "%";
+			
+			var colors = ["red","orange","#c7c748","green"];
+			var color = colors[colorIndex];
+			d3.select('.game-dock-unit-health-current').style("width",healthStyle);						
+			d3.select('.game-dock-unit-health-current').style("background-color",colors[colorIndex]);						
+			var healthText = ''+unit.health+"/10";
+			d3.select('.game-dock-unit-health-current').text(healthText);
+		}
+	},
+
 	selectUnit: function(unit){
 		var unitElement = this.getUnitElement(unit);
 		if(!unitElement)
