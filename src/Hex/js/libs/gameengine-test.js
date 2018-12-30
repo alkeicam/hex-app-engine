@@ -314,8 +314,8 @@ Test.prototype = {
                     return 2*this._strength;
                 },
                 fDefend: function(unit){
-                    // this unit does not receive defence bonus from terrain
-                    return this._strength;
+                    var defendHex = this.position;
+                    return (this._strength)*(1+defendHex._defenceBonus);
                 },
                 fExperience: function (opponentStrength,damageInflicted, damageReceived){
                     var experienceGained = 0;
