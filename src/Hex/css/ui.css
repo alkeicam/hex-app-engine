@@ -24,6 +24,7 @@
     border-style: solid;
     background-color: #0d2d4e;
     line-height: 2em;
+    visibility: hidden;
 }
 
 .game-dock-unit { 

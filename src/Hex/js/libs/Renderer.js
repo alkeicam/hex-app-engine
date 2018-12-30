@@ -289,6 +289,7 @@ Renderer.prototype = {
 			"1,-1": 2,
 			"0,-1": 3,
 			"-1,-1": 4,
+			"-1,0": 4,
 			"-1,1": 5,
 			"1,0": 1
 			
@@ -326,7 +327,7 @@ Renderer.prototype = {
 				var unit = gameEngine.getUnitData(unitId);
 				var isActive = gameEngine.isActiveUnit(unit);
 				if(isActive){
-					console.log('Started',this,d3.event);
+					
 					d3.select(this).attr('drag-start-x',this.x.baseVal.value);
 					d3.select(this).attr('drag-start-y',this.y.baseVal.value);	
 				}
@@ -335,7 +336,7 @@ Renderer.prototype = {
 				var unit = gameEngine.getUnitData(unitId);
 				var isActive = gameEngine.isActiveUnit(unit);
 				if(isActive){
-					console.log(this,d3.event);
+					
 					d3.select(this).attr("x", d3.event.x-this.getBBox().width/2).attr("y", d3.event.y-this.getBBox().height/2);	
 				}				
 			}).on("end",function(){
@@ -344,8 +345,7 @@ Renderer.prototype = {
 				var isActive = gameEngine.isActiveUnit(unit);
 
 				if(isActive){
-					d3.select(this).attr('drag-start-x');
-					console.log(this,d3.event);
+					d3.select(this).attr('drag-start-x');					
 
 					var event = d3.event;
 					var snapElement;
@@ -378,7 +378,7 @@ Renderer.prototype = {
 					// handle unit bearing after move
 					var direction = renderer._uiHandleBearingAfterDrag(this, snapElement);
 					unit.bearing = direction;							
-
+					console.log('Unit bearing: ',direction);
 					gameEngine.moveUnit(unit,hex);
 					renderer.uiUnitRerender(unit);
 				}
@@ -600,7 +600,8 @@ Renderer.prototype = {
 	},
 
 	_calculateHealthIndex: function (unit){
-		var healthIndicator =  Math.floor(4*unit.health/10.0) - 1;
+		var healthIndicator = Math.ceil(100*unit.health/10);
+		healthIndicator = Math.max(Math.ceil(healthIndicator/25)-1,0);			
 		return healthIndicator;
 	},
 
@@ -611,8 +612,9 @@ Renderer.prototype = {
 		// rerender unit state (health)
 		var healthIndex = this._calculateHealthIndex(unit);
 
-		var fillPattern = 'url(#unit-{{flag}}-{{asset}}-{{direction}}-{{health}})';
+		var fillPattern = 'url(#unit-{{flag}}-{{asset}}-{{direction}}-{{health}})';		
     	fillPattern = fillPattern.replace('{{asset}}',unit._displayStyle).replace('{{direction}}',unit.bearing).replace('{{health}}',healthIndex).replace('{{flag}}',unit._owner);
+    	console.log("Calculated fill:",fillPattern, healthIndex, unit.bearing);
     	return fillPattern;
 	},
 	/**

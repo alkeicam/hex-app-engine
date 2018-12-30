@@ -73,6 +73,8 @@ GameUIDock.prototype = {
 			d3.select('.company-colors').classed(colorClass,true);
 			d3.select('.turn-no').text(turnNo);
 
+			d3.select('.turn-next-button').style('background-color',this.currentTurn.activeParty);
+
 			this.dockDeselectUnit();
 		}else{
 			switch(gameEngineEvent.eventType){
@@ -113,21 +115,26 @@ GameUIDock.prototype = {
 		d3.select('.game-dock').style("visibility", "hidden");
 	},
 
+	_isActiveUnit: function(unit){
+    	return unit._owner == this.currentTurn.activeParty;
+    },
+
 	dockSelectUnit: function (unit){
 		var asset = this._findAssetMatchingUnit(unit);
-		if(asset){
+		if(asset && this._isActiveUnit(unit)){
 			d3.select('.game-dock').style("visibility", "visible");
 			
 			d3.select('.game-dock-unit-icon use').attr('xlink:href','/assets/svg/'+asset.resource);
 			d3.select('.game-dock-unit-name').text(unit.unitName);
+			d3.select('.game-dock-unit-name').style('background-color',this.currentTurn.activeParty);
 			d3.select('.game-dock-unit-strength').text(unit._strength);
 			d3.select('.game-dock-unit-movement .current').text(unit.remainingMoveUnits+"/");
 			d3.select('.game-dock-unit-movement .total').text(unit._moveUnits);
 			var healthStyle = Math.ceil(100*unit.health/10);
-			var colorIndex = Math.floor(healthStyle/25)-1;
+			var colorIndex = Math.max(Math.ceil(healthStyle/25)-1,0);
 			healthStyle += "%";
 			
-			var colors = ["red","orange","#c7c748","green"];
+			var colors = ["red","#c7c748","orange","green"];
 			var color = colors[colorIndex];
 			d3.select('.game-dock-unit-health-current').style("width",healthStyle);						
 			d3.select('.game-dock-unit-health-current').style("background-color",colors[colorIndex]);						
