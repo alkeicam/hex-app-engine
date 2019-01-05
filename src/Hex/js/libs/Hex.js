@@ -42,7 +42,7 @@ Hex.prototype = {
 	_initialize: function(q,r,params){
 		this.q = q;
 		this.r = r;
-		this._hexId = q+","+r;
+		this._hexId = "h_"+q+"_"+r;
 		if(params){
 			this._moveUnitsCost = (params["moveUnitsCost"]>0)?params["moveUnitsCost"]:1;
 			this._displayStyle = (params["displayStyle"])?params["displayStyle"]:"map-forest";
@@ -52,7 +52,7 @@ Hex.prototype = {
 		}	
 	},
 	_initFromHexId: function(hexId,params){
-		var hexXAndY = hexId.split(",");
+		var hexXAndY = hexId.replace('h_','').split("_");
 		var hexX = Number(hexXAndY[0]);
 		var hexY = Number(hexXAndY[1]);
 

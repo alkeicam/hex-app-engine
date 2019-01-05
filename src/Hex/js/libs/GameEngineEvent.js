@@ -4,7 +4,7 @@
 export function GameEngineEvent(params){
 	var originator;	// may be unit
 	var battleOutcome;	// if any
-	var eventType;	// UNIT_SELECTED, BATTLE_PERFORMED, UNIT_UPDATE, UNIT_DIE
+	var eventType;	// UNIT_SELECTED, BATTLE_PERFORMED, UNIT_UPDATE, UNIT_DIE, TURN
 
 	if (window === this){
 		return new GameEngineEvent(params);

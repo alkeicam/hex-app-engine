@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>  <html class="ie ie6 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 7]>     <html class="ie ie7 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 8]>     <html class="ie ie8 lte9 lte8 no-js">      <![endif]-->
+<!--[if IE 9]>     <html class="ie ie9 lte9 no-js">           <![endif]-->
+<!--[if gt IE 9]>  <html class="no-js">                       <![endif]-->
+<!--[if !IE]><!--> <html class="no-js">                       <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>MapEditor</title>
+
+    <!-- // IOS webapp icons // -->
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <link rel="stylesheet" href="css/ui.css"/>
+    <link rel="stylesheet" href="css/map.css"/>    
+    <!-- <link rel="stylesheet" href="css/map-editor.css"/> -->
+    
+
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    
+    
+<!--     <script type="module" src="js/libs/BattleOutcome.js"></script>
+    <script type="module" src="js/libs/Hex.js"></script>
+    <script type="module" src="js/libs/Unit.js"></script>
+ -->    
+    <script src="js/libs/jquery-3.3.1.min.js"></script>
+    <!-- <script src="js/libs/jquery-ui-1.10.4.min.js"></script> -->
+    <script src="js/libs/gameutils.js"></script>
+    <!-- <script src="js/drag/TweenMax.min.js"></script> -->
+    <!-- <script src="js/drag/utils/Draggable.min.js"></script> -->
+    <!-- <script src="js/libs/svg.min.js"></script>
+     <script src="js/libs/svg.draggable.min.js"></script> -->
+     <!-- <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+     <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+     <script src="https://d3js.org/d3-drag.v1.min.js"></script> -->
+     <script src="https://d3js.org/d3.v4.min.js"></script>
+    
+    
+
+    <script type="module">
+        import {MapEditor} from './js/libs/map-editor.js'  
+
+        var mapAssets = {};
+        mapAssets = {
+            assets: [
+                {
+                    description: "Base catalog - DESERT tile",
+                    catalog: "base",
+                    displayId: "desert-tent",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "0 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - PLAINS WITH FORREST tile",
+                    catalog: "base",
+                    displayId: "plains-forrest",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "37.04 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - GLACIER tile",
+                    catalog: "base",
+                    displayId: "glacier-blank",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "74.08 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - OCEAN tile",
+                    catalog: "base",
+                    displayId: "ocean-blank",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "111.12 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - PLAINS with RIVER tile",
+                    catalog: "base",
+                    displayId: "plains-river",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "148.16 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - PLAINS with RIVER (2) tile",
+                    catalog: "base",
+                    displayId: "plains-river-2",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "185.2 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - MOUNTAIN tile",
+                    catalog: "base",
+                    displayId: "mountains-blank",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "222.24 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - PLAINS tile",
+                    catalog: "base",
+                    displayId: "plains-blank",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "259.28 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - HILLS tile",
+                    catalog: "base",
+                    displayId: "hills-blank",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "296.32 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - HILLS with FORREST tile",
+                    catalog: "base",
+                    displayId: "hills-forrest",
+                    resource: "base_v1.svg#layer1",
+                    viewbox: "333.36 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - CITY Center tile",
+                    catalog: "base",
+                    displayId: "district-center",
+                    resource: "city_v1.svg#layer1",
+                    viewbox: "0 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - CITY Commercial tile",
+                    catalog: "base",
+                    displayId: "district-commercial",
+                    resource: "city_v1.svg#layer1",
+                    viewbox: "37.04 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - CITY Industrial tile",
+                    catalog: "base",
+                    displayId: "district-industrial",
+                    resource: "city_v1.svg#layer1",
+                    viewbox: "74.08 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - CITY Science tile",
+                    catalog: "base",
+                    displayId: "district-science",
+                    resource: "city_v1.svg#layer1",
+                    viewbox: "111.12 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - CITY Suburbs tile",
+                    catalog: "base",
+                    displayId: "district-suburbs",
+                    resource: "city_v1.svg#layer1",
+                    viewbox: "148.16 0 37.04 31.75"
+                },
+                {
+                    description: "Base catalog - CITY Agriculture tile",
+                    catalog: "base",
+                    displayId: "district-agriculture",
+                    resource: "city_v1.svg#layer1",
+                    viewbox: "185.2 0 37.04 31.75"
+                }
+            ]
+        }
+
+        //       var mapSpecification = {};
+
+        // mapSpecification = {rows: 2 , cols: 7,tiles: [
+        //     {
+        //         r: 0,
+        //         q: 0,
+        //         moveUnitsCost: 1,
+        //         displayStyle: "base-desert-tent",
+        //         terrainType: "DESERT",
+        //         sightCost: 1,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 1,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 2,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 3,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 4,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 5,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 6,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+
+        //     // 2nd row
+        //     {
+        //         r: 1,
+        //         q: 0,
+        //         moveUnitsCost: 1,
+        //         displayStyle: "base-desert-tent",
+        //         terrainType: "DESERT",
+        //         sightCost: 1,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 1,
+        //         moveUnitsCost: 1,
+        //         displayStyle: "base-desert-tent",
+        //         terrainType: "DESERT",
+        //         sightCost: 1,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 2,
+        //         moveUnitsCost: 1,
+        //         displayStyle: "base-desert-tent",
+        //         terrainType: "DESERT",
+        //         sightCost: 1,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 3,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 4,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 5,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 6,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+
+        //     // 3rd            
+        //     {
+        //         r: 2,
+        //         q: 1,
+        //         moveUnitsCost: 1,
+        //         displayStyle: "base-desert-tent",
+        //         terrainType: "DESERT",
+        //         sightCost: 1,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 2,
+        //         q: 3,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 2,
+        //         q: 5,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     }
+        // ]};    
+
+        // mapSpecification = {rows: 2 , cols: 7,tiles: [
+        //     {
+        //         r: 0,
+        //         q: 0,
+        //         moveUnitsCost: 0,
+        //         displayStyle: null,
+        //         terrainType: null,
+        //         sightCost: 0,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 1,
+        //         moveUnitsCost: 0,
+        //         displayStyle: null,
+        //         terrainType: null,
+        //         sightCost: 0,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 2,
+        //         moveUnitsCost: 0,
+        //         displayStyle: null,
+        //         terrainType: null,
+        //         sightCost: 0,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 3,
+        //         moveUnitsCost: 0,
+        //         displayStyle: null,
+        //         terrainType: null,
+        //         sightCost: 0,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 4,
+        //         moveUnitsCost: 0,
+        //         displayStyle: null,
+        //         terrainType: null,
+        //         sightCost: 0,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 5,
+        //         moveUnitsCost: 0,
+        //         displayStyle: null,
+        //         terrainType: null,
+        //         sightCost: 0,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 0,
+        //         q: 6,
+        //         moveUnitsCost: 0,
+        //         displayStyle: null,
+        //         terrainType: null,
+        //         sightCost: 0,
+        //         defenceBonus: 0
+        //     },
+
+        //     // 2nd row
+        //     {
+        //         r: 1,
+        //         q: 0,
+        //         moveUnitsCost: 0,
+        //         displayStyle: null,
+        //         terrainType: null,
+        //         sightCost: 0,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 1,
+        //         moveUnitsCost: 1,
+        //         displayStyle: "base-desert-tent",
+        //         terrainType: "DESERT",
+        //         sightCost: 1,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 2,
+        //         moveUnitsCost: 1,
+        //         displayStyle: "base-desert-tent",
+        //         terrainType: "DESERT",
+        //         sightCost: 1,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 3,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 4,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 5,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 1,
+        //         q: 6,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+
+        //     // 3rd            
+        //     {
+        //         r: 2,
+        //         q: 1,
+        //         moveUnitsCost: 1,
+        //         displayStyle: "base-desert-tent",
+        //         terrainType: "DESERT",
+        //         sightCost: 1,
+        //         defenceBonus: 0
+        //     },
+        //     {
+        //         r: 2,
+        //         q: 3,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     },
+        //     {
+        //         r: 2,
+        //         q: 5,
+        //         moveUnitsCost: 2,
+        //         displayStyle: "base-plains-forrest",
+        //         terrainType: "FOREST",
+        //         sightCost: 1,
+        //         defenceBonus: 0.7
+        //     }
+        // ]};     
+
+        //mapSpecification = {rows: 2 , cols: 7,tiles:[]};
+
+        var url_string = window.location.href
+        var url = new URL(url_string);
+        var rows = url.searchParams.get("rows") ? url.searchParams.get("rows"):2;
+        var cols = url.searchParams.get("cols") ? url.searchParams.get("cols"):7;
+        var mapName = url.searchParams.get("mapName") ? url.searchParams.get("mapName"):'';
+        
+        // mapSpecification.rows = rows;
+        // mapSpecification.cols = cols;
+        // mapSpecification.mapName = mapName;
+
+        var tilesSpecification = GameUtils.generateEmptyTilesMapSpecification(parseInt(rows), parseInt(cols));
+
+        var newMapSpecification = {
+            cols: parseInt(cols),
+            rows: parseInt(rows),
+            mapName: mapName,
+            tiles: tilesSpecification
+        };
+
+        GameUtils.save("mapSpecification", newMapSpecification);
+        
+
+        var loadedMapSpecification = GameUtils.load("mapSpecification");
+
+        
+
+        var mapEditor = new MapEditor(null,loadedMapSpecification, mapAssets);
+
+        window.mapEditorProxy = mapEditor;
+    </script>
+
+     
+</head>
+<body> 
+    <section class="section">
+    <div class="container is-fluid">
+        <div class="columns">
+            <div class="map-editor-hexes column is-three-quarters"></div>
+            <div class="map-editor-toolbar column">
+                <div class="map-editor-name map-editor-attribute field">
+                    <label for="tile-movement-cost" class="label">Map name</label>
+                    <div class="control">
+                        <input type="text" id="map-name" class="map-editor-attribute input" placeholder="Name your map here (6 chars or more)" minlength="6" maxlength="256" size="40">
+                    </div>
+                </div>
+                <div class="map-editor-tile-selector map-editor-attribute field">
+                    <label for="tile-terrain-type-select" class="label">Tile terrain type</label>
+                    <div class="control">
+                        <select id="tile-terrain-type-select" class="map-editor-attribute input">
+                            <option value="">--Please choose an option--</option>
+                            
+                            <option value="DESERT">DESERT</option>                    
+                            <option value="GLACIER">GLACIER</option>
+                            <option value="PLAINS-FOREST">PLAINS-FOREST</option>
+                            <option value="PLAINS-ROAD">PLAINS-RIVER</option>
+                            <option value="PLAINS-ROAD">PLAINS</option>                    
+                            <option value="MOUNTAINS">MOUNTAINS</option>
+                            <option value="OCEAN">OCEAN</option>
+
+                            
+                        </select>
+                    </div>
+                </div>
+                <div class="map-editor-tile-selector map-editor-attribute field">
+                    <label for="tile-fill-select" class="label">Tile graphical asset</label>
+                    <div class="control">
+                        <select id="tile-fill-select" class="map-editor-attribute input">
+                            <option value="">--Please choose an option--</option>
+                            <!-- 
+                            <option value="dog">Dog</option>
+                            <option value="cat">Cat</option>
+                            <option value="hamster">Hamster</option>
+                            <option value="parrot">Parrot</option>
+                            <option value="spider">Spider</option>
+                            <option value="goldfish">Goldfish</option> -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="map-editor-movement-selector map-editor-attribute field">
+                    <label for="tile-movement-cost" class="label">Tile movement cost</label>
+                    <div class="control">
+                        <input type="number" id="tile-movement-cost" class="map-editor-attribute input" min="0" max="100" step="0.01">
+                    </div>
+                </div>
+                <div class="map-editor-sight-selector map-editor-attribute field">
+                    <label for="tile-sight-cost" class="label">Tile sight cost</label>
+                    <div class="control">
+                        <input type="number" id="tile-sight-cost" class="map-editor-attribute input" min="0" max="100" step="0.01">
+                    </div>
+                </div>
+                <div class="map-editor-defence-selector map-editor-attribute field">
+                    <label for="tile-defence-bonus" class="label">Tile defence multiplier</label>
+                    <div class="control">
+                        <input type="number" id="tile-defence-bonus" class="map-editor-attribute input" min="-10" max="10" step="0.01">
+                    </div>
+                </div>
+                <div><button onclick="mapEditorProxy.downloadMap()" class="map-editor-attribute button is-primary">Download map</button></div>
+                
+            </div>
+        </div>
+    </div>
+    
+    </section>
+</body>
+</html>

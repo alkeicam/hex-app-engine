@@ -50,6 +50,8 @@ HexMap.prototype = {
   },
 
   createUnits: function(unitsSpecification){
+    if(!unitsSpecification)
+      return "";
     var grid = '';
 
     for(var i = 0; i<unitsSpecification.length; i++){
@@ -160,7 +162,8 @@ HexMap.prototype = {
 
 
     //patterns += this.createUnitPatterns('cat13-tank','layer1','red');
-    patterns += this.createUnitsPattern(unitAssets);
+    if(unitAssets)
+      patterns += this.createUnitsPattern(unitAssets);
 
     return patterns;
   },
@@ -209,12 +212,14 @@ HexMap.prototype = {
         debugString = ''+x+" "+y+" "+i+" "+j+" "+count+" "+size+" "+jLimit;
         var debugX = x+this.opts.offsetX/2;
         var debugY = y+this.opts.offsetY/2;
-        hexId = ''+i+","+j;
+        hexId = 'h_'+i+"_"+j;
         fill = '';
 
         var tile = this._findTileFromSpecificationForRQ(j,i,mapSpecification);
-        if(tile)
-          fill = 'url(#'+tile.displayStyle+')';              
+        if(tile && tile.displayStyle)          
+          fill = 'url(#'+tile.displayStyle+')'; 
+        else
+          fill = 'gray';          
         grid += hex.replace('{{x}}',x).replace('{{y}}',y).replace('{{fill}}',fill).replace('{{debug}}',debugString).replace('{{id}}',hexId).replace('{{debugId}}',hexId).replace('{{debugX}}',debugX).replace('{{debugY}}',debugY);        
       }
     }

@@ -1,0 +1,29 @@
+.container { 
+    width: 100%;  
+    height: 100vh;
+    
+}
+
+.map-editor-hexes { 
+	width: 70%; 	
+    float: left;
+    
+}
+
+.map-editor-toolbar { 
+    width: 30%;  
+    height: 100%;
+    float: left;
+    background-color: orange;
+    
+}
+
+.hex {
+    cursor: pointer;
+}
+
+.map-editor-attribute{
+    margin: 5px 5px;
+    font-family: monospace;
+    font-size: 1em;
+}

@@ -577,22 +577,22 @@ GE.prototype = {
 			// odd
 			switch(direction){
 			case "N":
-				resultHexId = (hex.q)+","+(hex.r-1);
+				resultHexId = "h_"+(hex.q)+"_"+(hex.r-1);
 			break;
 			case "NE":
-				resultHexId = (hex.q+1)+","+(hex.r-1);
+				resultHexId = "h_"+(hex.q+1)+"_"+(hex.r-1);
 			break;
 			case "SE":
-				resultHexId = (hex.q+1)+","+(hex.r);
+				resultHexId = "h_"+(hex.q+1)+"_"+(hex.r);
 			break;
 			case "S":
-				resultHexId = (hex.q)+","+(hex.r+1);
+				resultHexId = "h_"+(hex.q)+"_"+(hex.r+1);
 			break;
 			case "SW":
-				resultHexId = (hex.q-1)+","+(hex.r);
+				resultHexId = "h_"+(hex.q-1)+"_"+(hex.r);
 			break;
 			case "NW":
-				resultHexId = (hex.q-1)+","+(hex.r-1);
+				resultHexId = "h_"+(hex.q-1)+"_"+(hex.r-1);
 			break;
 			default:
 				return null;
@@ -602,22 +602,22 @@ GE.prototype = {
 			// even
 			switch(direction){
 			case "N":
-				resultHexId = (hex.q)+","+(hex.r-1);
+				resultHexId = "h_"+(hex.q)+"_"+(hex.r-1);
 			break;
 			case "NE":
-				resultHexId = (hex.q+1)+","+(hex.r);
+				resultHexId = "h_"+(hex.q+1)+"_"+(hex.r);
 			break;
 			case "SE":
-				resultHexId = (hex.q+1)+","+(hex.r+1);
+				resultHexId = "h_"+(hex.q+1)+"_"+(hex.r+1);
 			break;
 			case "S":
-				resultHexId = (hex.q)+","+(hex.r+1);
+				resultHexId = "h_"+(hex.q)+"_"+(hex.r+1);
 			break;
 			case "SW":
-				resultHexId = (hex.q-1)+","+(hex.r+1);
+				resultHexId = "h_"+(hex.q-1)+"_"+(hex.r+1);
 			break;
 			case "NW":
-				resultHexId = (hex.q-1)+","+(hex.r);
+				resultHexId = "h_"+(hex.q-1)+"_"+(hex.r);
 			break;
 			default:
 				return null;
