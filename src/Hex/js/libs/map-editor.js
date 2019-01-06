@@ -11,8 +11,10 @@
 export function MapEditor(eventHandlersArray, mapSpecification, mapAssets){
 	var eventHandlers;
     var mapAssets;
-    var selectedTile;
+    
     var mapSpecification;
+
+    var currentlySelectedTiles;
 
 	if (window === this) {
          return new MapEditor(eventHandlersArray, mapSpecification, mapAssets);
@@ -26,6 +28,7 @@ MapEditor.prototype = {
         this.eventHandlers = eventHandlersArray;
         this.mapAssets = mapAssets;
         this.mapSpecification = mapSpecification;
+        this.currentlySelectedTiles = [];
 
         // var mapAssets = {};
         // mapAssets = {
@@ -232,6 +235,7 @@ MapEditor.prototype = {
           return hexMap.createSVG();
         });
         
+        this.initializeMapPresentation();
 
         this.initializeClickHandler();
         this.initializeToolTileSelector();
@@ -241,7 +245,7 @@ MapEditor.prototype = {
         var dataArray = [];
         dataArray.push({description: '--Please choose an option--'});
         //newArray.push.apply(newArray, dataArray1);
-        dataArray = dataArray.concat(this.mapAssets.assets);
+        dataArray = dataArray.concat(this.mapAssets.assets.sort((a,b)=> (a.catalog+a.displayId).localeCompare(b.catalog+b.displayId) ));
 
         var that = this;
 
@@ -255,34 +259,46 @@ MapEditor.prototype = {
             }
         });
 
-        d3.select('#tile-fill-select').on("change", function(d) {
-            console.log(this.value);
-            var elementToUpdateId = that.selectedTile.elementId;
-            that.setFillForElementWithId(elementToUpdateId, this.value);
+        // handling modification in toolbar elements
+
+        d3.select('#tile-fill-select').on("change", function(d) {            
+            for(var i=0; i<that.currentlySelectedTiles.length;i++){
+                var elementToUpdateId = that.currentlySelectedTiles[i].elementId;
+                that.setFillForElementWithId(elementToUpdateId, this.value);    
+                that.setDefaultPropertyValuesByAssetForElementWithId(elementToUpdateId, this.value)
+            }                        
+        });
+
+        // d3.select('#tile-terrain-type-select').on("change", function(d) {
+        //     for(var i=0; i<that.currentlySelectedTiles.length;i++){
+        //         var elementToUpdateId = that.currentlySelectedTiles[i].elementId;
+        //         that.setElementPropertyForElementWithId(elementToUpdateId, 'terrainType', this.value);    
+        //     }                        
+        // });
+
+        // d3.select('#tile-movement-cost').on("input", function() {
+        //     for(var i=0; i<that.currentlySelectedTiles.length;i++){
+        //         var elementToUpdateId = that.currentlySelectedTiles[i].elementId;
+        //         that.setElementPropertyForElementWithId(elementToUpdateId, 'moveUnitsCost', this.value);    
+        //     }
             
-        });
+        // });
 
-        d3.select('#tile-terrain-type-select').on("change", function(d) {
-            console.log(this.value);
-            var elementToUpdateId = that.selectedTile.elementId;
-            that.setElementPropertyForElementWithId(elementToUpdateId, 'terrainType', this.value);
+        // d3.select('#tile-sight-cost').on("input", function() {
+        //     for(var i=0; i<that.currentlySelectedTiles.length;i++){
+        //         var elementToUpdateId = that.currentlySelectedTiles[i].elementId;
+        //         that.setElementPropertyForElementWithId(elementToUpdateId, 'sightCost', this.value);    
+        //     }
             
-        });
+        // });
 
-        d3.select('#tile-movement-cost').on("input", function() {
-            var elementToUpdateId = that.selectedTile.elementId;
-            that.setElementPropertyForElementWithId(elementToUpdateId, 'moveUnitsCost', this.value);
-        });
-
-        d3.select('#tile-sight-cost').on("input", function() {
-            var elementToUpdateId = that.selectedTile.elementId;
-            that.setElementPropertyForElementWithId(elementToUpdateId, 'sightCost', this.value);
-        });
-
-        d3.select('#tile-defence-bonus').on("input", function() {
-            var elementToUpdateId = that.selectedTile.elementId;
-            that.setElementPropertyForElementWithId(elementToUpdateId, 'defenceBonus', this.value);
-        });
+        // d3.select('#tile-defence-bonus').on("input", function() {
+        //     for(var i=0; i<that.currentlySelectedTiles.length;i++){
+        //         var elementToUpdateId = that.currentlySelectedTiles[i].elementId;
+        //         that.setElementPropertyForElementWithId(elementToUpdateId, 'defenceBonus', this.value);    
+        //     }
+            
+        // });
 
         d3.select('#map-name').on("input", function() {
             that.mapSpecification.mapName = this.value;
@@ -291,6 +307,121 @@ MapEditor.prototype = {
 
         var mapName = this.mapSpecification.mapName ? this.mapSpecification.mapName:'';
         d3.select('#map-name').property('value',mapName);  
+    },
+
+    setDefaultPropertyValuesByAssetForElementWithId: function(id, asset){
+
+        var paramsMap = [
+            {                
+                iTerrainType: 'default',
+                iFeature: 'default',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 1,
+                oSightCost: 1,
+                oDefenceBonus: 0.0
+            },
+            {                
+                iTerrainType: 'desert',
+                iFeature: 'default',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 1,
+                oSightCost: 1,
+                oDefenceBonus: -0.5
+            },
+            {                
+                iTerrainType: 'city',
+                iFeature: 'default',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 1,
+                oSightCost: 1,
+                oDefenceBonus: 0.5
+            },
+            {                
+                iTerrainType: 'glacier',
+                iFeature: 'default',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 2,
+                oSightCost: 1,
+                oDefenceBonus: 0.0
+            },
+            {                
+                iTerrainType: 'hills',
+                iFeature: 'default',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 2,
+                oSightCost: 1,
+                oDefenceBonus: 0.5
+            },            
+            {                
+                iTerrainType: 'hills',
+                iFeature: 'forrest',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 2,
+                oSightCost: 2,
+                oDefenceBonus: 1.0
+            },
+            {                
+                iTerrainType: 'mountains',
+                iFeature: 'default',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 100,
+                oSightCost: 100,
+                oDefenceBonus: 2
+            },
+            {                
+                iTerrainType: 'ocean',
+                iFeature: 'default',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 100,
+                oSightCost: 100,
+                oDefenceBonus: 0
+            },
+            {                
+                iTerrainType: 'plains',
+                iFeature: 'default',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 1,
+                oSightCost: 1,
+                oDefenceBonus: 0.0
+            },
+            {                
+                iTerrainType: 'plains',
+                iFeature: 'forrest',                
+                //oTerrainType = '',
+                oMoveUnitsCost: 2,
+                oSightCost: 2,
+                oDefenceBonus: 0.5
+            }
+
+
+        ];
+
+        // base-plains-blank
+        // CATALOG-TERRAINTYPE-FEATURE
+        var catalog = asset.split('-')[0];
+        var terrainType = asset.split('-')[1];
+        var feature = asset.split('-')[2];
+
+        
+        // find matching param mapping for given terrain and feature
+        var matchingParam = paramsMap.find(elem => elem.iTerrainType.toUpperCase() === terrainType.toUpperCase() && elem.iFeature.toUpperCase() === feature.toUpperCase());
+        
+        // when none found, try to find default terrain setting
+        if(!matchingParam){
+            matchingParam = paramsMap.find(elem => elem.iTerrainType.toUpperCase() === terrainType.toUpperCase() && elem.iFeature.toUpperCase() === 'DEFAULT');            
+        }
+        // when none found, then use global defaults
+        if(!matchingParam){
+            matchingParam = paramsMap.find(elem => elem.iTerrainType.toUpperCase() === 'DEFAULT' && elem.iFeature.toUpperCase() === 'DEFAULT');            
+        }
+
+        // set properties
+        this.setElementPropertyForElementWithId(id, 'terrainType', terrainType.toUpperCase());   
+        this.setElementPropertyForElementWithId(id, 'moveUnitsCost', matchingParam.oMoveUnitsCost);
+        this.setElementPropertyForElementWithId(id, 'sightCost', matchingParam.oSightCost); 
+        this.setElementPropertyForElementWithId(id, 'defenceBonus', matchingParam.oDefenceBonus); 
+
+
     },
 
     setElementPropertyForElementWithId: function(id, propertyName, value){
@@ -326,28 +457,24 @@ MapEditor.prototype = {
         var that = this;
 
         d3.selectAll('.hex').on("click",  function(d,i) {             
-            
+            var multiSelect = d3.event.shiftKey? true: false;
+
             var fill = d3.select(this).attr('fill');  
             if(fill.startsWith('url')){
                 fill = fill.replace('url(#','').replace(')','');            
             }else{
                 fill = '';
-            }
+            }            
             
-            var event = {elementId: this.id, elementFill: fill};
+            var event = {elementId: this.id, elementFill: fill, multiSelect: multiSelect, element: this };
             that.publishEvent(event);
             that.onTileSelect(event);
-            that.selectedTile = event;
-
-
-            d3.selectAll('.hex').attr("stroke", null);
-            d3.select(this).attr("stroke", "yellow");
-            d3.select(this).attr("stroke-width", 3);
-
         });
     },
 
     onTileSelect: function(event){
+
+        // initialize toolbar properties on click
         d3.select('#tile-fill-select').property('value',event.elementFill);
         var mapSpecificationElement = this.getMapSpecificationForId(event.elementId);
         var terrainType = mapSpecificationElement.terrainType ? mapSpecificationElement.terrainType: '';
@@ -361,8 +488,30 @@ MapEditor.prototype = {
         d3.select('#tile-sight-cost').property('value',sightCost);  
         d3.select('#tile-defence-bonus').property('value',defenceBonus);  
         
+        // handle selection
 
+        // unhighlight all
+        d3.selectAll('.hex').attr("stroke", null);
+        
+        if(event.multiSelect){
+            // multi select
+            // highlight already selected
+            for(var i=0;i<this.currentlySelectedTiles.length;i++){
+                var element = this.currentlySelectedTiles[i].element;
+                d3.select(element).attr("stroke", "yellow");
+                d3.select(element).attr("stroke-width", 3);
+            }            
+        }else{
+            // single tile select            
+            // clean list of currently selected 
+            this.currentlySelectedTiles.length = 0;
+        }
 
+        // add to the selected list
+         this.currentlySelectedTiles.push(event);
+        // highligh clicked element
+        d3.select(event.element).attr("stroke", "yellow");
+        d3.select(event.element).attr("stroke-width", 3);
               
     },
 
@@ -385,5 +534,43 @@ MapEditor.prototype = {
         document.body.appendChild(downloadAnchorNode); // required for firefox
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
+    },
+
+    initializeMapPresentation: function(){
+        var mapSizeClassArray = this.calculateMapSizeClass(this.mapSpecification.rows, this.mapSpecification.cols);
+        d3.select('.map-editor-hexes').classed(mapSizeClassArray[0],true);
+        d3.select('.map-editor-hexes').classed(mapSizeClassArray[1],true);
+
+        // var zoom = d3.behavior.zoom()
+        //     .scaleExtent([1, 10])
+        //     .on("zoom", zoomed);
+    },
+    /**
+    * SMALL 
+    * MEDIUM > 20 cols
+    * LARGE > 100 cols
+    */
+    calculateMapSizeClass: function(rows, cols){
+        var result = [];
+
+        var thresholds = [[15,'nano-map'],[30,'tiny-map'],[60,'small-map'],[90,'medium-map'],[120,'large-map']];
+
+        for(var i=0; i<thresholds.length;i++){
+            var threshold = thresholds[i];
+            if(cols<=threshold[0]){
+                result[1] = 'x-'+threshold[1];
+                break;
+            }
+        }
+
+        for(var i=0; i<thresholds.length;i++){
+            var threshold = thresholds[i];
+            if(rows<=threshold[0]){
+                result[0] = 'y-'+threshold[1];
+                break;
+            }
+        }
+
+        return result;
     }
 };

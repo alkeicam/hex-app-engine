@@ -1,29 +1,76 @@
-.container { 
+/*.container { 
     width: 100%;  
     height: 100vh;
     
-}
+}*/
 
-.map-editor-hexes { 
+/*.map-editor-hexes { 
 	width: 70%; 	
     float: left;
     
 }
+*/
+.map-editor-hexes { 
+    overflow: scroll;
+    height: 90vh;
+}
 
+.map-editor-hexes.x-large-map svg {
+    min-width: 750rem;
+}
+
+.map-editor-hexes.x-medium-map svg {
+    min-width: 400rem;
+}
+
+.map-editor-hexes.x-small-map svg {
+    min-width: 250rem;
+}
+
+.map-editor-hexes.x-tiny-map svg {
+    min-width: 150rem;
+}
+
+.map-editor-hexes.x-nano-map svg {
+    min-width: 75rem;
+}
+
+.map-editor-hexes.y-large-map svg {
+    min-height: 750rem;
+}
+
+.map-editor-hexes.y-medium-map svg {
+    min-height: 400rem;
+}
+
+.map-editor-hexes.y-small-map svg {
+    min-height: 250rem;
+}
+
+.map-editor-hexes.y-tiny-map svg {
+    min-height: 150rem;
+}
+
+.map-editor-hexes.y-nano-map svg {
+    min-height: 75rem;
+}
+
+
+/*
 .map-editor-toolbar { 
     width: 30%;  
     height: 100%;
     float: left;
     background-color: orange;
     
-}
+}*/
 
 .hex {
     cursor: pointer;
 }
 
-.map-editor-attribute{
+/*.map-editor-attribute{
     margin: 5px 5px;
     font-family: monospace;
     font-size: 1em;
-}
+}*/

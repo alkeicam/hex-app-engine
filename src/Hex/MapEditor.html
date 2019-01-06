@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
     <link rel="stylesheet" href="css/ui.css"/>
     <link rel="stylesheet" href="css/map.css"/>    
-    <!-- <link rel="stylesheet" href="css/map-editor.css"/> -->
+    <link rel="stylesheet" href="css/map-editor.css"/>
     
 
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
@@ -532,24 +532,6 @@
                     </div>
                 </div>
                 <div class="map-editor-tile-selector map-editor-attribute field">
-                    <label for="tile-terrain-type-select" class="label">Tile terrain type</label>
-                    <div class="control">
-                        <select id="tile-terrain-type-select" class="map-editor-attribute input">
-                            <option value="">--Please choose an option--</option>
-                            
-                            <option value="DESERT">DESERT</option>                    
-                            <option value="GLACIER">GLACIER</option>
-                            <option value="PLAINS-FOREST">PLAINS-FOREST</option>
-                            <option value="PLAINS-ROAD">PLAINS-RIVER</option>
-                            <option value="PLAINS-ROAD">PLAINS</option>                    
-                            <option value="MOUNTAINS">MOUNTAINS</option>
-                            <option value="OCEAN">OCEAN</option>
-
-                            
-                        </select>
-                    </div>
-                </div>
-                <div class="map-editor-tile-selector map-editor-attribute field">
                     <label for="tile-fill-select" class="label">Tile graphical asset</label>
                     <div class="control">
                         <select id="tile-fill-select" class="map-editor-attribute input">
@@ -564,6 +546,26 @@
                         </select>
                     </div>
                 </div>
+                <div class="map-editor-tile-selector map-editor-attribute field">
+                    <label for="tile-terrain-type-select" class="label">Tile terrain type</label>
+                    <div class="control">
+                        <select id="tile-terrain-type-select" class="map-editor-attribute input" disabled>
+                            <option value="">--Please choose an option--</option>
+                            
+                            <option value="DESERT">DESERT</option>                    
+                            <option value="DISTRICT">DISTRICT</option>                    
+                            <option value="GLACIER">GLACIER</option>
+                            <option value="HILLS">HILLS</option>
+                            
+                            <option value="MOUNTAINS">MOUNTAINS</option>
+                            <option value="OCEAN">OCEAN</option>
+                            <option value="PLAINS">PLAINS</option>
+
+                            
+                        </select>
+                    </div>
+                </div>
+                
                 
                 <div class="map-editor-movement-selector map-editor-attribute field">
                     <label for="tile-movement-cost" class="label">Tile movement cost</label>
@@ -590,5 +592,28 @@
     </div>
     
     </section>
+
+<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAloFJtk8JOkIpWMoVVnk8cCgq9KHQKNWU",
+    authDomain: "hexapp-f82d4.firebaseapp.com",
+    databaseURL: "https://hexapp-f82d4.firebaseio.com",
+    projectId: "hexapp-f82d4",
+    storageBucket: "hexapp-f82d4.appspot.com",
+    messagingSenderId: "148861884860"
+  };
+  firebase.initializeApp(config);
+
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    console.log("Logged");
+  } else {
+    // No user is signed in.
+    console.log("Not logged");
+  }
+});
+</script>
 </body>
 </html>
