@@ -55,8 +55,20 @@ Test.prototype = {
                     description: "Base catalog - modern tank",
                     catalog: "base",
                     displayId: "tank",
-                    resource: "unit-base-tank.svg#layer1"                    
-                }                
+                    resource: "unit-base_ww2-tank-opt.svg#layer1"                    
+                },
+                {
+                    description: "Base catalog - modern infantry",
+                    catalog: "base",
+                    displayId: "infantry",
+                    resource: "unit-base_ww2-infantry-opt.svg#layer1"                    
+                },
+                {
+                    description: "Base catalog - modern ranged",
+                    catalog: "base",
+                    displayId: "artillery",
+                    resource: "unit-base_ww2-ranged-opt.svg#layer1"                    
+                }              
             ]
         }
 
@@ -266,7 +278,7 @@ Test.prototype = {
                 unitId: "red-1",
                 position: hexArray[2],
                 remainingMoveUnits: 2,
-                unitName: 'Modern Tank',
+                unitName: 'Infantry',
                 moveUnits: 2,
                 health: 10,
                 sight: 3,
@@ -276,7 +288,74 @@ Test.prototype = {
                 strength: 22,
                 experience: 0,
                 owner: "red",
-                displayStyle: "base-tank",  // should match unit assets catalog, displayId
+                displayStyle: "base-infantry",  // should match unit assets catalog, displayId
+                
+                fIsEligibleAttackPath: function(attackLineHex){
+                    
+                    
+                    if(attackLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   attackLineHex){
+                        var hex = attackLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fIsEligibleSightPath: function(sightLineHex){
+                    
+                    
+                    if(sightLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   sightLineHex){
+                        var hex = sightLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fAttack: function(unit){
+                    return 2*this._strength;
+                },
+                fDefend: function(unit){
+                    var defendHex = this.position;
+                    return (this._strength)*(1+defendHex._defenceBonus);
+                },
+                fExperience: function (opponentStrength,damageInflicted, damageReceived){
+                    var experienceGained = 0;
+                    if(damageInflicted>2*damageReceived){
+                        experienceGained = 1;
+                    }
+                    return experienceGained;
+                },
+                fMoveRange: function(hexFrom, hexTo){
+                    return hexTo._moveUnitsCost;
+                    // dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
+                },
+            },
+            {
+                unitId: "red-2",
+                position: hexArray[10],
+                remainingMoveUnits: 2,
+                unitName: 'Artillery',
+                moveUnits: 2,
+                health: 10,
+                sight: 3,
+                bearing: 0,
+                range: 2,
+                rangedStrength: 32,
+                strength: 16,
+                experience: 0,
+                owner: "red",
+                displayStyle: "base-artillery",  // should match unit assets catalog, displayId
                 
                 fIsEligibleAttackPath: function(attackLineHex){
                     

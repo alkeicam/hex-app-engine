@@ -1,14 +1,7 @@
-// import {Hex} from './Hex.js'
-// import {Unit} from './Unit.js'
-// import {GE} from './gameengine.js'
-// import {GameUIDock} from './game-ui-dock.js'
-// import {Renderer} from './Renderer.js'
-// import {Company} from './Company.js'
- import {HexMap} from './map.js'
-// import {Turn} from './Turn.js'
+import {HexMap} from './map.js'
 
 
-export function MapEditor(eventHandlersArray, mapSpecification, mapAssets){
+export function MapEditor(eventHandlersArray, mapId, mapSpecification, mapAssets){
 	var eventHandlers;
     var mapAssets;
     
@@ -16,206 +9,22 @@ export function MapEditor(eventHandlersArray, mapSpecification, mapAssets){
 
     var currentlySelectedTiles;
 
+    var mapId;
+
 	if (window === this) {
-         return new MapEditor(eventHandlersArray, mapSpecification, mapAssets);
+         return new MapEditor(eventHandlersArray, mapId, mapSpecification, mapAssets);
     }
-    this._initializeMapEditorData(eventHandlersArray, mapSpecification, mapAssets);
+    this._initializeMapEditorData(eventHandlersArray, mapId,  mapSpecification, mapAssets);
     return this;
 };
 
 MapEditor.prototype = {
-	_initializeMapEditorData: function(eventHandlersArray, mapSpecification, mapAssets){
+	_initializeMapEditorData: function(eventHandlersArray, mapId, mapSpecification, mapAssets){
         this.eventHandlers = eventHandlersArray;
         this.mapAssets = mapAssets;
         this.mapSpecification = mapSpecification;
         this.currentlySelectedTiles = [];
-
-        // var mapAssets = {};
-        // mapAssets = {
-        //     assets: [
-        //         {
-        //             description: "Base catalog - desert tile with tent",
-        //             catalog: "base",
-        //             displayId: "desert-tent",
-        //             resource: "base.svg#layer1",
-        //             viewbox: "0 0 37.04 31.75"
-        //         },
-        //         {
-        //             description: "Base catalog - forrest",
-        //             catalog: "base",
-        //             displayId: "plains-forrest",
-        //             resource: "base.svg#layer1",
-        //             viewbox: "37.04 0 37.04 31.75"
-        //         }
-        //     ]
-        // }
-
-
-
-        // var mapSpecification = {};
-
-        // mapSpecification = {rows: 2 , cols: 7,tiles: [
-        //     {
-        //         r: 0,
-        //         q: 0,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 1,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 2,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 3,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 4,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 5,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 6,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-
-        //     // 2nd row
-        //     {
-        //         r: 1,
-        //         q: 0,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 1,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 2,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 3,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 4,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 5,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 6,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-
-        //     // 3rd            
-        //     {
-        //         r: 2,
-        //         q: 1,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 2,
-        //         q: 3,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 2,
-        //         q: 5,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     }
-        // ]};
-
-        
-
+        this.mapId = mapId;
 
         var hexMap = new HexMap({
           cols: mapSpecification.cols,
@@ -228,8 +37,6 @@ MapEditor.prototype = {
           mapSpecification: mapSpecification,          
           mapAssets: mapAssets
         });
-
-        //d3.select('.map-editor-hexes').append(hexMap.createSVG())
 
         d3.select('.map-editor-hexes').append(function() {
           return hexMap.createSVG();
@@ -534,6 +341,15 @@ MapEditor.prototype = {
         document.body.appendChild(downloadAnchorNode); // required for firefox
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
+    },
+
+    saveMap: function(){        
+        var event = {
+            mapSpecification: this.mapSpecification,
+            mapId: this.mapId
+        }
+        this.publishEvent(event);   
+            
     },
 
     initializeMapPresentation: function(){

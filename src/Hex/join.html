@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>  <html class="ie ie6 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 7]>     <html class="ie ie7 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 8]>     <html class="ie ie8 lte9 lte8 no-js">      <![endif]-->
+<!--[if IE 9]>     <html class="ie ie9 lte9 no-js">           <![endif]-->
+<!--[if gt IE 9]>  <html class="no-js">                       <![endif]-->
+<!--[if !IE]><!--> <html class="no-js">                       <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Join MapEditor</title>
+
+    <!-- // IOS webapp icons // -->
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.css" />
+
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    
+    
+    <script src="js/libs/jquery-3.3.1.min.js"></script>
+    <script src="js/libs/gameutils.js"></script>
+     <script src="https://d3js.org/d3.v4.min.js"></script>
+    
+    
+
+    <script type="module">
+        import {App} from './js/libs/App.js' 
+        var app = new App();
+
+        d3.select('#register').on('click', function(){
+            app.userJoin();
+        });
+    </script>
+</head>
+<body> 
+    <section class="section">
+    <div class="container is-fluid">
+        <div class="columns is-centered">
+            <div class="column is-one-quarter">
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control has-icons-left has-icons-right">
+                        <input id="email" class="input" type="email" placeholder="Email input" >
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <span id="email-invalid-1" class="icon is-small is-right is-hidden">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </span>
+                        <span id="email-valid" class="icon is-small is-right is-hidden">
+                          <i class="fas fa-check"></i>
+                        </span>
+                    </div>
+                    <p id="email-invalid-2" class="help is-danger is-hidden">This email is invalid</p>
+                </div>
+                <div class="field">
+                    <label class="label">Password</label>
+                    <p class="control has-icons-left">
+                        <input id="pass" class="input" type="password" placeholder="Password">
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                    </p>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                          <input id="consent" type="checkbox">
+                          I agree to the <a href="#">terms and conditions</a>
+                        </label>
+                    </div>
+                    <p id="consents-invalid" class="help is-danger is-hidden">Please accept terms and conditions</p>
+                </div>
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button id="register" class="button is-link">Submit</button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="columns is-centered">
+            <div class="column is-half has-text-centered">
+                <p>Already registered ? Sign in <a href="login.html">here</a>.</p>
+            </div>
+        </div>
+    </div>
+    
+    </section>
+
+<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAloFJtk8JOkIpWMoVVnk8cCgq9KHQKNWU",
+    authDomain: "hexapp-f82d4.firebaseapp.com",
+    databaseURL: "https://hexapp-f82d4.firebaseio.com",
+    projectId: "hexapp-f82d4",
+    storageBucket: "hexapp-f82d4.appspot.com",
+    messagingSenderId: "148861884860"
+  };
+  firebase.initializeApp(config);
+
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    console.log("Logged");
+  } else {
+    // No user is signed in.
+    console.log("Not logged");
+  }
+});
+</script>
+</body>
+</html>

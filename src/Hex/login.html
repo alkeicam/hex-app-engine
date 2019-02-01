@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>  <html class="ie ie6 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 7]>     <html class="ie ie7 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 8]>     <html class="ie ie8 lte9 lte8 no-js">      <![endif]-->
+<!--[if IE 9]>     <html class="ie ie9 lte9 no-js">           <![endif]-->
+<!--[if gt IE 9]>  <html class="no-js">                       <![endif]-->
+<!--[if !IE]><!--> <html class="no-js">                       <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Login MapEditor</title>
+
+    <!-- // IOS webapp icons // -->
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.css" />
+
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    
+    
+    <script src="js/libs/jquery-3.3.1.min.js"></script>
+    <script src="js/libs/gameutils.js"></script>
+     <script src="https://d3js.org/d3.v4.min.js"></script>
+    
+    
+
+    <script type="module">
+        var ui = new firebaseui.auth.AuthUI(firebase.auth());
+        var uiConfig = {
+            callbacks: {
+                signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+                  // User successfully signed in.
+                  // Return type determines whether we continue the redirect automatically
+                  // or whether we leave that to developer to handle.
+                  return true;
+                },
+                uiShown: function() {
+                  // The widget is rendered.
+                  // Hide the loader.
+                  document.getElementById('loader').style.display = 'none';
+                }
+            },
+            // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+            signInFlow: 'popup',
+            signInSuccessUrl: 'MapEditor.html',
+            signInOptions: [
+                // Leave the lines as is for the providers you want to offer your users.                
+                firebase.auth.EmailAuthProvider.PROVIDER_ID
+                
+            ],
+            // Terms of service url.
+            tosUrl: 'http://wp.pl',
+            // Privacy policy url.
+            privacyPolicyUrl: 'http://wp.pl/privacy'
+        };
+
+        ui.start('#auth-container', uiConfig);
+    </script>
+</head>
+<body> 
+    <section class="section">
+    <div class="container is-fluid">
+        <div class="columns is-centered">
+            <div class="column">
+                <div id="auth-container"></div>   
+            </div>
+            
+        </div>
+        <div class="columns is-centered">
+            <div class="column is-half has-text-centered">
+                <p>Not having an account ? <a href="join.html">Join</a> us.</p>
+            </div>
+        </div>
+    </div>
+    
+    </section>
+
+<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAloFJtk8JOkIpWMoVVnk8cCgq9KHQKNWU",
+    authDomain: "hexapp-f82d4.firebaseapp.com",
+    databaseURL: "https://hexapp-f82d4.firebaseio.com",
+    projectId: "hexapp-f82d4",
+    storageBucket: "hexapp-f82d4.appspot.com",
+    messagingSenderId: "148861884860"
+  };
+  firebase.initializeApp(config);
+
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    console.log("Logged");
+  } else {
+    // No user is signed in.
+    console.log("Not logged");
+  }
+});
+</script>
+</body>
+</html>

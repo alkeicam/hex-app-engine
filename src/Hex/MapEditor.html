@@ -28,6 +28,7 @@
     <script type="module" src="js/libs/Unit.js"></script>
  -->    
     <script src="js/libs/jquery-3.3.1.min.js"></script>
+    <script src="js/libs/rivet.js"></script>
     <!-- <script src="js/libs/jquery-ui-1.10.4.min.js"></script> -->
     <script src="js/libs/gameutils.js"></script>
     <!-- <script src="js/drag/TweenMax.min.js"></script> -->
@@ -38,11 +39,21 @@
      <script src="https://d3js.org/d3-selection.v1.min.js"></script>
      <script src="https://d3js.org/d3-drag.v1.min.js"></script> -->
      <script src="https://d3js.org/d3.v4.min.js"></script>
+     <!-- <script src="js/libs/saveSvgAsPng.js"></script> -->
+
+     
     
     
 
     <script type="module">
         import {MapEditor} from './js/libs/map-editor.js'  
+        import {App} from  './js/libs/App.js'  
+
+        var app = new App();
+
+        d3.select('#sign-out').on('click', function(){
+            app.userSignOut();
+        });
 
         var mapAssets = {};
         mapAssets = {
@@ -162,366 +173,65 @@
             ]
         }
 
-        //       var mapSpecification = {};
-
-        // mapSpecification = {rows: 2 , cols: 7,tiles: [
-        //     {
-        //         r: 0,
-        //         q: 0,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 1,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 2,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 3,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 4,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 5,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 6,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-
-        //     // 2nd row
-        //     {
-        //         r: 1,
-        //         q: 0,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 1,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 2,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 3,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 4,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 5,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 6,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-
-        //     // 3rd            
-        //     {
-        //         r: 2,
-        //         q: 1,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 2,
-        //         q: 3,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 2,
-        //         q: 5,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     }
-        // ]};    
-
-        // mapSpecification = {rows: 2 , cols: 7,tiles: [
-        //     {
-        //         r: 0,
-        //         q: 0,
-        //         moveUnitsCost: 0,
-        //         displayStyle: null,
-        //         terrainType: null,
-        //         sightCost: 0,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 1,
-        //         moveUnitsCost: 0,
-        //         displayStyle: null,
-        //         terrainType: null,
-        //         sightCost: 0,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 2,
-        //         moveUnitsCost: 0,
-        //         displayStyle: null,
-        //         terrainType: null,
-        //         sightCost: 0,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 3,
-        //         moveUnitsCost: 0,
-        //         displayStyle: null,
-        //         terrainType: null,
-        //         sightCost: 0,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 4,
-        //         moveUnitsCost: 0,
-        //         displayStyle: null,
-        //         terrainType: null,
-        //         sightCost: 0,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 5,
-        //         moveUnitsCost: 0,
-        //         displayStyle: null,
-        //         terrainType: null,
-        //         sightCost: 0,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 0,
-        //         q: 6,
-        //         moveUnitsCost: 0,
-        //         displayStyle: null,
-        //         terrainType: null,
-        //         sightCost: 0,
-        //         defenceBonus: 0
-        //     },
-
-        //     // 2nd row
-        //     {
-        //         r: 1,
-        //         q: 0,
-        //         moveUnitsCost: 0,
-        //         displayStyle: null,
-        //         terrainType: null,
-        //         sightCost: 0,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 1,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 2,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 3,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 4,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 5,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 1,
-        //         q: 6,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-
-        //     // 3rd            
-        //     {
-        //         r: 2,
-        //         q: 1,
-        //         moveUnitsCost: 1,
-        //         displayStyle: "base-desert-tent",
-        //         terrainType: "DESERT",
-        //         sightCost: 1,
-        //         defenceBonus: 0
-        //     },
-        //     {
-        //         r: 2,
-        //         q: 3,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     },
-        //     {
-        //         r: 2,
-        //         q: 5,
-        //         moveUnitsCost: 2,
-        //         displayStyle: "base-plains-forrest",
-        //         terrainType: "FOREST",
-        //         sightCost: 1,
-        //         defenceBonus: 0.7
-        //     }
-        // ]};     
-
-        //mapSpecification = {rows: 2 , cols: 7,tiles:[]};
-
         var url_string = window.location.href
         var url = new URL(url_string);
         var rows = url.searchParams.get("rows") ? url.searchParams.get("rows"):2;
         var cols = url.searchParams.get("cols") ? url.searchParams.get("cols"):7;
         var mapName = url.searchParams.get("mapName") ? url.searchParams.get("mapName"):'';
-        
-        // mapSpecification.rows = rows;
-        // mapSpecification.cols = cols;
-        // mapSpecification.mapName = mapName;
-
-        var tilesSpecification = GameUtils.generateEmptyTilesMapSpecification(parseInt(rows), parseInt(cols));
-
-        var newMapSpecification = {
-            cols: parseInt(cols),
-            rows: parseInt(rows),
-            mapName: mapName,
-            tiles: tilesSpecification
-        };
-
-        GameUtils.save("mapSpecification", newMapSpecification);
-        
-
-        var loadedMapSpecification = GameUtils.load("mapSpecification");
+        var mapId = url.searchParams.get("mapId") ? url.searchParams.get("mapId"):'';
 
         
 
-        var mapEditor = new MapEditor(null,loadedMapSpecification, mapAssets);
+        if(!mapId){
+            var tilesSpecification = GameUtils.generateEmptyTilesMapSpecification(parseInt(rows), parseInt(cols));
 
-        window.mapEditorProxy = mapEditor;
+            var newMapSpecification = {
+                cols: parseInt(cols),
+                rows: parseInt(rows),
+                mapName: mapName,
+                tiles: tilesSpecification
+            };
+
+            GameUtils.save("mapSpecification", newMapSpecification);
+            
+
+            var loadedMapSpecification = GameUtils.load("mapSpecification");    
+            var mapEditor = new MapEditor(null, null,loadedMapSpecification, mapAssets);
+
+            window.mapEditorProxy = mapEditor;
+        }else{
+            app.backendLoadMap(mapId).then(function(mapElement){
+                console.log('Loaded map',mapElement);
+                var loadedMapSpecification = mapElement.mapSpecification;
+                var eventHandlersArray = [];
+
+                var appHandler = {
+                    hObject: app,
+                    hFunction: app.handleEditorEvent
+                };
+                eventHandlersArray.push(appHandler);
+
+                var mapEditor = new MapEditor(eventHandlersArray, mapElement.mapId, loadedMapSpecification, mapAssets);
+                window.mapEditorProxy = mapEditor;
+            });
+        }
+
+        
+
+        
+
+
     </script>
 
      
 </head>
-<body> 
+<body class="has-navbar-fixed-top"> 
     <section class="section">
     <div class="container is-fluid">
+        <div class="notification is-primary is-hidden save-success">
+          <!-- <button class="delete"></button> -->
+          Saved successfully.
+        </div>
         <div class="columns">
             <div class="map-editor-hexes column is-three-quarters"></div>
             <div class="map-editor-toolbar column">
@@ -570,28 +280,106 @@
                 <div class="map-editor-movement-selector map-editor-attribute field">
                     <label for="tile-movement-cost" class="label">Tile movement cost</label>
                     <div class="control">
-                        <input type="number" id="tile-movement-cost" class="map-editor-attribute input" min="0" max="100" step="0.01">
+                        <input type="number" id="tile-movement-cost" class="map-editor-attribute input" min="0" max="100" step="0.01" disabled>
                     </div>
                 </div>
                 <div class="map-editor-sight-selector map-editor-attribute field">
                     <label for="tile-sight-cost" class="label">Tile sight cost</label>
                     <div class="control">
-                        <input type="number" id="tile-sight-cost" class="map-editor-attribute input" min="0" max="100" step="0.01">
+                        <input type="number" id="tile-sight-cost" class="map-editor-attribute input" min="0" max="100" step="0.01" disabled>
                     </div>
                 </div>
                 <div class="map-editor-defence-selector map-editor-attribute field">
                     <label for="tile-defence-bonus" class="label">Tile defence multiplier</label>
                     <div class="control">
-                        <input type="number" id="tile-defence-bonus" class="map-editor-attribute input" min="-10" max="10" step="0.01">
+                        <input type="number" id="tile-defence-bonus" class="map-editor-attribute input" min="-10" max="10" step="0.01" disabled>
                     </div>
                 </div>
-                <div><button onclick="mapEditorProxy.downloadMap()" class="map-editor-attribute button is-primary">Download map</button></div>
+                <div><!-- <button onclick="mapEditorProxy.downloadMap()" class="map-editor-attribute button is-primary">Download map</button> -->
+                    <a onclick="mapEditorProxy.downloadMap()" class="button is-primary" >
+                      <span class="icon">                        
+                        <i class="fas fa-download"></i>
+                      </span>
+                      <span>Download</span>
+                    </a>
+
+                    <a onclick="mapEditorProxy.saveMap()" class="button is-primary" >
+                      <span class="icon">                        
+                        <i class="far fa-save"></i>
+                      </span>
+                      <span>Save</span>
+                    </a>
+                    <!--     -->
+                </div>
+                
                 
             </div>
         </div>
-    </div>
-    
+    </div>    
     </section>
+    <nav class="navbar is-transparent is-fixed-top">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://bulma.io">
+              <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: a modern CSS framework based on Flexbox" width="112" height="28">
+            </a>            
+        </div>
+          <div id="navbarExampleTransparentExample" class="navbar-menu">
+            <div class="navbar-start">
+              <a class="navbar-item" href="Manage.html">
+                Maps
+              </a>
+              <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link" href="Manage.html">
+                  A
+                </a>
+                <div class="navbar-dropdown is-boxed">
+                  <a class="navbar-item" href="https://bulma.io/documentation/overview/start/">
+                    Overview
+                  </a>
+                  <a class="navbar-item" href="https://bulma.io/documentation/modifiers/syntax/">
+                    Modifiers
+                  </a>
+                  <a class="navbar-item" href="https://bulma.io/documentation/columns/basics/">
+                    Columns
+                  </a>
+                  <a class="navbar-item" href="https://bulma.io/documentation/layout/container/">
+                    Layout
+                  </a>
+                  <a class="navbar-item" href="https://bulma.io/documentation/form/general/">
+                    Form
+                  </a>
+                  <hr class="navbar-divider">
+                  <a class="navbar-item" href="https://bulma.io/documentation/elements/box/">
+                    Elements
+                  </a>
+                  <a class="navbar-item is-active" href="https://bulma.io/documentation/components/breadcrumb/">
+                    Components
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="navbar-end">
+                <a class="navbar-item">
+                    <span id="user-name"></span>
+                </a>
+              <div class="navbar-item">
+                <div class="field is-grouped">                  
+                  <p class="control">
+                    <a id="sign-out" class="button is-primary" href="https://github.com/jgthms/bulma/releases/download/0.7.2/bulma-0.7.2.zip">
+                      <span class="icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                      </span>
+                      <span>Sign out</span>
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        
 
 <script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
 <script>
@@ -608,7 +396,9 @@
 
   firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
-    console.log("Logged");
+    console.log("Logged",user);
+    var userLogin = user.email;
+    d3.select('#user-name').html(userLogin);
   } else {
     // No user is signed in.
     console.log("Not logged");
