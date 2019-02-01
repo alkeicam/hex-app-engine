@@ -68,6 +68,12 @@ Test.prototype = {
                     catalog: "base",
                     displayId: "artillery",
                     resource: "unit-base_ww2-ranged-opt.svg#layer1"                    
+                },
+                {
+                    description: "Base catalog - modern anti tank",
+                    catalog: "base",
+                    displayId: "antitank",
+                    resource: "unit-base_ww2-antitank-opt.svg#layer1"                    
                 }              
             ]
         }
@@ -409,6 +415,140 @@ Test.prototype = {
                 },
             },
             {
+                unitId: "red-3",
+                position: hexArray[11],
+                remainingMoveUnits: 2,
+                unitName: 'Antitank',
+                moveUnits: 2,
+                health: 10,
+                sight: 3,
+                bearing: 0,
+                range: 2,
+                rangedStrength: 32,
+                strength: 16,
+                experience: 0,
+                owner: "red",
+                displayStyle: "base-antitank",  // should match unit assets catalog, displayId
+                
+                fIsEligibleAttackPath: function(attackLineHex){
+                    
+                    
+                    if(attackLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   attackLineHex){
+                        var hex = attackLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fIsEligibleSightPath: function(sightLineHex){
+                    
+                    
+                    if(sightLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   sightLineHex){
+                        var hex = sightLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fAttack: function(unit){
+                    return 2*this._strength;
+                },
+                fDefend: function(unit){
+                    var defendHex = this.position;
+                    return (this._strength)*(1+defendHex._defenceBonus);
+                },
+                fExperience: function (opponentStrength,damageInflicted, damageReceived){
+                    var experienceGained = 0;
+                    if(damageInflicted>2*damageReceived){
+                        experienceGained = 1;
+                    }
+                    return experienceGained;
+                },
+                fMoveRange: function(hexFrom, hexTo){
+                    return hexTo._moveUnitsCost;
+                    // dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
+                },
+            },
+            {
+                unitId: "red-4",
+                position: hexArray[3],
+                remainingMoveUnits: 2,
+                unitName: 'Antitank',
+                moveUnits: 2,
+                health: 10,
+                sight: 3,
+                bearing: 0,
+                range: 2,
+                rangedStrength: 32,
+                strength: 16,
+                experience: 0,
+                owner: "red",
+                displayStyle: "base-antitank",  // should match unit assets catalog, displayId
+                
+                fIsEligibleAttackPath: function(attackLineHex){
+                    
+                    
+                    if(attackLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   attackLineHex){
+                        var hex = attackLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fIsEligibleSightPath: function(sightLineHex){
+                    
+                    
+                    if(sightLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   sightLineHex){
+                        var hex = sightLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fAttack: function(unit){
+                    return 2*this._strength;
+                },
+                fDefend: function(unit){
+                    var defendHex = this.position;
+                    return (this._strength)*(1+defendHex._defenceBonus);
+                },
+                fExperience: function (opponentStrength,damageInflicted, damageReceived){
+                    var experienceGained = 0;
+                    if(damageInflicted>2*damageReceived){
+                        experienceGained = 1;
+                    }
+                    return experienceGained;
+                },
+                fMoveRange: function(hexFrom, hexTo){
+                    return hexTo._moveUnitsCost;
+                    // dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
+                },
+            },
+            {
                 unitId: "blue-1",
                 unitName: 'Modern Tank',
                 position: hexArray[15],
@@ -416,7 +556,7 @@ Test.prototype = {
                 moveUnits: 2,
                 health: 10,
                 sight: 3,
-                bearing: 1,
+                bearing: 0,
                 range: 2,
                 rangedStrength: 0,
                 strength: 24,
@@ -476,6 +616,74 @@ Test.prototype = {
                     // dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
                 },
             },
+            {
+                unitId: "blue-2",
+                unitName: 'Modern Tank',
+                position: hexArray[14],
+                remainingMoveUnits: 2,
+                moveUnits: 2,
+                health: 10,
+                sight: 3,
+                bearing: 0,
+                range: 2,
+                rangedStrength: 0,
+                strength: 24,
+                experience: 0,
+                owner: "blue",
+                displayStyle: "base-tank",
+                
+                fIsEligibleAttackPath: function(attackLineHex){
+                    
+                    
+                    if(attackLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   attackLineHex){
+                        var hex = attackLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fIsEligibleSightPath: function(sightLineHex){
+                    
+                    
+                    if(sightLineHex.length==1)
+                        return true;
+
+                    var obstacleTerrainTypes = {"MOUNTAINS":"MOUNTAINS","SEA":"SEA"};
+                    for( var idx in   sightLineHex){
+                        var hex = sightLineHex[idx];
+                        if(hex._terrainType in obstacleTerrainTypes){
+                            return false;
+                        }                       
+                    }
+
+                    return true;
+                },
+                fAttack: function(unit){
+                    return 2*this._strength;
+                },
+                fDefend: function(unit){
+                    var defendHex = this.position;
+                    // this unit receives defence bonus from terrain
+                    return (this._strength)*(1+defendHex._defenceBonus);
+                },
+                fExperience: function (opponentStrength,damageInflicted, damageReceived){
+                    var experienceGained = 0;
+                    if(damageInflicted>2*damageReceived){
+                        experienceGained = 1;
+                    }
+                    return experienceGained;
+                },
+                fMoveRange: function(hexFrom, hexTo){
+                    return hexTo._moveUnitsCost;
+                    // dodac dla naziemnych, ze jak jeset hexTo zajete przez jakas jednostke to impassable
+                },
+            }
         ];
 
         for(var unitSpecification of unitsSpecification){

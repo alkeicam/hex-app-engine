@@ -105,8 +105,13 @@ HexMap.prototype = {
     iOffset = width/4;
     jOffset = height/6;
 
-    for(i=0;i<4;i++){
-      for(j=0;j<6;j++){
+    //var directions = 6;
+    // simplify object
+    var directions = 1;
+    var healthIndicator = 4;
+
+    for(i=0;i<healthIndicator;i++){
+      for(j=0;j<directions;j++){
         x = i*iOffset;
         y = j*jOffset;
 

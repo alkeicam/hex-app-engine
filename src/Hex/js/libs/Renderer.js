@@ -613,7 +613,10 @@ Renderer.prototype = {
 		var healthIndex = this._calculateHealthIndex(unit);
 
 		var fillPattern = 'url(#unit-{{flag}}-{{asset}}-{{direction}}-{{health}})';		
-    	fillPattern = fillPattern.replace('{{asset}}',unit._displayStyle).replace('{{direction}}',unit.bearing).replace('{{health}}',healthIndex).replace('{{flag}}',unit._owner);
+
+    	//fillPattern = fillPattern.replace('{{asset}}',unit._displayStyle).replace('{{direction}}',unit.bearing).replace('{{health}}',healthIndex).replace('{{flag}}',unit._owner);
+		// force single direction
+    	fillPattern = fillPattern.replace('{{asset}}',unit._displayStyle).replace('{{direction}}',0).replace('{{health}}',healthIndex).replace('{{flag}}',unit._owner);
     	console.log("Calculated fill:",fillPattern, healthIndex, unit.bearing);
     	return fillPattern;
 	},
