@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>  <html class="ie ie6 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 7]>     <html class="ie ie7 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 8]>     <html class="ie ie8 lte9 lte8 no-js">      <![endif]-->
+<!--[if IE 9]>     <html class="ie ie9 lte9 no-js">           <![endif]-->
+<!--[if gt IE 9]>  <html class="no-js">                       <![endif]-->
+<!--[if !IE]><!--> <html class="no-js">                       <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Scenario Editor</title>
+
+    <!-- // IOS webapp icons // -->
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <link rel="stylesheet" href="css/ui.css"/>
+    <link rel="stylesheet" href="css/map.css"/>    
+    <link rel="stylesheet" href="css/map-editor.css"/>
+    <link rel="stylesheet" href="css/bulma-extensions.min.css"/>
+    
+
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    
+    
+<!--     <script type="module" src="js/libs/BattleOutcome.js"></script>
+    <script type="module" src="js/libs/Hex.js"></script>
+    <script type="module" src="js/libs/Unit.js"></script>
+ -->    
+    <script src="js/libs/jquery-3.3.1.min.js"></script>
+    <script src="js/libs/rivet.js"></script>
+    <!-- <script src="js/libs/jquery-ui-1.10.4.min.js"></script> -->
+    <script src="js/libs/gameutils.js"></script>
+    <!-- <script src="js/drag/TweenMax.min.js"></script> -->
+    <!-- <script src="js/drag/utils/Draggable.min.js"></script> -->
+    <!-- <script src="js/libs/svg.min.js"></script>
+     <script src="js/libs/svg.draggable.min.js"></script> -->
+     <!-- <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+     <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+     <script src="https://d3js.org/d3-drag.v1.min.js"></script> -->
+     <script src="https://d3js.org/d3.v4.min.js"></script>
+     <!-- <script src="js/libs/saveSvgAsPng.js"></script> -->
+
+     <script type="text/javascript" src="js/libs/bulma-extensions.min.js"></script>
+
+     
+    
+    
+
+    <script type="module">
+        import {MapEditor} from './js/libs/map-editor.js'  
+        import {App} from  './js/libs/App.js'  
+        import {MapBrowser} from  './js/libs/map-browser.js'  
+
+        var app = new App();
+        
+
+        var mapBrowser = new MapBrowser();
+        
+
+        // initialize bulmaTagsinput
+        var tagsInputs = bulmaExtensions.bulmaTagsinput.attach();
+        app.view.tagsInputs = tagsInputs;
+
+        d3.select('#sign-out').on('click', function(){
+            app.userSignOut();
+        });
+
+        var url_string = window.location.href
+        var url = new URL(url_string);
+
+        var scenarioId = url.searchParams.get("scenarioId") ? url.searchParams.get("scenarioId"):'';
+
+        
+
+        if(!scenarioId){
+            console.log("Please provide valid scenario id.")
+            window.location.replace("/Scenarios.html");
+        }else{
+            app.backendLoadScenario(scenarioId).then(function(scenario){
+                console.log('Loaded scenario',scenario);
+
+                // when map is public or has been requested a public review then one cannot edit the map
+                if(scenario.isPublic == -1 || scenario.isPublic==1){
+                    console.log("Scenario is public so edit is not allowed.")
+                    window.location.replace("/Scenarios.html");
+                }
+
+                
+                app.loadUserMaps().then(function(mapArray){
+                    var userMaps = mapArray;
+                    mapBrowser.initializeWithMaps(scenario.map, userMaps,null);
+                });
+
+                
+                
+
+                app.model.scenarioHolder = scenario;
+                window.appProxy = app;
+                window.mapBrowserProxy = mapBrowser;
+
+                var tagInput = appProxy.view.tagsInputs[0];
+                var tags = appProxy.model.scenarioHolder.tags.split(',');
+                for(var i = 0; i<tags.length; i++){
+                    tagInput.addTag(tags[i]);
+                }
+
+            });
+        }
+
+        rivets.formatters.fromTimestamp = function(value){
+            var theDate = new Date(value);
+
+            var result = theDate.toLocaleDateString(undefined, {  
+                day : 'numeric',
+                month : 'short',
+                year : 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            })
+            return result;
+        }
+
+        // <a rv-href="group.Id | formatString 'group.aspx?id=@value&name=@0&owner=@1' group.Name group.Owner">My Link</a>
+        rivets.formatters.hrefBuilder = function (value, text) {
+            text = text.replace('@value', value);
+
+            var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
+            args.shift(); args.shift(); //remove the "value" and "text" arguments from the array
+            
+            for (var i = 0; i < args.length; i++) {
+                text = text.replace('@' + i, args[i]);
+            }    
+
+            return text;
+        };
+
+        rivets.formatters.variableBuilder = function (value, text) {
+            text = text.replace('@value', value);
+
+            var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
+            args.shift(); args.shift(); //remove the "value" and "text" arguments from the array
+            
+            for (var i = 0; i < args.length; i++) {
+                text = text.replace('@' + i, args[i]);
+            }    
+
+            return text;
+        };
+
+        rivets.formatters.eq = function (value, arg) {            
+            return value == arg;
+        };
+
+        rivets.formatters.neq = function (value, arg) {            
+            return value != arg;
+        };
+
+        rivets.formatters.split = function(value){
+            var result = value.join();
+            
+            return result;
+        }
+
+        rivets.formatters.mapFilter = function(elements, filter, filter2){
+            return elements.filter(function(element) {                
+
+                var matchVisibility = filter.length > 0 ? element.visible === filter : true;
+
+                if(filter === 'all')
+                    matchVisibility = true;
+
+                var idx = element.map.mapName.toLowerCase().indexOf(filter2);
+                                
+                var matchPhrase = filter2.length > 0 ? idx > -1 : true;
+                //var matchPhrase = filter2.length > 0 ? element.mapName === filter2 : true;
+
+                return matchVisibility && matchPhrase;
+            });
+        }
+
+
+
+
+        rivets.bind(document.getElementById('app1'), app);
+        rivets.bind(document.getElementById('app2'), app);
+        rivets.bind(document.getElementById('app3'), app);
+
+        rivets.bind(document.getElementById('browser-app'), mapBrowser);
+
+    </script>
+
+     
+</head>
+<body  class="has-navbar-fixed-top"> 
+    <section class="section">
+    <div class="container is-fluid">
+        <div class="notification is-primary is-hidden operation-success">          
+          Operation performed successfully.
+        </div>
+        <div class="notification is-danger is-hidden operation-failure">          
+          Something went wrong.
+        </div>
+        <nav id="app3" class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+                <li>
+                    <a href="/">
+                        <span class="icon is-small">
+                            <i class="fas fa-home" aria-hidden="true"></i>
+                        </span>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/Scenarios.html">
+                        <span class="icon is-small">
+                            <i class="fas fa-home" aria-hidden="true"></i>
+                        </span>
+                        <span>Scenarios</span>
+                    </a>
+
+                </li>
+                <li class="is-active"><a href="#" aria-current="page">{model.scenarioHolder.name}</a></li>                
+            </ul>
+        </nav>          
+        <div class="columns"> 
+
+            
+            <div id="app1" class="column is-one-third"> 
+                <p class="title is-1">Main</p>
+                <p class="subtitle is-3"><i class="fas fa-info-circle"></i> Basic information</p>
+                <div class="field">
+                    <label for="scenario-name" class="label">Scenario name</label>
+                    <div class="control">
+                        <input type="text" id="scenario-name" class="input" rv-value="model.scenarioHolder.name" placeholder="Name your scenario here (6 chars or more)" minlength="6" maxlength="256" size="40" >
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="scenario-create-turns" class="label">No of turns</label>
+                    <div class="control">
+                        <input type="number" id="scenario-create-turns" rv-value="model.scenarioHolder.turns" class="input" min="3" max="40" step="1" value="15" size="2" placeholder="15">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="scenario-create-powerindex" class="label">Power Index</label>
+                    <div class="control">
+                        <input type="number" id="scenario-create-powerindex" rv-value="model.scenarioHolder.powerIndex" class="input" min="1" step="1" value="100" size="5"  placeholder="100">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="scenario-create-tags" class="label">Tags</label>
+                    <div class="control">
+                        <input id="scenario-create-tags" class="input" type="tags" placeholder="Add Tag">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="scenario-teaser" class="label">Teaser</label>
+                    <div class="control">
+                        <textarea class="textarea" placeholder="Scenario teaser (presented to the players)" rows="10" rv-value="model.scenarioHolder.teaser"></textarea>
+                    </div>
+                </div>
+
+                                              
+            </div>
+            <div class="column is-one-third">
+                <p class="title is-1">Map</p>
+                <p class="subtitle is-3"><i class="fas fa-atlas"></i> Map selection</p>
+                <div id="app2" class="field">
+                    <label for="scenario-name" class="label">Selected map</label>
+                    <div class="control">
+                        <input type="text" id="scenario-name" class="input" rv-value="model.scenarioHolder.map.mapName" placeholder="Name of the map" minlength="6" maxlength="256" size="40" readonly>
+                    </div>
+                    <p class="help">Map Id: {model.scenarioHolder.map.mapId}</p>
+                    <p class="help"><a rv-href="model.scenarioHolder.map.mapId | hrefBuilder 'MapEditor.html?mapId=@value'" target="_blank">See map</a></p>
+                </div>
+                <div class="field">
+                    <label for="scenario-name" class="label">Change map</label>
+                    <nav id="browser-app" class="panel">
+                        <p class="panel-heading">
+                        Map browser
+                        </p>
+                        <div class="panel-block">
+                            <p class="control has-icons-left">
+                                <input class="input is-small" type="text" placeholder="search" rv-value="model.currentFilterName">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-search" aria-hidden="true"></i>
+                                </span>
+                            </p>
+                        </div>  
+                        <p class="panel-tabs">
+                            <a rv-if="model.currentFilterVisibility | eq 'all'" rv-onclick="'all' | variableBuilder 'mapBrowserProxy.setCurrentFilterVisibility('@value')'" class="is-active">all</a>
+                            <a rv-if="model.currentFilterVisibility | neq 'all'" rv-onclick="'all' | variableBuilder 'mapBrowserProxy.setCurrentFilterVisibility('@value')'" >all</a>
+                            <a rv-if="model.currentFilterVisibility | eq 'public'" rv-onclick="'public' | variableBuilder 'mapBrowserProxy.setCurrentFilterVisibility('@value')'" class="is-active">public</a>
+                            <a rv-if="model.currentFilterVisibility | neq 'public'" rv-onclick="'public' | variableBuilder 'mapBrowserProxy.setCurrentFilterVisibility('@value')'">public</a>
+                            <a rv-if="model.currentFilterVisibility | eq 'private'" rv-onclick="'private' | variableBuilder 'mapBrowserProxy.setCurrentFilterVisibility('@value')'" class="is-active">private</a>
+                            <a rv-if="model.currentFilterVisibility | neq 'private'" rv-onclick="'private' | variableBuilder 'mapBrowserProxy.setCurrentFilterVisibility('@value')'">private</a>
+                        </p>
+                        <div rv-each-map="model.maps | mapFilter model.currentFilterVisibility model.currentFilterName">
+
+                            <a rv-if="model.currentSelected.map.mapId | eq map.map.mapId" class="panel-block is-active" rv-onclick="map.map.mapId | variableBuilder 'mapBrowserProxy.setCurrentSelected('@value')'">
+                                <span class="panel-icon">
+                                  <i class="fas fa-atlas"></i>
+                                </span>
+                                <span class="is-size-6 tooltip" rv-data-tooltip="map.map.mapId">{map.map.mapName} </span> 
+                            </a>
+                             <a rv-if="model.currentSelected.map.mapId | neq map.map.mapId" class="panel-block" rv-onclick="map.map.mapId | variableBuilder 'mapBrowserProxy.setCurrentSelected('@value')'">
+                                <span class="panel-icon">
+                                  <i class="fas fa-atlas"></i>
+                                </span>
+                                <span class="is-size-6 tooltip" rv-data-tooltip="map.map.mapId">{map.map.mapName} </span> 
+                            </a>
+                        </div>
+                        <div class="panel-block">
+                            <button class="button is-link is-outlined is-fullwidth" rv-onclick="model.currentSelected.map.mapId | variableBuilder 'appProxy.scenarioChangeMap('@value')'">
+                              Use selected map in scenario
+                            </button>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            <div class="column">
+                <p class="title is-1">Map</p>
+                <p class="subtitle is-3"><i class="fas fa-trophy"></i> Deployment and victory conditions</p>
+                 
+            </div>            
+        </div>
+        <div class="columns">
+            <div class="column is-two-third"></div>
+            <div class="column is-one-third">
+                <nav class="level">
+                    <div class="level-left"></div>
+                    <div class="level-right">
+                        <p class="level-item">
+                            <a onclick="mapEditorProxy.downloadMap()" class="button is-primary" >
+                              <span class="icon">                        
+                                <i class="fas fa-download"></i>
+                              </span>
+                              <span>Download</span>
+                            </a>
+                        </p>
+                        <p class="level-item">
+                            <a onclick="appProxy.saveCurrentScenario()" class="button is-primary" >
+                              <span class="icon">                        
+                                <i class="far fa-save"></i>
+                              </span>
+                              <span>Save</span>
+                            </a>    
+                        </p>
+                    </div>
+                </nav>
+                
+            </div>
+        </div>
+
+    </div>    
+    </section>
+    <nav class="navbar is-transparent is-fixed-top">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://bulma.io">
+              <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: a modern CSS framework based on Flexbox" width="112" height="28">
+            </a>            
+        </div>
+          <div id="navbarExampleTransparentExample" class="navbar-menu">
+            <div class="navbar-start">
+              <a class="navbar-item" href="Manage.html">
+                Maps
+              </a>
+              <a class="navbar-item"  href="Scenarios.html">
+                Scenarios
+              </a>
+              <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link" href="Manage.html">
+                  A
+                </a>
+                <div class="navbar-dropdown is-boxed">
+                  <a class="navbar-item" href="https://bulma.io/documentation/overview/start/">
+                    Overview
+                  </a>
+                  <a class="navbar-item" href="https://bulma.io/documentation/modifiers/syntax/">
+                    Modifiers
+                  </a>
+                  <a class="navbar-item" href="https://bulma.io/documentation/columns/basics/">
+                    Columns
+                  </a>
+                  <a class="navbar-item" href="https://bulma.io/documentation/layout/container/">
+                    Layout
+                  </a>
+                  <a class="navbar-item" href="https://bulma.io/documentation/form/general/">
+                    Form
+                  </a>
+                  <hr class="navbar-divider">
+                  <a class="navbar-item" href="https://bulma.io/documentation/elements/box/">
+                    Elements
+                  </a>
+                  <a class="navbar-item is-active" href="https://bulma.io/documentation/components/breadcrumb/">
+                    Components
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="navbar-end">
+                <a class="navbar-item">
+                    <span id="user-name"></span>
+                </a>
+              <div class="navbar-item">
+                <div class="field is-grouped">                  
+                  <p class="control">
+                    <a id="sign-out" class="button is-primary" href="https://github.com/jgthms/bulma/releases/download/0.7.2/bulma-0.7.2.zip">
+                      <span class="icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                      </span>
+                      <span>Sign out</span>
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        
+
+<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAloFJtk8JOkIpWMoVVnk8cCgq9KHQKNWU",
+    authDomain: "hexapp-f82d4.firebaseapp.com",
+    databaseURL: "https://hexapp-f82d4.firebaseio.com",
+    projectId: "hexapp-f82d4",
+    storageBucket: "hexapp-f82d4.appspot.com",
+    messagingSenderId: "148861884860"
+  };
+  firebase.initializeApp(config);
+
+  firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    console.log("Logged",user);
+    var userLogin = user.email;
+    d3.select('#user-name').html(userLogin);
+  } else {
+    // No user is signed in.
+    console.log("Not logged");
+  }
+});
+</script>
+</body>
+</html>

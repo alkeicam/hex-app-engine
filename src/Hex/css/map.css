@@ -1,4 +1,4 @@
-body { padding: 1em 0; background: #ddd ; color: #ccc; }
+body { padding: 1em 0; background: #f8f9fd ; color: #ccc; }
 svg { max-width: 100%; height: auto; display: block; }
 .highlight {stroke-width:2; stroke: green; }
 /*.highlight {opacity: 0.6;}*/

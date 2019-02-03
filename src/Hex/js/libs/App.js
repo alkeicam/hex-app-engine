@@ -17,7 +17,12 @@ App.prototype = {
 
   model: {
     user: {},
-    maps: []
+    maps: [],
+    scenarios: [],
+    scenarioHolder: {}  // stores scenario object during create and scenario configuration
+  },
+  view: {
+    tagsInputs: {}
   },
 
   timeout: 5000,
@@ -27,6 +32,8 @@ App.prototype = {
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
         that.model.user = user;        
+        
+        // load user maps
         var mapRef = firebase.database().ref('/userMap/' + that.model.user.uid).orderByChild('modifiedSort');
         console.log(mapRef);
         mapRef.on('value', function(snapshot) {
@@ -42,9 +49,31 @@ App.prototype = {
             that.model.maps = [];
           }
         });
+
+        // load user scenarios
+        var scenarioRef = firebase.database().ref('/userScenario/' + that.model.user.uid).orderByChild('modifiedSort');
+        console.log(scenarioRef);
+        scenarioRef.on('value', function(snapshot) {
+          console.log(snapshot.val());  
+          if(snapshot.val()){
+            that.model.scenarios.length = 0;
+            snapshot.forEach(function(child) {
+              that.model.scenarios.push(child.val());              
+            });            
+            console.log(that.model.scenarios);
+          }else{
+            that.model.scenarios.length = 0;   
+            that.model.scenarios = [];
+          }
+        });
+
+        // load public maps
+
+
       } else {
         that.model.user = {};
         that.model.maps = [];
+        that.model.scenarios = [];
       }
     });
   },
@@ -103,13 +132,97 @@ App.prototype = {
     firebase.auth().signOut().then(function() {
       window.location.replace("login.html");
     }).catch(function(error) {
-      // An error happened.
+      window.location.replace("login.html");
     });
+  },
+
+  loadUserMaps: function(){
+    var resultArray = [];
+    var that = this;
+
+    return new Promise(function(resolve, reject){
+      var mapRef = firebase.database().ref('/userMap/' + that.model.user.uid).orderByChild('modifiedSort');
+
+      mapRef.on('value', function(snapshot) {        
+        if(snapshot.val()){          
+          snapshot.forEach(function(child) {            
+            resultArray.push(child.val());              
+          });                      
+        }else{}
+        console.log(resultArray);
+        return resolve(resultArray);                      
+      });
+
+      
+    });
+  },
+
+  scenarioChangeMap: function(mapId){
+    var that = this;
+    console.log('Changed',mapId);
+    this.backendLoadMap(mapId).then(function(map){
+      that.model.scenarioHolder.map = map;       
+    }, function(error){
+      console.log(error);
+      that.showNotificationError();
+    }).catch(function(error){
+      console.log(error);
+      that.showNotificationError();
+    });
+    
+  },
+
+  saveCurrentScenario: function(){
+    var scenario = this.model.scenarioHolder;
+    scenario.tags = this.view.tagsInputs[0].getValue();
+
+    this.saveScenario(scenario);
+  },
+
+  saveScenario: function(scenario){
+
+    // set some defaults
+    scenario.teaser = scenario.teaser || '';
+
+    scenario.modified = Date.now();
+    scenario.modifiedSort = -Date.now();
+
+    
+    this.backendSaveScenario(scenario);
+    this.backendSaveUserScenario(scenario);
+
+    this.showNotificationSuccess();
+  },
+
+  scenarioCreateStepOne: function(modalId){
+    d3.select('#'+modalId).classed('is-active',true);    
+  },
+
+
+
+  scenarioCreateStepOneCancel: function(modalId){
+    d3.select('#'+modalId).classed('is-active',null);
+  },
+
+  scenarioCreateStepTwo: function(modalId){
+    // this is a fix as rivet rv-value does not work poperly with tagsinput component
+    var tags = d3.select('#scenario-create-tags').property("value");
+    
+
+    
+    //this.backendCreateScenario(this.model.scenarioHolder.name, this.model.scenarioHolder.turns, this.model.scenarioHolder.powerIndex, this.model.scenarioHolder.tags);
+    this.backendCreateScenario(this.model.scenarioHolder.name, this.model.scenarioHolder.turns, this.model.scenarioHolder.powerIndex, tags);
+    this.model.scenarioHolder = {};
+
+    d3.select('#'+modalId).classed('is-active',null);
+    d3.select('#scenario-create-tags').attr("value",null);    
   },
 
   mapCreateStepOne: function(createMapModalId){
     d3.select('#'+createMapModalId).classed('is-active',true);    
   },
+
+
 
   mapCreateStepOneCancel: function(createMapModalId){
     d3.select('#'+createMapModalId).classed('is-active',null);
@@ -125,6 +238,80 @@ App.prototype = {
     d3.select('#'+createMapModalId).classed('is-active',null);
   },
 
+  showNotificationSuccess: function(){
+    d3.select('.notification,.operation-success').classed('is-hidden',null);  
+    
+    setTimeout(function(){
+      d3.select('.notification,.operation-success').classed('is-hidden',true);
+    },this.timeout);    
+  },
+
+  showNotificationError: function(){
+    d3.select('.notification,.operation-failure').classed('is-hidden',null);  
+    
+    setTimeout(function(){
+      d3.select('.notification,.operation-failure').classed('is-hidden',true);
+    },this.timeout);    
+  },
+
+  scenarioDelete: function(scenarioId){
+    var that = this;
+    this.backendLoadScenario(scenarioId).then(function(scenario){
+      
+      that.backendDeleteScenario(scenario).then(function(){
+        that.backendDeleteUserScenario(scenario).then(function(){          
+          that.showNotificationSuccess();
+        }, function(error){
+          console.log(error);    
+          that.showNotificationError();
+        }).catch(function(error){
+          console.log(error);    
+          that.showNotificationError();
+        });
+      },function(error){
+          console.log(error);    
+          that.showNotificationError();
+        }).catch(function(error){
+        console.log(error);  
+        that.showNotificationError();
+      });  
+    },function(error){
+          console.log(error);    
+          that.showNotificationError();
+        }).catch(function(error){
+      console.log(error);
+      that.showNotificationError();
+    });
+  },
+
+  scenarioClone: function(scenarioId){
+    var that = this;
+    this.backendLoadScenario(scenarioId).then(function(scenario){
+
+      //backendCreateScenario: function(name, turns, powerIndex, tags){
+
+      //var cloneScenarioId = that.backendCreateScenario(scenario.name+'-clone', scenario.turns, scenario.powerIndex, scenario.tags.join());
+      var cloneScenarioId = that.backendCreateScenario(scenario.name+'-clone', scenario.turns, scenario.powerIndex, scenario.tags);
+
+      that.backendLoadScenario(cloneScenarioId).then(function(scenarioCloned){
+        scenarioCloned.teaser = scenario.teaser;
+        scenarioCloned.rulesAndConditions = scenario.rulesAndConditions;
+        scenarioCloned.teaser = scenario.teaser;
+        scenarioCloned.deploymentSpecification = scenario.deploymentSpecification;
+        scenarioCloned.victoryConditions = scenario.victoryConditions;
+
+        that.backendSaveScenario(scenarioCloned);
+        that.backendSaveUserScenario(scenarioCloned);
+      }).catch(function(error){
+        console.log(error);
+        that.showNotificationError();
+      });
+    }).catch(function(error){
+      console.log(error);
+      that.showNotificationError();
+    });
+  },
+
   mapDelete: function(mapId){
     var that = this;
     this.backendLoadMap(mapId).then(function(map){
@@ -132,20 +319,18 @@ App.prototype = {
       that.backendDeleteMap(map).then(function(){
         that.backendDeleteUserMap(map).then(function(){
           console.log('Deleted');  
-          d3.select('.notification,.delete-success').classed('is-hidden',null);  
-
-        
-          setTimeout(function(){
-            d3.select('.notification,.delete-success').classed('is-hidden',true);
-          },that.timeout);    
+          that.showNotificationSuccess();
         }).catch(function(error){
           console.log(error);    
+          that.showNotificationError();
         });
       }).catch(function(error){
         console.log(error);  
+        that.showNotificationError();
       });  
     }).catch(function(error){
       console.log(error);
+      that.showNotificationError();
     });
   },
 
@@ -153,16 +338,36 @@ App.prototype = {
     var that = this;
     this.backendLoadMap(mapId).then(function(map){
       var cloneMapId = that.backendCreateMap(map.mapName+'-clone', map.rows, map.cols);
-      that.backendLoadMap(mapId).then(function(mapCloned){
+      that.backendLoadMap(cloneMapId).then(function(mapCloned){
         mapCloned.mapSpecification = map.mapSpecification;
+        mapCloned.isPublic = map.isPublic;
+
         that.backendSaveMap(mapCloned);
+        that.backendSaveUserMap(mapCloned);
       }).catch(function(error){
         console.log(error);
+        that.showNotificationError();
       });
+    }).catch(function(error){
+      console.log(error);
+      that.showNotificationError();
+    });
+  },
+
+
+  mapRequestPublic: function(mapId){
+    var that = this;
+    this.backendLoadMap(mapId).then(function(map){
+      // send map for public review
+      map.isPublic = -1;
+      that.backendSaveMap(map);  
+      that.backendSaveUserMap(map);    
     }).catch(function(error){
       console.log(error);
     });
   },
+
+
 
   validateEmail: function(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -179,7 +384,7 @@ App.prototype = {
       firebase.database().ref('/maps/' + map.mapId).remove().then(function(){
         return resolve();
       }).catch(function(error){
-        return reject();
+        return reject(error);
       });
       
     });
@@ -190,10 +395,63 @@ App.prototype = {
       firebase.database().ref('/userMap/' + map.userId+"/"+map.mapId).remove().then(function(){
         return resolve();      
       }).catch(function(error){
-        return reject();  
+        return reject(error);  
       });
       
     });
+  },
+
+
+  backendDeleteScenario: function(scenario){
+    return new Promise(function(resolve, reject){
+      firebase.database().ref('/scenarios/' + scenario.scenarioId).remove().then(function(){
+        return resolve();
+      }).catch(function(error){
+        return reject(error);
+      });
+      
+    });
+  },
+
+  backendDeleteUserScenario: function(scenario){
+    return new Promise(function(resolve, reject){
+      firebase.database().ref('/userScenario/' + scenario.userId+"/"+scenario.scenarioId).remove().then(function(){
+        return resolve();      
+      }).catch(function(error){
+        return reject(error);  
+      });
+      
+    });
+  },
+
+
+  backendCreateScenario: function(name, turns, powerIndex, tags){
+    
+    var id = this.backendGenerateUUID();
+
+    var scenario = {
+      scenarioId: id,
+      name: name,
+      userId: this.backendGetLoggedUser().uid,
+      created: Date.now(),
+      modified: Date.now(),
+      modifiedSort: -Date.now(),
+      isPublic: 0,
+      powerIndex: powerIndex,
+      turns: turns,
+      deploymentSpecification: null,
+      victoryConditions: null,
+      map: null,
+      //tags: tags.split(',')   
+      tags: tags,
+      teaser: null
+    };
+    
+
+    this.backendSaveScenario(scenario);
+    this.backendSaveUserScenario(scenario);
+
+    return id;
   },
 
   backendCreateMap: function(mapName, rows, cols){
@@ -217,7 +475,8 @@ App.prototype = {
       created: Date.now(),
       modified: Date.now(),
       modifiedSort: -Date.now(),
-      mapSpecification: mapSpecification
+      mapSpecification: mapSpecification,
+      isPublic: 0
     }
 
     this.backendSaveMap(map);
@@ -242,12 +501,7 @@ App.prototype = {
         that.backendSaveMap(map);
         that.backendSaveUserMap(map);
 
-        d3.select('.notification,.save-success').classed('is-hidden',null);  
-
-        
-        setTimeout(function(){
-          d3.select('.notification,.save-success').classed('is-hidden',true);
-        },3000); 
+        that.showNotificationSuccess();
 
       });
     }    
@@ -262,6 +516,25 @@ App.prototype = {
           return reject();
       });
     });
+  },
+
+  backendLoadScenario: function(scenarioId){
+    return new Promise(function(resolve, reject){
+      var mapRef = firebase.database().ref('/scenarios/' + scenarioId).once('value').then(function(snapshot){
+        if(snapshot)
+          return resolve(snapshot.val());
+        else 
+          return reject();
+      });
+    });
+  },
+
+  backendSaveScenario: function(scenario){
+    firebase.database().ref('/scenarios/' + scenario.scenarioId).set(scenario);
+  },
+
+  backendSaveUserScenario: function(scenario){
+    firebase.database().ref('/userScenario/' + scenario.userId+"/"+scenario.scenarioId).set(scenario);
   },
 
   backendSaveMap: function(map){

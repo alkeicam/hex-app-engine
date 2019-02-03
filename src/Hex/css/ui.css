@@ -28,18 +28,18 @@
 }
 
 .game-dock-unit { 
-	width: 50%; 
+	width: 40%; 
 	height: 100%; 
-    background-color: #0d2d4e;
+    background-color: #8bb4de;
     float: left;
     border-top-left-radius: 10px;
 }
 
 .game-dock-unit-details { 
-	width: 50%; 
+	width: 60%; 
 	height: 100%; 
     background-color: #0d2d4e;
-    float: left;
+    float: left;    
     border-top-right-radius: 10px;
     /*visibility: hidden;*/
     color: white;
@@ -48,6 +48,13 @@
     font-size: 1em;
 }
 
+.game-dock-unit-details .padded-left{
+	padding-left: 5%;
+}
+
+.game-dock-unit-details .margin-left{
+	margin-left: 5%;
+}
 
 
 .company-colors-blue {
@@ -103,8 +110,8 @@
 }
 
 .game-dock-unit-icon {
-	width: 70%;
-	padding: 10px;
+	width: 100%;
+	/*padding: 10px;*/
 	/*transform: rotate(45deg);*/
 }
 

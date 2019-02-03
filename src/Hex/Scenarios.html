@@ -10,7 +10,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Manage Maps</title>
+    <title>Manage Scenarios</title>
 
     <!-- // IOS webapp icons // -->
     
@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="css/ui.css"/>
     <link rel="stylesheet" href="css/map.css"/>    
     <link rel="stylesheet" href="css/map-editor.css"/>
+    <link rel="stylesheet" href="css/bulma-extensions.min.css"/>
     
 
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
@@ -43,6 +44,8 @@
      
      <!-- <script src="js/libs/saveSvgAsPng.js"></script> -->
 
+     <script type="text/javascript" src="js/libs/bulma-extensions.min.js"></script>
+
      
     
     
@@ -50,6 +53,9 @@
     <script type="module">
         import {MapEditor} from './js/libs/map-editor.js'  
         import {App} from  './js/libs/App.js'  
+
+        // initialize bulmaTagsinput
+        var tagsInputs = bulmaExtensions.bulmaTagsinput.attach();
 
         var app = new App();
 
@@ -107,6 +113,15 @@
             return value != arg;
         };
 
+        rivets.formatters.split = function (value) {  
+            var result = [];
+            try{
+                result = value.split(',');
+            }catch(exception){
+                result = [];
+            }                  
+            return result;
+        };
 
         rivets.bind(document.getElementById('app'), app);
 
@@ -125,66 +140,74 @@
           Something went wrong.
         </div>
         <div class="columns">
-            <div class="column is-three-quarters">
-                <p class="title is-3">Manage maps</p>
-                <p class="subtitle is-6">Create, edit and share your maps</p>
+            <div class="column is-four-fifths">
+                <p class="title is-3">Manage scenarios</p>
+                <p class="subtitle is-6">Create, edit and share your scenarios</p>
 
                 <table class="table is-fullwidth is-striped is-hoverable">
                     <thead>
                         <tr>
                             
-                            <th>Map name</th>                            
+                            <th>Scenario name</th>                            
                             <th>Created</th>
                             <th>Modified</th>                            
-                            <th>Size (rows x cols)</th>
+                            <th>Turns</th>
+                            <th>Power Index</th>
+                            <th>Tags</th>
                             <th>Action</th>                            
                         </tr>
                     </thead>
                     <tbody>
-                        <tr rv-each-usermap="model.maps">
+                        <tr rv-each-userscenario="model.scenarios">
                             
-                            <th>{usermap.mapName}</th>                            
-                            <td>{usermap.created | fromTimestamp}</td>
-                            <td>{usermap.modified | fromTimestamp}</td>
-                            <td>{usermap.rows} x {usermap.cols}</td>
+                            <th class="is-size-6">{userscenario.name}</th>                            
+                            <td><span class="is-size-7">{userscenario.created | fromTimestamp}</span></td>
+                            <td><span class="is-size-7">{userscenario.modified | fromTimestamp}</span></td>
+                            <td class="is-size-7">{userscenario.turns}</td>
+                            <td class="is-size-7">{userscenario.powerIndex}</td>
+                            <td>
+                                <span rv-each-scenariotag="userscenario.tags | split">
+                                  <span class="tag">{scenariotag}</span>                                    
+                                </span>                                
+                            </td>
                             <td>
                                 <!-- href="MapEditor.html?mapId={usermap.mapId} -->
-                                <a  rv-if="usermap.isPublic | eq 0" class="button is-small" rv-href="usermap.mapId | hrefBuilder 'MapEditor.html?mapId=@value'">
+                                <a  rv-if="userscenario.isPublic | eq 0" class="button is-small" rv-href="userscenario.scenarioId | hrefBuilder 'ScenarioEditor.html?scenarioId=@value'">
                                     <span class="icon">
                                         <i class="fas fa-edit"></i>
                                     </span>
                                     <span>Edit</span>
                                 </a>
 
-                                <a  rv-if="usermap.isPublic | neq 0" class="button is-small" disabled >
+                                <a  rv-if="userscenario.isPublic  | neq 0" class="button is-small" disabled >
                                     <span class="icon">
                                         <i class="fas fa-edit"></i>
                                     </span>
                                     <span>Edit</span>
                                 </a>
 
-                                <a class="button is-small" rv-onclick="usermap.mapId | variableBuilder 'appProxy.mapClone('@value')'">
+                                <a class="button is-small" rv-onclick="userscenario.scenarioId | variableBuilder 'appProxy.scenarioClone('@value')'">
                                     <span class="icon">
                                         <i class="far fa-copy"></i>
                                     </span>
                                     <span>Clone</span>
                                 </a>
                                                                 
-                                <a rv-if="usermap.isPublic | eq 0" class="button is-danger is-small" rv-ondblclick="usermap.mapId | variableBuilder 'appProxy.mapDelete('@value')'">
+                                <a rv-if="userscenario.isPublic | eq 0" class="button is-danger is-small" rv-ondblclick="userscenario.scenarioId | variableBuilder 'appProxy.scenarioDelete('@value')'">
                                     <span class="icon">
                                         <i class="far fa-trash-alt"></i>
                                     </span>
                                     <span>Delete</span>
                                 </a>
 
-                                <a rv-if="usermap.isPublic | eq 0" class="button is-warning is-small" rv-onclick="usermap.mapId | variableBuilder 'appProxy.mapRequestPublic('@value')'">
+                                <a rv-if="userscenario.isPublic | eq 0" class="button is-warning is-small" rv-onclick="userscenario.scenarioId | variableBuilder 'appProxy.scenarioRequestPublic('@value')'">
                                     <span class="icon">
                                         <i class="fas fa-star"></i>
                                     </span>
                                     <span>Request public</span>
                                 </a>
 
-                                <a rv-if="usermap.isPublic | neq 0" class="button is-danger is-small" disabled >
+                                <a rv-if="userscenario.isPublic | neq 0" class="button is-danger is-small" disabled >
                                     <span class="icon">
                                         <i class="far fa-trash-alt"></i>
                                     </span>
@@ -192,8 +215,9 @@
                                 </a>
                                 
                                 
-                                <span rv-if="usermap.isPublic | eq 1" class="tag is-warning"><i class="fas fa-star"></i>This map is Public !</span>
-                                <span rv-if="usermap.isPublic | eq -1" class="tag is-info"><i class="fas fa-star"></i>Under review</span>
+                                <span rv-if="userscenario.isPublic | eq 1" class="tag is-warning"><i class="fas fa-star"></i>This scenario is Public !</span>
+                                <span rv-if="userscenario.isPublic | eq -1" class="tag is-info"><i class="fas fa-star"></i>Under review</span>
+
                             </td>
                         </tr>
                     </tbody>
@@ -202,47 +226,53 @@
             </div>
             <div class="column">     
                 <div>
-                    <a onclick="appProxy.mapCreateStepOne('map-create-modal')" class="map-editor-attribute button is-primary" >
+                    <a onclick="appProxy.scenarioCreateStepOne('scenario-create-modal')" class="map-editor-attribute button is-primary" >
                       <span class="icon">                        
                         <i class="far fa-plus-square"></i>
                       </span>
-                      <span>Add new map</span>
+                      <span>Add new scenario</span>
                     </a>
                 </div>
             </div>
         </div>
     </div>
     </section>
-    <div id="map-create-modal" class="modal">
+    <div id="scenario-create-modal" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
-                <p class="modal-card-title">Create new map</p>
-                <button onclick="appProxy.mapCreateStepOneCancel('map-create-modal')" class="delete" aria-label="close"></button>
+                <p class="modal-card-title">Create new scenario</p>
+                <button onclick="appProxy.scenarioCreateStepOneCancel('scenario-create-modal')" class="delete" aria-label="close"></button>
             </header>
             <section class="modal-card-body">
                 <div class="field">
-                    <label for="map-create-name" class="label">Map name</label>
+                    <label for="map-create-name" class="label">Scenario name</label>
                     <div class="control">
-                        <input type="text" id="map-create-name" class="input" placeholder="Name your map here (6 chars or more)" minlength="6" maxlength="256" size="40">
+                        <input type="text" id="scenario-create-name" rv-value="model.scenarioHolder.name" class="input" placeholder="Name your scenario here (6 chars or more)" minlength="6" maxlength="256" size="40">
                     </div>
                 </div>
                 <div class="field">
-                    <label for="map-create-rows" class="label">No of rows</label>
+                    <label for="scenario-create-turns" class="label">No of turns</label>
                     <div class="control">
-                        <input type="number" id="map-create-rows" class="input" min="3" max="100" step="1" value="7" size="2">
+                        <input type="number" id="scenario-create-turns" rv-value="model.scenarioHolder.turns" class="input" min="3" max="40" step="1" value="15" size="2" placeholder="15">
                     </div>
                 </div>
                 <div class="field">
-                    <label for="map-create-cols" class="label">No of cols</label>
+                    <label for="scenario-create-powerindex" class="label">Power Index</label>
                     <div class="control">
-                        <input type="number" id="map-create-cols" class="input" min="7" max="100" step="1" value="11" size="2">
+                        <input type="number" id="scenario-create-powerindex" rv-value="model.scenarioHolder.powerIndex" class="input" min="1" step="1" value="100" size="5"  placeholder="100">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="scenario-create-tags" class="label">Tags</label>
+                    <div class="control">
+                        <input id="scenario-create-tags" class="input" type="tags" placeholder="Add Tag" value="">
                     </div>
                 </div>
             </section>
             <footer class="modal-card-foot">
-                <button onclick="appProxy.mapCreateStepTwo('map-create-modal')" class="button is-success">Create</button>
-                <button onclick="appProxy.mapCreateStepOneCancel('map-create-modal')" class="button">Cancel</button>
+                <button onclick="appProxy.scenarioCreateStepTwo('scenario-create-modal')" class="button is-success">Create</button>
+                <button onclick="appProxy.scenarioCreateStepOneCancel('scenario-create-modal')" class="button">Cancel</button>
             </footer>
         </div>
     </div>
@@ -254,10 +284,10 @@
         </div>
           <div id="navbarExampleTransparentExample" class="navbar-menu">
             <div class="navbar-start">
-              <a class="navbar-item is-active"  href="Manage.html">
+              <a class="navbar-item"  href="Manage.html">
                 Maps
               </a>
-              <a class="navbar-item"  href="Scenarios.html">
+              <a class="navbar-item is-active"  href="Scenarios.html">
                 Scenarios
               </a>
               <div class="navbar-item has-dropdown is-hoverable">
