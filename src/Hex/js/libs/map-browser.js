@@ -55,14 +55,23 @@ MapBrowser.prototype = {
     initializeWithMaps: function(map, userMapsArray, publicMapsArray){
         this._initialize();
 
-        this.model.currentSelected.map = {
-            mapName: map.mapName,
-            mapId: map.mapId
-        };
+        if(map){
+            this.model.currentSelected.map = {
+                mapName: map.mapName ,
+                mapId: map.mapId
+            }    
+        }else{
+            this.model.currentSelected.map = {
+                mapName: null ,
+                mapId: null
+            }
+        }
+
+        
 
         var mapsArray = [];
 
-        
+
         for(var i = 0; i< userMapsArray.length; i++){
             var mapElement = {
                 map: userMapsArray[i],

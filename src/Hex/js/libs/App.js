@@ -19,7 +19,7 @@ App.prototype = {
     user: {},
     maps: [],
     scenarios: [],
-    scenarioHolder: {}  // stores scenario object during create and scenario configuration
+    scenarioHolder: {},  // stores scenario object during create and scenario configuration    
   },
   view: {
     tagsInputs: {}
@@ -74,6 +74,7 @@ App.prototype = {
         that.model.user = {};
         that.model.maps = [];
         that.model.scenarios = [];
+        that.model.scenarioHolder = {};
       }
     });
   },
@@ -161,7 +162,7 @@ App.prototype = {
     var that = this;
     console.log('Changed',mapId);
     this.backendLoadMap(mapId).then(function(map){
-      that.model.scenarioHolder.map = map;       
+      that.model.scenarioHolder.map = map;          
     }, function(error){
       console.log(error);
       that.showNotificationError();
@@ -173,8 +174,11 @@ App.prototype = {
   },
 
   saveCurrentScenario: function(){
-    var scenario = this.model.scenarioHolder;
+    //beware, here we need to make sure that variables used by rivet are not interfering
+    var scenario = this.model.scenarioHolder;    
     scenario.tags = this.view.tagsInputs[0].getValue();
+
+
 
     this.saveScenario(scenario);
   },
@@ -183,6 +187,14 @@ App.prototype = {
 
     // set some defaults
     scenario.teaser = scenario.teaser || '';
+    if(!scenario.map){
+      scenario.map = {
+        mapId: '',
+        mapName: ''
+      }
+    }    
+    scenario.deploymentSpecification = scenario.deploymentSpecification || {};
+    scenario.victoryConditions = scenario.victoryConditions || {};
 
     scenario.modified = Date.now();
     scenario.modifiedSort = -Date.now();
@@ -294,11 +306,11 @@ App.prototype = {
       var cloneScenarioId = that.backendCreateScenario(scenario.name+'-clone', scenario.turns, scenario.powerIndex, scenario.tags);
 
       that.backendLoadScenario(cloneScenarioId).then(function(scenarioCloned){
-        scenarioCloned.teaser = scenario.teaser;
-        scenarioCloned.rulesAndConditions = scenario.rulesAndConditions;
-        scenarioCloned.teaser = scenario.teaser;
-        scenarioCloned.deploymentSpecification = scenario.deploymentSpecification;
-        scenarioCloned.victoryConditions = scenario.victoryConditions;
+        scenarioCloned.teaser = scenario.teaser || '';
+        scenarioCloned.map = scenario.map || {};        
+        scenarioCloned.rulesAndConditions = scenario.rulesAndConditions || {};        
+        scenarioCloned.deploymentSpecification = scenario.deploymentSpecification || {};
+        scenarioCloned.victoryConditions = scenario.victoryConditions || {};
 
         that.backendSaveScenario(scenarioCloned);
         that.backendSaveUserScenario(scenarioCloned);
@@ -439,12 +451,12 @@ App.prototype = {
       isPublic: 0,
       powerIndex: powerIndex,
       turns: turns,
-      deploymentSpecification: null,
-      victoryConditions: null,
-      map: null,
+      // deploymentSpecification: {},
+      // victoryConditions: {},
+      // map: {},
       //tags: tags.split(',')   
       tags: tags,
-      teaser: null
+      teaser: ''
     };
     
 

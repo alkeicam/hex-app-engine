@@ -19,6 +19,10 @@
     <link rel="stylesheet" href="css/map.css"/>    
     <link rel="stylesheet" href="css/map-editor.css"/>
     <link rel="stylesheet" href="css/bulma-extensions.min.css"/>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/github.min.css"/>
+
+    
     
 
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
@@ -44,6 +48,13 @@
 
      <script type="text/javascript" src="js/libs/bulma-extensions.min.js"></script>
 
+     <!-- <script
+ charset="UTF-8"
+ src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/go.min.js"></script> -->
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js"></script>
+ 
+
      
     
     
@@ -52,6 +63,8 @@
         import {MapEditor} from './js/libs/map-editor.js'  
         import {App} from  './js/libs/App.js'  
         import {MapBrowser} from  './js/libs/map-browser.js'  
+
+        hljs.initHighlightingOnLoad();
 
         var app = new App();
         
@@ -164,6 +177,32 @@
             return result;
         }
 
+        rivets.formatters.notEmpty = function(value){
+            if(value)
+                return true;
+            return false;                    
+        }
+
+        rivets.formatters.empty = function(value){
+            if(value)
+                return false;
+            return true;                    
+        }
+
+        rivets.formatters.emptyObject = function(value){      
+            if(!value)
+                return true;      
+            return Object.keys(value).length === 0 && value.constructor === Object;                    
+        }
+
+        rivets.formatters.notEmptyObject = function(value){            
+            if(!value)
+                return false;
+            return !(Object.keys(value).length === 0 && value.constructor === Object);                    
+        }
+
+        
+
         rivets.formatters.mapFilter = function(elements, filter, filter2){
             return elements.filter(function(element) {                
 
@@ -187,6 +226,7 @@
         rivets.bind(document.getElementById('app1'), app);
         rivets.bind(document.getElementById('app2'), app);
         rivets.bind(document.getElementById('app3'), app);
+        rivets.bind(document.getElementById('app4'), app);
 
         rivets.bind(document.getElementById('browser-app'), mapBrowser);
 
@@ -269,11 +309,16 @@
                 <p class="subtitle is-3"><i class="fas fa-atlas"></i> Map selection</p>
                 <div id="app2" class="field">
                     <label for="scenario-name" class="label">Selected map</label>
+                    <div class="tags has-addons">
+                      <span class="tag">Status</span>
+                      <span rv-if="model.scenarioHolder.map.mapId" class="tag is-primary">OK</span>
+                      <span rv-if="model.scenarioHolder.map.mapId | empty" class="tag is-danger">Needs configuration</span>
+                    </div>                    
                     <div class="control">
                         <input type="text" id="scenario-name" class="input" rv-value="model.scenarioHolder.map.mapName" placeholder="Name of the map" minlength="6" maxlength="256" size="40" readonly>
                     </div>
                     <p class="help">Map Id: {model.scenarioHolder.map.mapId}</p>
-                    <p class="help"><a rv-href="model.scenarioHolder.map.mapId | hrefBuilder 'MapEditor.html?mapId=@value'" target="_blank">See map</a></p>
+                    <p rv-if="model.scenarioHolder.map.mapId" class="help"><a rv-href="model.scenarioHolder.map.mapId | hrefBuilder 'MapEditor.html?mapId=@value'" target="_blank">See map</a></p>
                 </div>
                 <div class="field">
                     <label for="scenario-name" class="label">Change map</label>
@@ -320,10 +365,53 @@
                     </nav>
                 </div>
             </div>
-            <div class="column">
+            <div id="app4" class="column">
                 <p class="title is-1">Map</p>
                 <p class="subtitle is-3"><i class="fas fa-trophy"></i> Deployment and victory conditions</p>
-                 
+                <div rv-if="model.scenarioHolder.map.mapId | empty" class="field">Select map to configure deployment and victory conditions.</div>
+
+                <div rv-if="model.scenarioHolder.map.mapId" class="field">
+                    <label for="scenario-deployment" class="label"><i class="fas fa-clipboard-list"></i> Deployment settings</label>
+                    <div class="tags has-addons">
+                      <span class="tag">Status</span>
+                      <span rv-if="model.scenarioHolder.deploymentSpecification | notEmptyObject" class="tag is-primary">OK</span>
+                      <span rv-if="model.scenarioHolder.deploymentSpecification | emptyObject" class="tag is-danger">Needs configuration</span>
+                    </div>
+                    
+                    <div class="control">                        
+                        <a rv-href="model.scenarioHolder.scenarioId | hrefBuilder 'MapEditor.html?scenarioId=@value&mode=deployment&mapId=@0' model.scenarioHolder.map.mapId" class="button is-active is-fullwidth">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span rv-if="model.scenarioHolder.deploymentSpecification | notEmptyObject">Configure</span>
+                            <span rv-if="model.scenarioHolder.deploymentSpecification | emptyObject">Modify</span>
+                        </a>                        
+                    </div>                    
+                    <!-- <p class="help"><a rv-href="model.scenarioHolder.map.mapId | hrefBuilder 'MapEditor.html?mapId=@value'" target="_blank">See deployment specification</a></p> -->
+                </div> 
+
+                <div rv-if="model.scenarioHolder.map.mapId" class="field">                                                            
+                    <label for="scenario-deployment" class="label"><i class="fas fa-clipboard-check"></i> Victory Locations</label>
+                    <div class="tags has-addons">
+                      <span class="tag">Status</span>
+                      <span rv-if="model.scenarioHolder.victoryConditions | notEmptyObject" class="tag is-primary">Configured - OK</span>
+                      <span rv-if="model.scenarioHolder.victoryConditions | emptyObject" class="tag is-danger">Needs configuration</span>
+                    </div>
+                    <div class="control">                        
+                        <a rv-href="model.scenarioHolder.scenarioId | hrefBuilder 'MapEditor.html?scenarioId=@value&mode=victoryConditions&mapId=@0' model.scenarioHolder.map.mapId" class="button is-active is-fullwidth">
+                            <span class="icon">
+                               <i class="fas fa-edit"></i>
+                            </span>
+                            <span rv-if="model.scenarioHolder.victoryConditions | emptyObject">Configure</span>
+                            <span rv-if="model.scenarioHolder.victoryConditions | notEmptyObject">Modify</span>
+                        </a>                        
+                    </div>                    
+                    <!-- <p class="help"><a rv-href="model.scenarioHolder.map.mapId | hrefBuilder 'MapEditor.html?mapId=@value'" target="_blank">See victory specification</a></p> -->
+                </div> 
+                <!-- <div class="field">                                                            
+                    <textarea class="textarea" ></textarea>
+                </div> -->
+
             </div>            
         </div>
         <div class="columns">
