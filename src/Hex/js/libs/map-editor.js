@@ -1,7 +1,7 @@
 import {HexMap} from './map.js'
 
 
-export function MapEditor(eventHandlersArray, mapId, mapSpecification, mapAssets){
+export function MapEditor(eventHandlersArray, mapId, mapSpecification, mapAssets, scenarioId, editMode, deploymentSpecification, victoryConditions){
 	var eventHandlers;
     var mapAssets;
     
@@ -11,21 +11,43 @@ export function MapEditor(eventHandlersArray, mapId, mapSpecification, mapAssets
 
     var mapId;
 
+    var scenarioId;
+
 	if (window === this) {
-         return new MapEditor(eventHandlersArray, mapId, mapSpecification, mapAssets);
+         return new MapEditor(eventHandlersArray, mapId, mapSpecification, mapAssets, scenarioId, editMode, deploymentSpecification, victoryConditions);
     }
-    this._initializeMapEditorData(eventHandlersArray, mapId,  mapSpecification, mapAssets);
+    this._initializeMapEditorData(eventHandlersArray, mapId,  mapSpecification, mapAssets, scenarioId, editMode, deploymentSpecification, victoryConditions);
     return this;
 };
 
 MapEditor.prototype = {
-	_initializeMapEditorData: function(eventHandlersArray, mapId, mapSpecification, mapAssets){
+    model: {
+        editMode: null,
+        deploymentSpecificationHolder: {
+            deploymentTiles: []
+        },
+        victoryConditionsHolder: {
+            red: {
+                primaryVictoryCondition: {},
+                secondaryVictoryCondition: {}
+            },
+            blue: {
+                primaryVictoryCondition: {},
+                secondaryVictoryCondition: {}
+            }
+        }
+    },
+
+	_initializeMapEditorData: function(eventHandlersArray, mapId, mapSpecification, mapAssets, scenarioId, editMode, deploymentSpecification, victoryConditions){
         this.eventHandlers = eventHandlersArray;
         this.mapAssets = mapAssets;
         this.mapSpecification = mapSpecification;
         this.currentlySelectedTiles = [];
         this.mapId = mapId;
+        this.scenarioId = scenarioId;
 
+        this.model.editMode = editMode;
+        console.log("Model",this.model);
         var hexMap = new HexMap({
           cols: mapSpecification.cols,
           rows: mapSpecification.rows,
@@ -33,7 +55,7 @@ MapEditor.prototype = {
           spacing: 4,
           offsetX: 0, //58,
           offsetY: 45, //58,
-          debug: true,
+          debug: false,
           mapSpecification: mapSpecification,          
           mapAssets: mapAssets
         });
@@ -41,6 +63,29 @@ MapEditor.prototype = {
         d3.select('.map-editor-hexes').append(function() {
           return hexMap.createSVG();
         });
+
+        // setup victory conditions
+
+        for(var i=0; victoryConditions && i < victoryConditions.length; i++){
+            var victoryCondition = victoryConditions[i];
+            this.model.victoryConditionsHolder[victoryCondition.party].primaryVictoryCondition = victoryCondition.primaryVictoryCondition;
+            this.model.victoryConditionsHolder[victoryCondition.party].secondaryVictoryCondition = victoryCondition.secondaryVictoryCondition;
+        }
+
+        console.log("Model",this.model);
+        
+
+        // setup deployment specification
+        for(var i = 0; deploymentSpecification && i<deploymentSpecification.length; i++ ){
+            this.model.deploymentSpecificationHolder.deploymentTiles.push(deploymentSpecification[i]);
+        }
+        
+        console.log("Model",this.model);
+
+        // apply deployment colors (if applicable)
+        this.applyDeploymentSpecificationColors();
+
+        this.applyVictoryConditionsColors();
         
         this.initializeMapPresentation();
 
@@ -73,6 +118,14 @@ MapEditor.prototype = {
                 var elementToUpdateId = that.currentlySelectedTiles[i].elementId;
                 that.setFillForElementWithId(elementToUpdateId, this.value);    
                 that.setDefaultPropertyValuesByAssetForElementWithId(elementToUpdateId, this.value)
+            }                        
+        });
+
+        d3.select('#tile-deployment-select').on("change", function(d) {            
+            for(var i=0; i<that.currentlySelectedTiles.length;i++){
+                var elementToUpdateId = that.currentlySelectedTiles[i].elementId;                
+
+                that.setDeploymentForTile(elementToUpdateId, this.value)
             }                        
         });
 
@@ -231,6 +284,10 @@ MapEditor.prototype = {
 
     },
 
+    navigateBackToScenario: function(){
+        window.location.href = '/ScenarioEditor.html?scenarioId='+this.scenarioId;
+    },
+
     setElementPropertyForElementWithId: function(id, propertyName, value){
         var mapSpecificationElement = this.getMapSpecificationForId(id);
         if(mapSpecificationElement){
@@ -248,6 +305,25 @@ MapEditor.prototype = {
         }
     },
 
+    setDeploymentForTile: function(id, value){
+        var deploymentSpecification = this.getDeploymentSpecificationForId(id);
+        var idArray = id.replace('h_','').split('_');
+
+        if(deploymentSpecification){
+            deploymentSpecification.party = value
+        }else{
+            deploymentSpecification = {
+                party: value,
+                q: idArray[0],
+                r: idArray[1]
+            }
+            this.model.deploymentSpecificationHolder.deploymentTiles.push(deploymentSpecification);
+        }
+
+        d3.select('#'+id).attr("stroke", value);
+        d3.select('#'+id).attr("stroke-width", 3);
+    },
+
     getMapSpecificationForId: function(id){
         var idArray = id.replace('h_','').split('_');
         for(var i=0; i<this.mapSpecification.tiles.length;i++){
@@ -255,6 +331,18 @@ MapEditor.prototype = {
 
             if(mapSpecificationElement.q == idArray[0] && mapSpecificationElement.r == idArray[1]){
                 return mapSpecificationElement;                
+            }
+        }
+    },
+
+    getDeploymentSpecificationForId: function(id){
+        var idArray = id.replace('h_','').split('_');
+
+        for(var i=0; i<this.model.deploymentSpecificationHolder.deploymentTiles.length;i++){
+            var deploymentSpecificationElement = this.model.deploymentSpecificationHolder.deploymentTiles[i];
+
+            if(deploymentSpecificationElement.q == idArray[0] && deploymentSpecificationElement.r == idArray[1]){
+                return deploymentSpecificationElement;                
             }
         }
     },
@@ -279,6 +367,91 @@ MapEditor.prototype = {
         });
     },
 
+    applyDeploymentSpecificationColors: function(){
+        if(this.model.deploymentSpecificationHolder.deploymentTiles.length > 0){
+            for(var i=0; i<this.model.deploymentSpecificationHolder.deploymentTiles.length; i++ ){
+                var deploymentTile = this.model.deploymentSpecificationHolder.deploymentTiles[i];
+                var id = "h_"+deploymentTile.q+"_"+deploymentTile.r;
+                d3.select('#'+id).attr("stroke", deploymentTile.party);
+                d3.select('#'+id).attr("stroke-width", 3);
+                
+            }
+        }
+    },
+
+    markTileVictoryCondition: function(tile, party, kind){
+        var colors = {
+            red: {
+                primary: 'maroon',
+                secondary: '#C08080'
+            },
+            blue: {
+                primary: 'navy',
+                secondary: '#8080C0'  
+            }
+        }
+
+        var id = "h_"+tile.q+"_"+tile.r;
+        var color = colors[party][kind];
+        d3.select('#'+id).attr("stroke", color);
+        d3.select('#'+id).attr("stroke-width", 4);
+    },
+
+    markTileAsPrimaryVictoryCondition: function(party){
+        var selectedTile = this.currentlySelectedTiles[0];
+
+        var mapSpecificationElement = this.getMapSpecificationForId(selectedTile.elementId);
+
+        this.model.victoryConditionsHolder[party].primaryVictoryCondition = {
+            q: mapSpecificationElement.q,
+            r: mapSpecificationElement.r
+        }
+
+        this.markTileVictoryCondition(this.model.victoryConditionsHolder[party].primaryVictoryCondition, party, 'primary');
+
+        this._recolourTiles();
+
+    },  
+
+    markTileAsSecondaryVictoryCondition: function(party){
+        var selectedTile = this.currentlySelectedTiles[0];
+
+        var mapSpecificationElement = this.getMapSpecificationForId(selectedTile.elementId);
+
+        this.model.victoryConditionsHolder[party].secondaryVictoryCondition = {
+            q: mapSpecificationElement.q,
+            r: mapSpecificationElement.r
+        }
+
+        this.markTileVictoryCondition(this.model.victoryConditionsHolder[party].secondaryVictoryCondition, party, 'secondary');
+        this._recolourTiles();
+    },  
+
+    applyVictoryConditionsColors: function(){
+
+        if(this.model.victoryConditionsHolder.red && this.model.victoryConditionsHolder.red.primaryVictoryCondition){
+            var tile = this.model.victoryConditionsHolder.red.primaryVictoryCondition;
+            this.markTileVictoryCondition(tile, 'red','primary');
+        }
+
+        if(this.model.victoryConditionsHolder.red && this.model.victoryConditionsHolder.red.secondaryVictoryCondition){
+            var tile = this.model.victoryConditionsHolder.red.secondaryVictoryCondition;
+            this.markTileVictoryCondition(tile, 'red','secondary');
+        }
+
+        if(this.model.victoryConditionsHolder.blue && this.model.victoryConditionsHolder.blue.primaryVictoryCondition){
+            var tile = this.model.victoryConditionsHolder.blue.primaryVictoryCondition;
+            this.markTileVictoryCondition(tile, 'blue','primary');
+        }
+
+        if(this.model.victoryConditionsHolder.blue && this.model.victoryConditionsHolder.blue.secondaryVictoryCondition){
+            var tile = this.model.victoryConditionsHolder.blue.secondaryVictoryCondition;
+            this.markTileVictoryCondition(tile, 'blue','secondary');
+        }
+
+        
+    },
+
     onTileSelect: function(event){
 
         // initialize toolbar properties on click
@@ -289,7 +462,15 @@ MapEditor.prototype = {
         var sightCost = mapSpecificationElement.sightCost ? mapSpecificationElement.sightCost:0;
         var defenceBonus = mapSpecificationElement.defenceBonus ? mapSpecificationElement.defenceBonus : 0;
         
+
+        var deploymentSpecificationElement = this.getDeploymentSpecificationForId(event.elementId);
+
         d3.select('#tile-terrain-type-select').property('value',terrainType);
+
+        if(deploymentSpecificationElement)
+            d3.select('#tile-deployment-select').property('value',deploymentSpecificationElement.party);
+        else
+            d3.select('#tile-deployment-select').property('value',"");
 
         d3.select('#tile-movement-cost').property('value',moveCost);        
         d3.select('#tile-sight-cost').property('value',sightCost);  
@@ -297,22 +478,16 @@ MapEditor.prototype = {
         
         // handle selection
 
-        // unhighlight all
-        d3.selectAll('.hex').attr("stroke", null);
+        this._recolourTiles(event);
         
-        if(event.multiSelect){
-            // multi select
-            // highlight already selected
-            for(var i=0;i<this.currentlySelectedTiles.length;i++){
-                var element = this.currentlySelectedTiles[i].element;
-                d3.select(element).attr("stroke", "yellow");
-                d3.select(element).attr("stroke-width", 3);
-            }            
-        }else{
+        
+
+        if(!event.multiSelect){
             // single tile select            
             // clean list of currently selected 
             this.currentlySelectedTiles.length = 0;
         }
+        
 
         // add to the selected list
          this.currentlySelectedTiles.push(event);
@@ -320,6 +495,31 @@ MapEditor.prototype = {
         d3.select(event.element).attr("stroke", "yellow");
         d3.select(event.element).attr("stroke-width", 3);
               
+    },
+
+    _recolourTiles: function(event){
+        // unhighlight all
+        d3.selectAll('.hex').attr("stroke", null);
+
+        // // unhighlight all - when deployment color is applied then color is not removed
+        // d3.selectAll('.hex').each(function(d,i){
+        //     if(d3.select(this).attr("stroke") == 'yellow')
+        //         d3.select(this).attr("stroke", null);
+        // });
+        // highligh deployment (if applicable)
+        
+        this.applyDeploymentSpecificationColors();
+        this.applyVictoryConditionsColors();
+
+        if(event && event.multiSelect){
+            // multi select
+            // highlight already selected
+            for(var i=0;i<this.currentlySelectedTiles.length;i++){
+                var element = this.currentlySelectedTiles[i].element;
+                d3.select(element).attr("stroke", "yellow");
+                d3.select(element).attr("stroke-width", 3);
+            }            
+        }
     },
 
     publishEvent: function(hexEvent){
@@ -332,24 +532,48 @@ MapEditor.prototype = {
     },
 
     downloadMap: function(){
-        var exportObj = this.mapSpecification;
-        var exportName = "mapSpecification.js";
-        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
-        var downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href",     dataStr);
-        downloadAnchorNode.setAttribute("download", exportName + ".json");
-        document.body.appendChild(downloadAnchorNode); // required for firefox
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
+        // var exportObj = this.mapSpecification;
+        // var exportName = "mapSpecification.js";
+        // var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+        // var downloadAnchorNode = document.createElement('a');
+        // downloadAnchorNode.setAttribute("href",     dataStr);
+        // downloadAnchorNode.setAttribute("download", exportName + ".json");
+        // document.body.appendChild(downloadAnchorNode); // required for firefox
+        // downloadAnchorNode.click();
+        // downloadAnchorNode.remove();
+
+        GameUtils.downloadObjectAsJSON(this.mapSpecification, "mapSpecification.js");
     },
 
     saveMap: function(){        
         var event = {
+            kind: 'saveMap',
             mapSpecification: this.mapSpecification,
             mapId: this.mapId
         }
         this.publishEvent(event);   
             
+    },
+
+    saveScenarioDeployment: function(){        
+        var event = {
+            kind: 'saveScenarioDeployment',
+            deploymentSpecification: this.model.deploymentSpecificationHolder.deploymentTiles,
+            mapId: this.mapId,
+            scenarioId: this.scenarioId
+        }
+        this.publishEvent(event);   
+            
+    },
+
+    saveScenarioVictoryConditions: function(){
+        var event = {
+            kind: 'saveScenarioVictory',
+            victoryConditions: this.model.victoryConditionsHolder,
+            mapId: this.mapId,
+            scenarioId: this.scenarioId
+        }
+        this.publishEvent(event);   
     },
 
     initializeMapPresentation: function(){

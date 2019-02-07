@@ -29,6 +29,106 @@ GameUtils.load = function(id){
     return JSON.parse(window.localStorage.getItem(id));
 };
 
+GameUtils.initializeRivetFormatters = function(){
+    rivets.formatters.fromTimestamp = function(value){
+            var theDate = new Date(value);
+
+            var result = theDate.toLocaleDateString(undefined, {  
+                day : 'numeric',
+                month : 'short',
+                year : 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            })
+            return result;
+        }
+
+        // <a rv-href="group.Id | formatString 'group.aspx?id=@value&name=@0&owner=@1' group.Name group.Owner">My Link</a>
+        rivets.formatters.hrefBuilder = function (value, text) {
+            text = text.replace('@value', value);
+
+            var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
+            args.shift(); args.shift(); //remove the "value" and "text" arguments from the array
+            
+            for (var i = 0; i < args.length; i++) {
+                text = text.replace('@' + i, args[i]);
+            }    
+
+            return text;
+        };
+
+        rivets.formatters.variableBuilder = function (value, text) {
+            text = text.replace('@value', value);
+
+            var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
+            args.shift(); args.shift(); //remove the "value" and "text" arguments from the array
+            
+            for (var i = 0; i < args.length; i++) {
+                text = text.replace('@' + i, args[i]);
+            }    
+
+            return text;
+        };
+
+        rivets.formatters.eq = function (value, arg) {            
+            return value == arg;
+        };
+
+        rivets.formatters.neq = function (value, arg) {            
+            return value != arg;
+        };
+
+        rivets.formatters.split = function (value) {  
+            var result = [];
+            if(!value)
+                return result;
+            try{
+                result = value.trim().split(',');
+            }catch(exception){
+                result = [];
+            }                  
+            return result;
+        };
+
+        rivets.formatters.notEmpty = function(value){
+            if(value)
+                return true;
+            return false;                    
+        }
+
+        rivets.formatters.empty = function(value){
+            if(value)
+                return false;
+            return true;                    
+        }
+
+        rivets.formatters.emptyObject = function(value){      
+            if(!value)
+                return true;      
+            return Object.keys(value).length === 0 && value.constructor === Object;                    
+        }
+
+        rivets.formatters.notEmptyObject = function(value){            
+            if(!value)
+                return false;
+            return !(Object.keys(value).length === 0 && value.constructor === Object);                    
+        }
+};
+
+GameUtils.downloadObjectAsJSON = function(targetObject, fileName){    
+        var exportObj = targetObject;
+        var exportName = fileName;
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+        var downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href",     dataStr);
+        downloadAnchorNode.setAttribute("download", exportName + ".json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    
+}
+
 GameUtils.generateEmptyTilesMapSpecification = function(rows, cols){
 	console.log("Going to generate blank tile specification: rows, cols", rows , cols)
 

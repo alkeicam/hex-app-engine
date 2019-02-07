@@ -20,6 +20,7 @@ App.prototype = {
     maps: [],
     scenarios: [],
     scenarioHolder: {},  // stores scenario object during create and scenario configuration    
+    isDeploymentConfigured: false
   },
   view: {
     tagsInputs: {}
@@ -162,7 +163,13 @@ App.prototype = {
     var that = this;
     console.log('Changed',mapId);
     this.backendLoadMap(mapId).then(function(map){
-      that.model.scenarioHolder.map = map;          
+      that.model.scenarioHolder.map = map; 
+      that.model.scenarioHolder.deploymentSpecification = [];
+      that.model.isDeploymentConfigured = false;
+      that.model.scenarioHolder.victoryConditions = {};
+      that.model.isVictoryConditionsConfigured = false;
+
+      that.saveCurrentScenario();
     }, function(error){
       console.log(error);
       that.showNotificationError();
@@ -181,6 +188,26 @@ App.prototype = {
 
 
     this.saveScenario(scenario);
+  },
+
+  downloadCurrentScenario: function(){
+    var scenarioId = this.model.scenarioHolder.scenarioId;
+
+    this.backendLoadScenario(scenarioId).then(function(scenario){
+      GameUtils.downloadObjectAsJSON(scenario, scenario.name);  
+    });
+    
+  },
+
+  saveMap: function(map){
+    map.modified = Date.now();
+    map.modifiedSort = -Date.now();
+    
+
+    this.backendSaveMap(map);
+    this.backendSaveUserMap(map);
+
+    this.showNotificationSuccess();
   },
 
   saveScenario: function(scenario){
@@ -309,11 +336,12 @@ App.prototype = {
         scenarioCloned.teaser = scenario.teaser || '';
         scenarioCloned.map = scenario.map || {};        
         scenarioCloned.rulesAndConditions = scenario.rulesAndConditions || {};        
-        scenarioCloned.deploymentSpecification = scenario.deploymentSpecification || {};
+        scenarioCloned.deploymentSpecification = scenario.deploymentSpecification || [];
         scenarioCloned.victoryConditions = scenario.victoryConditions || {};
 
-        that.backendSaveScenario(scenarioCloned);
-        that.backendSaveUserScenario(scenarioCloned);
+        // that.backendSaveScenario(scenarioCloned);
+        // that.backendSaveUserScenario(scenarioCloned);
+        that.saveScenario(scenarioCloned);
       }).catch(function(error){
         console.log(error);
         that.showNotificationError();
@@ -349,13 +377,16 @@ App.prototype = {
   mapClone: function(mapId){
     var that = this;
     this.backendLoadMap(mapId).then(function(map){
-      var cloneMapId = that.backendCreateMap(map.mapName+'-clone', map.rows, map.cols);
+      var newMapName = map.mapName+'-clone';
+      var cloneMapId = that.backendCreateMap(newMapName, map.rows, map.cols);
       that.backendLoadMap(cloneMapId).then(function(mapCloned){
         mapCloned.mapSpecification = map.mapSpecification;
-        mapCloned.isPublic = map.isPublic;
+        if(mapCloned.mapSpecification)
+          mapCloned.mapSpecification.mapName = newMapName;
 
-        that.backendSaveMap(mapCloned);
-        that.backendSaveUserMap(mapCloned);
+        // that.backendSaveMap(mapCloned);
+        // that.backendSaveUserMap(mapCloned);
+        that.saveMap(mapCloned);
       }).catch(function(error){
         console.log(error);
         that.showNotificationError();
@@ -372,8 +403,20 @@ App.prototype = {
     this.backendLoadMap(mapId).then(function(map){
       // send map for public review
       map.isPublic = -1;
-      that.backendSaveMap(map);  
-      that.backendSaveUserMap(map);    
+      // that.backendSaveMap(map);  
+      // that.backendSaveUserMap(map);  
+      that.saveMap(map);  
+    }).catch(function(error){
+      console.log(error);
+    });
+  },
+
+  scenarioRequestPublic: function(scenarioId){
+    var that = this;
+    this.backendLoadScenario(scenarioId).then(function(scenario){
+      // send scenario for public review
+      scenario.isPublic = -1;
+      that.saveScenario(scenario);    
     }).catch(function(error){
       console.log(error);
     });
@@ -460,8 +503,10 @@ App.prototype = {
     };
     
 
-    this.backendSaveScenario(scenario);
-    this.backendSaveUserScenario(scenario);
+    // this.backendSaveScenario(scenario);
+    // this.backendSaveUserScenario(scenario);
+    this.saveScenario(scenario);
+
 
     return id;
   },
@@ -491,9 +536,9 @@ App.prototype = {
       isPublic: 0
     }
 
-    this.backendSaveMap(map);
-    this.backendSaveUserMap(map);
-
+    // this.backendSaveMap(map);
+    // this.backendSaveUserMap(map);
+    this.saveMap(map);
     return mapId;
 
   },
@@ -501,22 +546,75 @@ App.prototype = {
   handleEditorEvent: function(event){
     var mapSpecification = event.mapSpecification?event.mapSpecification:null;
     var mapId = event.mapId?event.mapId:null;
+    var scenarioId = event.scenarioId;
     var that = this;
 
-    if(mapSpecification&&mapId){
-      this.backendLoadMap(mapId).then(function(map){
-        map.mapSpecification = mapSpecification;
-        map.modified = Date.now();
-        map.modifiedSort = -Date.now();
-        map.mapName = mapSpecification.mapName;
+    var eventType = event.kind;
 
-        that.backendSaveMap(map);
-        that.backendSaveUserMap(map);
+    switch(eventType){
+      case 'saveMap':
+        if(mapSpecification&&mapId){
+          this.backendLoadMap(mapId).then(function(map){
+            map.mapSpecification = mapSpecification;
+            map.modified = Date.now();
+            map.modifiedSort = -Date.now();
+            map.mapName = mapSpecification.mapName;
 
-        that.showNotificationSuccess();
+            // that.backendSaveMap(map);
+            // that.backendSaveUserMap(map);
 
-      });
-    }    
+            // that.showNotificationSuccess();
+            that.saveMap(map);
+
+          });
+        }      
+        break;
+      case 'saveScenarioDeployment':
+        this.backendLoadScenario(scenarioId).then(function(scenario){
+          scenario.deploymentSpecification = event.deploymentSpecification;
+          // that.backendSaveScenario(scenario);
+          // that.backendSaveUserScenario(scenario);
+
+          // // save in holder for futher save
+          // //that.model.scenarioHolder.deploymentSpecification = event.deploymentSpecification
+
+          // that.showNotificationSuccess();
+          that.saveScenario(scenario);
+        });
+        break;
+      case 'saveScenarioVictory':
+        this.backendLoadScenario(scenarioId).then(function(scenario){
+          // process victory conditions         
+          var victoryConditions = [{
+              party: 'red',
+              primaryVictoryCondition: event.victoryConditions.red.primaryVictoryCondition || {},
+              secondaryVictoryCondition: event.victoryConditions.red.secondaryVictoryCondition || {}
+            },
+            {
+              party: 'blue',
+              primaryVictoryCondition: event.victoryConditions.blue.primaryVictoryCondition || {},
+              secondaryVictoryCondition: event.victoryConditions.blue.secondaryVictoryCondition || {}
+            }
+          ];
+
+          
+
+          scenario.victoryConditions = victoryConditions;
+
+
+          // that.backendSaveScenario(scenario);
+          // that.backendSaveUserScenario(scenario);
+
+          // // save in holder for futher save
+          // //that.model.scenarioHolder.deploymentSpecification = event.deploymentSpecification
+
+          // that.showNotificationSuccess();
+          that.saveScenario(scenario);
+        });
+        break;
+    }
+
+    
   },
 
   backendLoadMap: function(mapId){
@@ -531,10 +629,16 @@ App.prototype = {
   },
 
   backendLoadScenario: function(scenarioId){
+    var that = this;
+
     return new Promise(function(resolve, reject){
       var mapRef = firebase.database().ref('/scenarios/' + scenarioId).once('value').then(function(snapshot){
-        if(snapshot)
-          return resolve(snapshot.val());
+        if(snapshot){
+          var scenario = snapshot.val();
+          that.model.isDeploymentConfigured = scenario.deploymentSpecification && scenario.deploymentSpecification.length > 0 ? true:false;
+          that.model.isVictoryConditionsConfigured = scenario.victoryConditions && scenario.victoryConditions.length == 2 ? true:false;
+          return resolve(scenario);
+        }
         else 
           return reject();
       });

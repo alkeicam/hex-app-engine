@@ -64,64 +64,7 @@
         });
         window.appProxy = app;
 
-        rivets.formatters.fromTimestamp = function(value){
-            var theDate = new Date(value);
-
-            var result = theDate.toLocaleDateString(undefined, {  
-                day : 'numeric',
-                month : 'short',
-                year : 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            })
-            return result;
-        }
-
-        // <a rv-href="group.Id | formatString 'group.aspx?id=@value&name=@0&owner=@1' group.Name group.Owner">My Link</a>
-        rivets.formatters.hrefBuilder = function (value, text) {
-            text = text.replace('@value', value);
-
-            var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
-            args.shift(); args.shift(); //remove the "value" and "text" arguments from the array
-            
-            for (var i = 0; i < args.length; i++) {
-                text = text.replace('@' + i, args[i]);
-            }    
-
-            return text;
-        };
-
-        rivets.formatters.variableBuilder = function (value, text) {
-            text = text.replace('@value', value);
-
-            var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
-            args.shift(); args.shift(); //remove the "value" and "text" arguments from the array
-            
-            for (var i = 0; i < args.length; i++) {
-                text = text.replace('@' + i, args[i]);
-            }    
-
-            return text;
-        };
-
-        rivets.formatters.eq = function (value, arg) {            
-            return value == arg;
-        };
-
-        rivets.formatters.neq = function (value, arg) {            
-            return value != arg;
-        };
-
-        rivets.formatters.split = function (value) {  
-            var result = [];
-            try{
-                result = value.split(',');
-            }catch(exception){
-                result = [];
-            }                  
-            return result;
-        };
+        GameUtils.initializeRivetFormatters();
 
         rivets.bind(document.getElementById('app'), app);
 
@@ -278,9 +221,9 @@
     </div>
     <nav class="navbar is-transparent is-fixed-top">
         <div class="navbar-brand">
-            <a class="navbar-item" href="https://bulma.io">
-              <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: a modern CSS framework based on Flexbox" width="112" height="28">
-            </a>            
+            <a class="navbar-item" href="#">
+              <img src="/assets/png/g6.png" alt="Hex - Empires at War" width="32" height="32">
+            </a>          
         </div>
           <div id="navbarExampleTransparentExample" class="navbar-menu">
             <div class="navbar-start">
@@ -289,36 +232,7 @@
               </a>
               <a class="navbar-item is-active"  href="Scenarios.html">
                 Scenarios
-              </a>
-              <div class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link " href="Manage.html">
-                  Inne
-                </a>
-                <div class="navbar-dropdown is-boxed">
-                  <a class="navbar-item" href="https://bulma.io/documentation/overview/start/">
-                    Overview
-                  </a>
-                  <a class="navbar-item" href="https://bulma.io/documentation/modifiers/syntax/">
-                    Modifiers
-                  </a>
-                  <a class="navbar-item" href="https://bulma.io/documentation/columns/basics/">
-                    Columns
-                  </a>
-                  <a class="navbar-item" href="https://bulma.io/documentation/layout/container/">
-                    Layout
-                  </a>
-                  <a class="navbar-item" href="https://bulma.io/documentation/form/general/">
-                    Form
-                  </a>
-                  <hr class="navbar-divider">
-                  <a class="navbar-item" href="https://bulma.io/documentation/elements/box/">
-                    Elements
-                  </a>
-                  <a class="navbar-item" href="https://bulma.io/documentation/components/breadcrumb/">
-                    Components
-                  </a>
-                </div>
-              </div>
+              </a>              
             </div>
 
             <div class="navbar-end">

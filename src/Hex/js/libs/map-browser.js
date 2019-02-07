@@ -44,13 +44,29 @@ MapBrowser.prototype = {
                         }
     },
 
-	_initialize: function(){    
-        // load maps
-
-        // load user maps
-
-        // load public maps            
+	_initialize: function(){            
+        this.initializeRivetFormatters();         
 	},
+
+    initializeRivetFormatters: function(){
+        rivets.formatters.mapFilter = function(elements, filter, filter2){
+            return elements.filter(function(element) {                
+
+                var matchVisibility = filter.length > 0 ? element.visible === filter : true;
+
+                if(filter === 'all')
+                    matchVisibility = true;
+
+                var idx = element.map.mapName.toLowerCase().indexOf(filter2);
+                                
+                var matchPhrase = filter2.length > 0 ? idx > -1 : true;
+                //var matchPhrase = filter2.length > 0 ? element.mapName === filter2 : true;
+
+                return matchVisibility && matchPhrase;
+            });
+        }
+
+    },
 
     initializeWithMaps: function(map, userMapsArray, publicMapsArray){
         this._initialize();

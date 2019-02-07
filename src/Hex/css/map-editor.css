@@ -10,6 +10,21 @@
     
 }
 */
+
+.victory-primary-red {
+    background-color: maroon !important
+}
+.victory-secondary-red {
+    background-color: #C08080 !important
+}
+
+.victory-primary-blue {
+    background-color: navy !important
+}
+.victory-secondary-blue { 
+    background-color: #8080C0 !important
+}
+
 .map-editor-hexes { 
     overflow: scroll;
     height: 90vh;

@@ -179,6 +179,9 @@
         var cols = url.searchParams.get("cols") ? url.searchParams.get("cols"):7;
         var mapName = url.searchParams.get("mapName") ? url.searchParams.get("mapName"):'';
         var mapId = url.searchParams.get("mapId") ? url.searchParams.get("mapId"):'';
+        var scenarioId = url.searchParams.get("scenarioId") ? url.searchParams.get("scenarioId"):'';
+        var mode = url.searchParams.get("mode") ? url.searchParams.get("mode"):'edit';
+
 
         
 
@@ -196,10 +199,47 @@
             
 
             var loadedMapSpecification = GameUtils.load("mapSpecification");    
-            var mapEditor = new MapEditor(null, null,loadedMapSpecification, mapAssets);
+            var mapEditor = new MapEditor(null, null,loadedMapSpecification, mapAssets, null, mode);
 
             window.mapEditorProxy = mapEditor;
-        }else{
+
+            rivets.bind(document.getElementById('app'), mapEditor);
+
+        }else if(mapId && scenarioId){
+            app.backendLoadMap(mapId).then(function(mapElement){
+                console.log('Loaded map',mapElement);
+
+                // // when map is public or has been requested a public review then one cannot edit the map
+                // if(mapElement.isPublic == -1 || mapElement.isPublic==1){
+                //     console.log("Map is public so edit is not allowed.")
+                //     window.location.replace("/Manage.html");
+                // }
+
+                var loadedMapSpecification = mapElement.mapSpecification;
+                var eventHandlersArray = [];
+
+                var appHandler = {
+                    hObject: app,
+                    hFunction: app.handleEditorEvent
+                };
+                eventHandlersArray.push(appHandler);
+
+                app.backendLoadScenario(scenarioId).then(function(scenario){
+
+                    var mapEditor = new MapEditor(eventHandlersArray, mapElement.mapId, loadedMapSpecification, mapAssets, scenarioId, mode, scenario.deploymentSpecification,scenario.victoryConditions );
+                    window.mapEditorProxy = mapEditor;
+
+                    rivets.bind(document.getElementById('app'), mapEditor);   
+                    rivets.bind(document.getElementById('app2'), mapEditor);    
+
+                    rivets.bind(document.getElementById('nav'), {kind: mode, back: scenarioId, backName: scenario.name});    
+                });
+
+                
+                
+            });
+        }
+        else{
             app.backendLoadMap(mapId).then(function(mapElement){
                 console.log('Loaded map',mapElement);
 
@@ -218,11 +258,18 @@
                 };
                 eventHandlersArray.push(appHandler);
 
-                var mapEditor = new MapEditor(eventHandlersArray, mapElement.mapId, loadedMapSpecification, mapAssets);
+                var mapEditor = new MapEditor(eventHandlersArray, mapElement.mapId, loadedMapSpecification, mapAssets, null,  mode);
                 window.mapEditorProxy = mapEditor;
+
+                rivets.bind(document.getElementById('app'), mapEditor);
+                rivets.bind(document.getElementById('app2'), mapEditor);
+                rivets.bind(document.getElementById('nav'), {kind: mode, backName: mapElement.mapName});    
             });
         }
 
+        GameUtils.initializeRivetFormatters();
+
+        
         
 
         
@@ -241,10 +288,140 @@
         <div class="notification is-danger is-hidden operation-failure">          
           Something went wrong.
         </div>
-        
-        <div class="columns">
+        <nav class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <nav id="nav" class="breadcrumb" aria-label="breadcrumbs">
+                        <ul rv-if="kind | eq 'deployment'">
+                            <li>
+                                <a href="/">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-home" aria-hidden="true"></i>
+                                    </span>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Scenarios.html">
+                                    <!-- <span class="icon is-small">
+                                        <i class="fas fa-home" aria-hidden="true"></i>
+                                    </span> -->
+                                    <span>Scenarios</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a rv-href="back | hrefBuilder 'ScenarioEditor.html?scenarioId=@value'" />
+                                    <!-- <span class="icon is-small">
+                                        <i class="fas fa-home" aria-hidden="true"></i>
+                                    </span> -->
+                                    <span>{backName}</span>
+                                </a>
+                            </li>                
+                            <li class="is-active"><a href="#" aria-current="page">Deployment Specification</a></li>                
+                        </ul>
+                        <ul rv-if="kind | eq 'victory'">
+                            <li>
+                                <a href="/">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-home" aria-hidden="true"></i>
+                                    </span>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Scenarios.html">
+                                    <!-- <span class="icon is-small">
+                                        <i class="fas fa-home" aria-hidden="true"></i>
+                                    </span> -->
+                                    <span>Scenarios</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a rv-href="back | hrefBuilder 'ScenarioEditor.html?scenarioId=@value'" />
+                                    <!-- <span class="icon is-small">
+                                        <i class="fas fa-home" aria-hidden="true"></i>
+                                    </span> -->
+                                    <span>{backName}</span>
+                                </a>
+                            </li>                
+                            <li class="is-active"><a href="#" aria-current="page">Victory Specification</a></li>                
+                        </ul>
+                        <ul rv-if="kind | eq 'edit'">
+                            <li>
+                                <a href="/">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-home" aria-hidden="true"></i>
+                                    </span>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Manage.html">                                    
+                                    <span>Maps</span>
+                                </a>
+                            </li>                            
+                            <li class="is-active"><a href="#" aria-current="page">{backName}</a></li>                
+                        </ul>
+                    </nav> 
+                </div>
+            </div>
+            <div id="app2" class="level-right">
+                <div rv-if="model.editMode | eq 'edit'"  class="level-item">
+                    <div><!-- <button onclick="mapEditorProxy.downloadMap()" class="map-editor-attribute button is-primary">Download map</button> -->
+                        <a onclick="mapEditorProxy.downloadMap()" class="button is-primary" >
+                          <span class="icon">                        
+                            <i class="fas fa-download"></i>
+                          </span>
+                          <span>Download</span>
+                        </a>
+
+                        <a onclick="mapEditorProxy.saveMap()" class="button is-primary" >
+                          <span class="icon">                        
+                            <i class="far fa-save"></i>
+                          </span>
+                          <span>Save</span>
+                        </a>                    
+                    </div>  
+                </div>  
+                <div rv-if="model.editMode | eq 'deployment'"  class="level-item">
+                    <div><!-- <button onclick="mapEditorProxy.downloadMap()" class="map-editor-attribute button is-primary">Download map</button> -->                    
+                        <a onclick="mapEditorProxy.saveScenarioDeployment()" class="button is-primary" >
+                          <span class="icon">                        
+                            <i class="far fa-save"></i>
+                          </span>
+                          <span>Save</span>
+                        </a>    
+                        <a onclick="mapEditorProxy.navigateBackToScenario()" class="button is-primary" >
+                          <span class="icon">                        
+                            <i class="fas fa-arrow-left"></i>
+                          </span>
+                          <span>Back to scenario</span>
+                        </a>                     
+                    </div> 
+                </div> 
+                <div rv-if="model.editMode | eq 'victory'"  class="level-item">
+                    <div><!-- <button onclick="mapEditorProxy.downloadMap()" class="map-editor-attribute button is-primary">Download map</button> -->                    
+                        <a onclick="mapEditorProxy.saveScenarioVictoryConditions()" class="button is-primary" >
+                          <span class="icon">                        
+                            <i class="far fa-save"></i>
+                          </span>
+                          <span>Save</span>
+                        </a> 
+                        <a onclick="mapEditorProxy.navigateBackToScenario()" class="button is-primary" >
+                          <span class="icon">                        
+                            <i class="fas fa-arrow-left"></i>
+                          </span>
+                          <span>Back to scenario</span>
+                        </a>                       
+                    </div> 
+                </div>   
+            </div>
+        </nav>     
+        <div id="app"  class="columns">            
             <div class="map-editor-hexes column is-three-quarters"></div>
-            <div class="map-editor-toolbar column">
+
+            <!-- START - edit mode -->
+            <div rv-if="model.editMode | eq 'edit'" class="map-editor-toolbar column">
                 <div class="map-editor-name map-editor-attribute field">
                     <label for="tile-movement-cost" class="label">Map name</label>
                     <div class="control">
@@ -305,33 +482,135 @@
                         <input type="number" id="tile-defence-bonus" class="map-editor-attribute input" min="-10" max="10" step="0.01" disabled>
                     </div>
                 </div>
-                <div><!-- <button onclick="mapEditorProxy.downloadMap()" class="map-editor-attribute button is-primary">Download map</button> -->
-                    <a onclick="mapEditorProxy.downloadMap()" class="button is-primary" >
-                      <span class="icon">                        
-                        <i class="fas fa-download"></i>
-                      </span>
-                      <span>Download</span>
-                    </a>
-
-                    <a onclick="mapEditorProxy.saveMap()" class="button is-primary" >
-                      <span class="icon">                        
-                        <i class="far fa-save"></i>
-                      </span>
-                      <span>Save</span>
-                    </a>
-                    <!--     -->
-                </div>
-                
-                
+                                          
             </div>
+            <!--  END - edit mode   -->
+            <!-- START - deployment mode -->
+            <div rv-if="model.editMode | eq 'deployment'" class="map-editor-toolbar column">
+                <div class="field">
+                    <label for="tile-deployment-select" class="label">Party deployment select</label>
+                    <div class="control">
+                        <select id="tile-deployment-select" class="input">
+                            <option value="">--Please choose an option--</option>
+                            <option value="blue">Blue Deployment Area</option>
+                            <option value="red">Red Deployment Area</option>                            
+                        </select>
+                    </div>
+                </div>
+                                          
+            </div>
+            <!--  END - deployment mode   -->
+            <!-- START - victory mode -->
+            <div rv-if="model.editMode | eq 'victory'" class="map-editor-toolbar column">
+                <h3 class="title is-3">Red victory conditions</h3>
+                <div class="field">
+                    
+                    <label for="tile-deployment-select" class="label"><span class="tag victory-primary-red"></span> Primary target</label>
+
+
+                    <div class="tags has-addons">
+                      <span class="tag">Status</span>
+                      <span rv-if="model.victoryConditionsHolder.red.primaryVictoryCondition | emptyObject" class="tag is-danger">Needs configuration</span>
+                      <span rv-if="model.victoryConditionsHolder.red.primaryVictoryCondition | notEmptyObject" class="tag is-primary">OK</span>
+                      
+                    </div>
+                    <div class="control">
+                        <a rv-if="model.victoryConditionsHolder.red.primaryVictoryCondition | emptyObject" onclick="mapEditorProxy.markTileAsPrimaryVictoryCondition('red')" class="button is-active is-warning ">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span>Configure</span>                            
+                        </a> 
+                        <a rv-if="model.victoryConditionsHolder.red.primaryVictoryCondition | notEmptyObject" onclick="mapEditorProxy.markTileAsPrimaryVictoryCondition('red')" class="button is-active">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span>Modify</span>                            
+                        </a>   
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="tile-deployment-select" class="label"><span class="tag victory-secondary-red"></span> Secondary target</label>
+                    <div class="tags has-addons">
+                      <span class="tag">Status</span>
+                      <span rv-if="model.victoryConditionsHolder.red.secondaryVictoryCondition | emptyObject" class="tag is-danger">Needs configuration</span>
+                      <span rv-if="model.victoryConditionsHolder.red.secondaryVictoryCondition | notEmptyObject" class="tag is-primary">OK</span>
+                      
+                    </div>
+                    <div class="control">
+                        <a rv-if="model.victoryConditionsHolder.red.secondaryVictoryCondition | emptyObject" onclick="mapEditorProxy.markTileAsSecondaryVictoryCondition('red')" class="button is-active is-warning ">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span>Configure</span>                            
+                        </a>   
+                        <a rv-if="model.victoryConditionsHolder.red.secondaryVictoryCondition | notEmptyObject" onclick="mapEditorProxy.markTileAsSecondaryVictoryCondition('red')" class="button is-active ">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span>Modify</span>                            
+                        </a>
+                    </div>
+                </div>
+                <h3 class="title is-3">Blue victory conditions</h3>
+                <div class="field">
+                    <label for="tile-deployment-select" class="label"><span class="tag victory-primary-blue"></span> Primary target</label>
+                    <div class="tags has-addons">
+                      <span class="tag">Status</span>
+                      <span rv-if="model.isDeploymentConfigured" class="tag is-primary">OK</span>
+                      <span rv-if="model.isDeploymentConfigured | neq true" class="tag is-danger">Needs configuration</span>
+                    </div>
+                    <div class="control">
+                        <a rv-if="model.victoryConditionsHolder.blue.primaryVictoryCondition | emptyObject" onclick="mapEditorProxy.markTileAsPrimaryVictoryCondition('blue')" class="button is-active is-warning">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span rv-if="model.isDeploymentConfigured | neq true">Configure</span>
+                            <span rv-if="model.isDeploymentConfigured">Modify</span>
+                        </a>   
+                        <a rv-if="model.victoryConditionsHolder.blue.primaryVictoryCondition | notEmptyObject" onclick="mapEditorProxy.markTileAsPrimaryVictoryCondition('blue')" class="button is-active ">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span rv-if="model.isDeploymentConfigured | neq true">Configure</span>
+                            <span rv-if="model.isDeploymentConfigured">Modify</span>
+                        </a>   
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="tile-deployment-select" class="label"><span class="tag victory-secondary-blue"></span> Secondary target</label>
+                    <div class="tags has-addons">
+                      <span class="tag">Status</span>
+                      <span rv-if="model.isDeploymentConfigured" class="tag is-primary">OK</span>
+                      <span rv-if="model.isDeploymentConfigured | neq true" class="tag is-danger">Needs configuration</span>
+                    </div>
+                    <div class="control">
+                        <a rv-if="model.victoryConditionsHolder.blue.secondaryVictoryCondition | emptyObject"onclick="mapEditorProxy.markTileAsSecondaryVictoryCondition('blue')" class="button is-active is-warning ">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span rv-if="model.isDeploymentConfigured | neq true">Configure</span>
+                            <span rv-if="model.isDeploymentConfigured">Modify</span>
+                        </a> 
+                        <a rv-if="model.victoryConditionsHolder.blue.secondaryVictoryCondition | notEmptyObject"onclick="mapEditorProxy.markTileAsSecondaryVictoryCondition('blue')" class="button is-active ">
+                            <span class="icon">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span rv-if="model.isDeploymentConfigured | neq true">Configure</span>
+                            <span rv-if="model.isDeploymentConfigured">Modify</span>
+                        </a>   
+                    </div>
+                </div>                      
+            </div>
+            <!--  END - victory mode   -->
         </div>
     </div>    
     </section>
     <nav class="navbar is-transparent is-fixed-top">
         <div class="navbar-brand">
-            <a class="navbar-item" href="https://bulma.io">
-              <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: a modern CSS framework based on Flexbox" width="112" height="28">
-            </a>            
+            <a class="navbar-item" href="#">
+              <img src="/assets/png/g6.png" alt="Hex - Empires at War" width="32" height="32">
+            </a>
         </div>
           <div id="navbarExampleTransparentExample" class="navbar-menu">
             <div class="navbar-start">
@@ -340,36 +619,7 @@
               </a>
               <a class="navbar-item"  href="Scenarios.html">
                 Scenarios
-              </a>
-              <div class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link" href="Manage.html">
-                  A
-                </a>
-                <div class="navbar-dropdown is-boxed">
-                  <a class="navbar-item" href="https://bulma.io/documentation/overview/start/">
-                    Overview
-                  </a>
-                  <a class="navbar-item" href="https://bulma.io/documentation/modifiers/syntax/">
-                    Modifiers
-                  </a>
-                  <a class="navbar-item" href="https://bulma.io/documentation/columns/basics/">
-                    Columns
-                  </a>
-                  <a class="navbar-item" href="https://bulma.io/documentation/layout/container/">
-                    Layout
-                  </a>
-                  <a class="navbar-item" href="https://bulma.io/documentation/form/general/">
-                    Form
-                  </a>
-                  <hr class="navbar-divider">
-                  <a class="navbar-item" href="https://bulma.io/documentation/elements/box/">
-                    Elements
-                  </a>
-                  <a class="navbar-item is-active" href="https://bulma.io/documentation/components/breadcrumb/">
-                    Components
-                  </a>
-                </div>
-              </div>
+              </a>              
             </div>
 
             <div class="navbar-end">
