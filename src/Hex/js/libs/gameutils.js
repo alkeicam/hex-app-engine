@@ -114,6 +114,12 @@ GameUtils.initializeRivetFormatters = function(){
                 return false;
             return !(Object.keys(value).length === 0 && value.constructor === Object);                    
         }
+
+        rivets.formatters.size = function(value){            
+            if(!value)
+                return 0;
+            return value.length;                    
+        }
 };
 
 GameUtils.downloadObjectAsJSON = function(targetObject, fileName){    

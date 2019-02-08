@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>  <html class="ie ie6 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 7]>     <html class="ie ie7 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 8]>     <html class="ie ie8 lte9 lte8 no-js">      <![endif]-->
+<!--[if IE 9]>     <html class="ie ie9 lte9 no-js">           <![endif]-->
+<!--[if gt IE 9]>  <html class="no-js">                       <![endif]-->
+<!--[if !IE]><!--> <html class="no-js">                       <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Configure Battle</title>
+
+    <!-- // IOS webapp icons // -->
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <link rel="stylesheet" href="css/ui.css"/>
+    <link rel="stylesheet" href="css/map.css"/>    
+    
+    <link rel="stylesheet" href="css/bulma-extensions.min.css"/>
+
+    <link rel="stylesheet" href="css/battle-editor.css"/>
+
+    
+    
+
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    
+    
+<!--     <script type="module" src="js/libs/BattleOutcome.js"></script>
+    <script type="module" src="js/libs/Hex.js"></script>
+    <script type="module" src="js/libs/Unit.js"></script>
+ -->    
+    <script src="js/libs/jquery-3.3.1.min.js"></script>
+    <script src="js/libs/rivet.js"></script>
+    <!-- <script src="js/libs/jquery-ui-1.10.4.min.js"></script> -->
+    <script src="js/libs/gameutils.js"></script>
+    <!-- <script src="js/drag/TweenMax.min.js"></script> -->
+    <!-- <script src="js/drag/utils/Draggable.min.js"></script> -->
+    <!-- <script src="js/libs/svg.min.js"></script>
+     <script src="js/libs/svg.draggable.min.js"></script> -->
+     <!-- <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+     <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+     <script src="https://d3js.org/d3-drag.v1.min.js"></script> -->
+     <script src="https://d3js.org/d3.v4.min.js"></script>
+     <!-- <script src="js/libs/saveSvgAsPng.js"></script> -->
+
+     <script type="text/javascript" src="js/libs/bulma-extensions.min.js"></script>
+
+     <!-- <script
+ charset="UTF-8"
+ src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/go.min.js"></script> -->
+         
+
+    <script type="module">
+        // console.log = function() {};
+        
+        import {App} from  './js/libs/App.js'  
+        import {ScenarioBrowser} from  './js/libs/scenario-browser.js' 
+        import {BattleEditor} from  './js/libs/battle-editor.js'  
+        
+        var app = new App();
+        
+
+        var scenarioBrowser = new ScenarioBrowser();
+        
+
+        
+
+        d3.select('#sign-out').on('click', function(){
+            app.userSignOut();
+        });
+
+        var url_string = window.location.href
+        var url = new URL(url_string);
+
+        var scenarioId = url.searchParams.get("scenarioId") ? url.searchParams.get("scenarioId"):'';
+
+        app.initialized().then(function(){
+            var battleEditor = new BattleEditor(app.model.user);            
+                
+
+            battleEditor.model.kind = 'browse';
+
+            // load scenarios for scenario browser
+            app.loadUserScenarios('name').then(function(scenarioArray){
+                var eventHandlersArray = [];
+
+                var handler = {
+                    hObject: battleEditor,
+                    hFunction: battleEditor.handleEvent
+                };
+                eventHandlersArray.push(handler);
+                
+                var selectedScenario = null;
+
+                for(var i=0; i< scenarioArray.length; i++){
+                    if(scenarioArray[i].scenarioId == scenarioId) 
+                        selectedScenario = scenarioArray[i];
+                }
+                // here order is important - firs add handlers, then initialize
+                scenarioBrowser.addHandlers(eventHandlersArray);
+                scenarioBrowser.initializeWithScenarios(selectedScenario, scenarioArray, null);
+                
+
+                var avilableUsersHandler = {
+                    hObject: battleEditor,
+                    hFunction: battleEditor.handleAvailableUsersChanged
+                };
+                app.observeAvailableUsers(avilableUsersHandler);
+
+
+
+
+            });
+
+            window.appProxy = app;
+            window.scenarioBrowserProxy = scenarioBrowser;
+            window.battleEditorProxy = battleEditor;
+
+
+
+
+            // if(!scenarioId){                
+
+            //     console.log('Running in scenario select mode');
+                
+            //     battleEditor.model.kind = 'browse';
+
+            //     // load scenarios for scenario browser
+            //     app.loadUserScenarios('name').then(function(scenarioArray){
+            //         var eventHandlersArray = [];
+
+            //         var handler = {
+            //             hObject: battleEditor,
+            //             hFunction: battleEditor.handleEvent
+            //         };
+            //         eventHandlersArray.push(handler);
+
+            //         scenarioBrowser.initializeWithScenarios(null, scenarioArray, null);
+            //         scenarioBrowser.addHandlers(eventHandlersArray);
+
+            //         var avilableUsersHandler = {
+            //             hObject: battleEditor,
+            //             hFunction: battleEditor.handleAvailableUsersChanged
+            //         };
+            //         app.observeAvailableUsers(avilableUsersHandler);
+
+
+
+
+            //     });
+
+            //     window.appProxy = app;
+            //     window.scenarioBrowserProxy = scenarioBrowser;
+            //     window.battleEditorProxy = battleEditor;
+                    
+
+            // }else{
+            //     console.log('Running in selected scenario mode.', scenarioId);
+                
+            //     battleEditor.model.kind = 'scenario';
+
+            //     app.backendLoadScenario(scenarioId).then(function(scenario){
+            //         console.log('Loaded scenario',scenario);
+
+            //         window.appProxy = app;
+            //         window.scenarioBrowserProxy = scenarioBrowser;
+            //         window.battleEditorProxy = battleEditor;
+
+            //     });
+            // }
+
+            rivets.bind(document.getElementById('be-app1'), battleEditor);
+            rivets.bind(document.getElementById('be-app2'), battleEditor);   
+            rivets.bind(document.getElementById('be-app3'), battleEditor);  
+            rivets.bind(document.getElementById('be-app4'), battleEditor);    
+        });
+
+        
+        GameUtils.initializeRivetFormatters();
+        
+
+   
+        rivets.bind(document.getElementById('sb-app'), scenarioBrowser);  
+
+        rivets.bind(document.getElementById('app'), app);          
+
+        
+             
+    </script>
+
+     
+</head>
+<body  class="has-navbar-fixed-top"> 
+    <section class="section">
+    <div class="container is-fluid">
+        <div class="notification is-primary is-hidden operation-success">          
+          Operation performed successfully.
+        </div>
+        <div class="notification is-danger is-hidden operation-failure">          
+          Something went wrong.
+        </div>
+        <nav id="be-app4" class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <nav id="app3" class="breadcrumb" aria-label="breadcrumbs">
+                        <ul>
+                            <li>
+                                <a href="/">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-home" aria-hidden="true"></i>
+                                    </span>
+                                    <span>Home</span>
+                                </a>
+                            </li>                            
+                            <li class="is-active"><a href="#" aria-current="page">Battle setup</a></li>                
+                        </ul>
+                    </nav>          
+                </div>
+            </div>
+            <div class="level-right">
+                <div  class="level-item">
+                    <div rv-if="model.battleConfigured | call model.battle.turnTimeLimitS model.battle.startingParty model.battle.redUserId model.battle.blueUserId model.battle.scenarioId ">                        
+                        <a onclick="appProxy.saveCurrentScenario()" class="button is-primary ">
+                          <span class="icon">                        
+                            <i class="fas fa-bolt"></i>
+                          </span>
+                          <span>Yes ! Proceed to the battle</span>
+                        </a>                            
+                    </div>
+                    <div rv-if="model.battleConfigured | call model.battle.turnTimeLimitS model.battle.startingParty model.battle.redUserId model.battle.blueUserId model.battle.scenarioId | neq true">                        
+                        <a class="button is-primary " disabled>
+                          <!-- <span class="icon">                        
+                            <i class="far fa-save"></i>
+                          </span> -->
+                          <span>Proceed to the battle (waiting for complete configuration)</span>
+                        </a>                            
+                    </div>  
+                </div>                 
+            </div>
+        </nav>
+        <div class="columns">             
+            <div  class="column is-one-third"> 
+                <p class="title is-1">Battle settings</p>
+                <p class="subtitle is-3"><i class="fas fa-info-circle"></i> Select scenario</p>
+
+                <div id="be-app1" class="field">
+                    
+                    <div class="tags has-addons">
+                      <span class="tag">Status</span>
+                      <span rv-if="model.battle.scenarioId" class="tag is-primary">OK</span>
+                      <span rv-if="model.battle.scenarioId | empty" class="tag is-danger">Needs configuration</span>
+                    </div>           
+                    <label for="scenario-create-turns" class="label">Selected scenario</label>         
+                    <div class="control">
+                        <input type="text" id="scenario-name" class="input" rv-value="model.scenario.name" placeholder="Name of the scenario" minlength="6" maxlength="256" size="40" readonly>
+                    </div>
+                    <div class="control">
+                        <span rv-each-scenariotag="model.scenario.tags | split">
+                          <span class="tag">{scenariotag}</span>                                    
+                        </span>
+                    </div>
+                    <p class="help">Scenario Id: {model.scenarioId}</p>
+                    <p rv-if="model.scenarioHolder.map.mapId" class="help"><a rv-href="model.scenarioId | hrefBuilder 'ScenarioEditor.html?scenarioId=@value'" target="_blank">See scenario</a></p>
+                </div>
+                <div class="field">
+                    <!-- <label for="scenario-name" class="label">Change scenario</label> -->
+                    <nav id="sb-app" class="panel">
+                        <p class="panel-heading">
+                        Scenario browser
+                        </p>
+                        <div class="panel-block">
+                            <p class="control has-icons-left">
+                                <input class="input is-small" type="text" placeholder="search" rv-value="model.currentFilterName">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-search" aria-hidden="true"></i>
+                                </span>
+                            </p>
+                        </div>  
+                        <p class="panel-tabs">
+                            <a rv-if="model.currentFilterVisibility | eq 'all'" rv-onclick="'all' | variableBuilder 'scenarioBrowserProxy.setCurrentFilterVisibility('@value')'" class="is-active">all</a>
+                            <a rv-if="model.currentFilterVisibility | neq 'all'" rv-onclick="'all' | variableBuilder 'scenarioBrowserProxy.setCurrentFilterVisibility('@value')'" >all</a>
+                            <a rv-if="model.currentFilterVisibility | eq 'public'" rv-onclick="'public' | variableBuilder 'scenarioBrowserProxy.setCurrentFilterVisibility('@value')'" class="is-active">public</a>
+                            <a rv-if="model.currentFilterVisibility | neq 'public'" rv-onclick="'public' | variableBuilder 'scenarioBrowserProxy.setCurrentFilterVisibility('@value')'">public</a>
+                            <a rv-if="model.currentFilterVisibility | eq 'private'" rv-onclick="'private' | variableBuilder 'scenarioBrowserProxy.setCurrentFilterVisibility('@value')'" class="is-active">private</a>
+                            <a rv-if="model.currentFilterVisibility | neq 'private'" rv-onclick="'private' | variableBuilder 'scenarioBrowserProxy.setCurrentFilterVisibility('@value')'">private</a>
+                        </p>
+                        <div rv-each-scenario="model.scenarios | scenarioFilter model.currentFilterVisibility model.currentFilterName">
+
+                            <a rv-if="model.currentSelected.scenario.scenarioId | eq scenario.scenario.scenarioId" class="panel-block is-active" rv-onclick="scenario.scenario.scenarioId | variableBuilder 'scenarioBrowserProxy.setCurrentSelected('@value')'">
+                                <span class="panel-icon">
+                                  <i class="fas fa-atlas"></i>
+                                </span>
+                                <span class="is-size-6 tooltip" rv-data-tooltip="scenario.scenario.teaser">{scenario.scenario.name} </span> 
+                                <span rv-each-scenariotag="scenario.scenario.tags | split">
+                                  <span class="tag">{scenariotag}</span>                                    
+                                </span>
+                            </a>
+                             <a rv-if="model.currentSelected.scenario.scenarioId | neq scenario.scenario.scenarioId" class="panel-block" rv-onclick="scenario.scenario.scenarioId | variableBuilder 'scenarioBrowserProxy.setCurrentSelected('@value')'">
+                                <span class="panel-icon">
+                                  <i class="fas fa-atlas"></i>
+                                </span>
+                                <span class="is-size-6 tooltip" rv-data-tooltip="scenario.scenario.teaser">{scenario.scenario.name} </span> 
+                                <span rv-each-scenariotag="scenario.scenario.tags | split">
+                                  <span class="tag">{scenariotag}</span>                                    
+                                </span>
+                            </a>
+                        </div>
+                        <!-- <div class="panel-block">
+                            <button class="button is-link is-outlined is-fullwidth" rv-onclick="model.currentSelected.map.mapId | variableBuilder 'appProxy.scenarioChangeMap('@value')'">
+                              Use selected map in scenario
+                            </button>
+                        </div> -->
+                    </nav>
+                </div>                              
+            </div>
+            <div id="be-app2" class="column is-one-third">
+                <p class="title is-1">&nbsp;</p>
+                <p class="subtitle is-3"><i class="fas fa-sliders-h"></i> Battle parameters</p>
+
+                <div class="tags has-addons">
+                  <span class="tag">Status</span>
+                  <span rv-if="model.battleParametersConfigured | call model.battle.turnTimeLimitS model.battle.startingParty" class="tag is-primary">OK</span>
+                  <span rv-if="model.battleParametersConfigured | call model.battle.turnTimeLimitS model.battle.startingParty | neq true" class="tag is-danger">Needs configuration</span>
+                </div>
+                <div class="field">
+                    <label for="scenario-create-turns" class="label">Starting party</label>                    
+                    <div class="control">
+                        <select rv-value="model.battle.startingParty" class="input">
+                            <option value="">--Please choose an option--</option>                            
+                            <option value="blue">BLUE party takes first turn</option>                            
+                            <option value="red">RED party takes first turn</option>                                                        
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="scenario-create-turns" class="label">Turn time limit (seconds)</label>
+                    <div class="control">
+                        <input type="number" id="scenario-create-turns" rv-value="model.battle.turnTimeLimitS" class="input" min="3" max="40" step="1" value="15" size="2" placeholder="i.e. 120 seconds" >
+                    </div>
+                </div>
+                
+                <div class="field">
+                    <label for="scenario-create-turns" class="label">No of turns</label>
+                    <div class="control">
+                        <input type="number" id="scenario-create-turns" rv-value="model.scenario.turns" class="input" min="3" max="40" step="1" value="15" size="2" placeholder="15" readonly>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="scenario-create-powerindex" class="label">Power Index</label>
+                    <div class="control">
+                        <input type="number" id="scenario-create-powerindex" rv-value="model.scenario.powerIndex" class="input" min="1" step="1" value="100" size="5"  placeholder="100" readonly>
+                    </div>
+                </div>
+            </div>
+            <div id="be-app3" class="column">
+                <p class="title is-1">&nbsp;</p>
+                <p class="subtitle is-3"><i class="fas fa-user-friends"></i> Opponent selection</p>
+                <div class="tags has-addons">
+                  <span class="tag">Status</span>
+                  <span rv-if="model.battleOpponentConfigured | call model.battle.redUserId model.battle.blueUserId" class="tag is-primary">OK</span>
+                  <span rv-if="model.battleOpponentConfigured | call model.battle.redUserId model.battle.blueUserId | neq true" class="tag is-danger">Needs configuration</span>
+                </div>
+                <div class="field">
+                    <label for="scenario-create-turns" class="label">Your color</label>                    
+                    <div class="control">
+                        <select rv-value="model.userCreatingParty" class="input" disabled>
+                            <!-- <option value="">--Please choose an option--</option>                             -->
+                            <option value="red">RED Player</option>                            
+                            <option value="blue">BLUE Player</option>                                                        
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="scenario-create-turns" class="label">Opponent</label>                     
+                    <div class="control">
+                        <input type="text" id="scenario-name" class="input" rv-value="model.opponent.email" placeholder="Please select opponent from the list below" minlength="6" maxlength="256" size="40" readonly>
+                    </div>               
+                </div>
+                <div class="field">
+                    <label for="scenario-create-turns" class="label">Currently {model.availableUsers | size} matching opponent/s</label>        
+                    <div class="control">
+                        <div class='carousel carousel-animated carousel-animate-slide' data-size="2">
+                            <div class='carousel-container' >
+                                <div class='carousel-item is-active' rv-each-opponent="model.availableUsers">                                  
+                                    <div class="card">
+                                        <header class="card-header">
+                                            <p class="card-header-title">
+                                                {opponent.email}
+                                            </p>
+                                            
+                                        </header>
+                                        <!-- <div class="card-image">
+                                            <figure class="image is-4by3">
+                                                <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
+                                            </figure>
+                                        </div> -->
+                                        <div class="card-content">
+                                            <div class="content">
+                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis mauris.                                                
+                                            </div>
+                                        </div>
+                                        <footer class="card-footer">
+                                            <a rv-onclick="model.user.uid | variableBuilder 'battleEditorProxy.setOpponentSelected('@value','@0')' opponent.uid"  class="card-footer-item">
+                                                <span class="icon is-small is-left">
+                                                    <i class="fas fa-check-square"></i>
+                                                </span>
+                                                 Select
+                                                </a>
+                                            
+                                        </footer>
+                                    </div>                                
+                                </div>                                
+                            </div>
+                            <div class="carousel-navigation ">
+                                <div class="carousel-nav-left clickable">
+                                    <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                                </div>
+                                <div class="carousel-nav-right clickable">
+                                    <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </div>        
+    </div>    
+    </section>
+    <nav id="app" class="navbar is-transparent is-fixed-top">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="#">
+              <img src="/assets/png/g6.png" alt="Hex - Empires at War" width="32" height="32">
+            </a>           
+        </div>
+          <div id="navbarExampleTransparentExample" class="navbar-menu">
+            <div class="navbar-start">
+              <a class="navbar-item" href="Manage.html">
+                Maps
+              </a>
+              <a class="navbar-item"  href="Scenarios.html">
+                Scenarios
+              </a>              
+            </div>
+
+            <div class="navbar-end">
+                <a class="navbar-item">
+                    <span id="user-name">{model.user.email}</span>
+                </a>
+              <div class="navbar-item">
+                <div class="field is-grouped">                  
+                  <p class="control">
+                    <a id="sign-out" class="button is-primary" href="https://github.com/jgthms/bulma/releases/download/0.7.2/bulma-0.7.2.zip">
+                      <span class="icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                      </span>
+                      <span>Sign out</span>
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        
+
+<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAloFJtk8JOkIpWMoVVnk8cCgq9KHQKNWU",
+    authDomain: "hexapp-f82d4.firebaseapp.com",
+    databaseURL: "https://hexapp-f82d4.firebaseio.com",
+    projectId: "hexapp-f82d4",
+    storageBucket: "hexapp-f82d4.appspot.com",
+    messagingSenderId: "148861884860"
+  };
+  firebase.initializeApp(config);
+
+  // firebase.auth().onAuthStateChanged(function(user) {
+  // if (user) {
+  //   console.log("Logged",user);
+  //   var userLogin = user.email;
+  //   d3.select('#user-name').html(userLogin);
+  // } else {
+  //   // No user is signed in.
+  //   console.log("Not logged");
+  // }
+// });
+</script>
+</body>
+</html>

@@ -46,10 +46,13 @@
     
 
     <script type="module">
+        console.log = function() {};
         import {MapEditor} from './js/libs/map-editor.js'  
         import {App} from  './js/libs/App.js'  
 
         var app = new App();
+
+        app.initialized();
 
         d3.select('#sign-out').on('click', function(){
             app.userSignOut();
@@ -205,6 +208,8 @@
 
             rivets.bind(document.getElementById('app'), mapEditor);
 
+            rivets.bind(document.getElementById('main-app'), app);
+
         }else if(mapId && scenarioId){
             app.backendLoadMap(mapId).then(function(mapElement){
                 console.log('Loaded map',mapElement);
@@ -232,7 +237,8 @@
                     rivets.bind(document.getElementById('app'), mapEditor);   
                     rivets.bind(document.getElementById('app2'), mapEditor);    
 
-                    rivets.bind(document.getElementById('nav'), {kind: mode, back: scenarioId, backName: scenario.name});    
+                    rivets.bind(document.getElementById('nav'), {kind: mode, back: scenarioId, backName: scenario.name});   
+                    rivets.bind(document.getElementById('main-app'), app); 
                 });
 
                 
@@ -264,6 +270,7 @@
                 rivets.bind(document.getElementById('app'), mapEditor);
                 rivets.bind(document.getElementById('app2'), mapEditor);
                 rivets.bind(document.getElementById('nav'), {kind: mode, backName: mapElement.mapName});    
+                rivets.bind(document.getElementById('main-app'), app);
             });
         }
 
@@ -606,7 +613,7 @@
         </div>
     </div>    
     </section>
-    <nav class="navbar is-transparent is-fixed-top">
+    <nav id="main-app" class="navbar is-transparent is-fixed-top">
         <div class="navbar-brand">
             <a class="navbar-item" href="#">
               <img src="/assets/png/g6.png" alt="Hex - Empires at War" width="32" height="32">
@@ -624,7 +631,7 @@
 
             <div class="navbar-end">
                 <a class="navbar-item">
-                    <span id="user-name"></span>
+                    <span id="user-name">{model.user.email}</span>
                 </a>
               <div class="navbar-item">
                 <div class="field is-grouped">                  
@@ -657,16 +664,7 @@
   };
   firebase.initializeApp(config);
 
-  firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    console.log("Logged",user);
-    var userLogin = user.email;
-    d3.select('#user-name').html(userLogin);
-  } else {
-    // No user is signed in.
-    console.log("Not logged");
-  }
-});
+
 </script>
 </body>
 </html>

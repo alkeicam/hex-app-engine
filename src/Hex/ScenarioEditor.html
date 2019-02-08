@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="css/map-editor.css"/>
     <link rel="stylesheet" href="css/bulma-extensions.min.css"/>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/github.min.css"/>
+    
 
     
     
@@ -52,7 +52,7 @@
  charset="UTF-8"
  src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/go.min.js"></script> -->
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js"></script>
+    
  
 
      
@@ -60,13 +60,15 @@
     
 
     <script type="module">
+        console.log = function() {};
         import {MapEditor} from './js/libs/map-editor.js'  
         import {App} from  './js/libs/App.js'  
         import {MapBrowser} from  './js/libs/map-browser.js'  
 
-        hljs.initHighlightingOnLoad();
+        
 
         var app = new App();
+
         
 
         var mapBrowser = new MapBrowser();
@@ -85,42 +87,44 @@
 
         var scenarioId = url.searchParams.get("scenarioId") ? url.searchParams.get("scenarioId"):'';
 
-        
+        app.initialized().then(function(){
+            if(!scenarioId){
+                console.log("Please provide valid scenario id.")
+                window.location.replace("/Scenarios.html");
+            }else{
+                app.backendLoadScenario(scenarioId).then(function(scenario){
+                    console.log('Loaded scenario',scenario);
 
-        if(!scenarioId){
-            console.log("Please provide valid scenario id.")
-            window.location.replace("/Scenarios.html");
-        }else{
-            app.backendLoadScenario(scenarioId).then(function(scenario){
-                console.log('Loaded scenario',scenario);
+                    // when map is public or has been requested a public review then one cannot edit the map
+                    if(scenario.isPublic == -1 || scenario.isPublic==1){
+                        console.log("Scenario is public so edit is not allowed.")
+                        window.location.replace("/Scenarios.html");
+                    }
 
-                // when map is public or has been requested a public review then one cannot edit the map
-                if(scenario.isPublic == -1 || scenario.isPublic==1){
-                    console.log("Scenario is public so edit is not allowed.")
-                    window.location.replace("/Scenarios.html");
-                }
+                    
+                    app.loadUserMaps().then(function(mapArray){
+                        var userMaps = mapArray;
+                        mapBrowser.initializeWithMaps(scenario.map, userMaps,null);
+                    });
 
-                
-                app.loadUserMaps().then(function(mapArray){
-                    var userMaps = mapArray;
-                    mapBrowser.initializeWithMaps(scenario.map, userMaps,null);
+                    
+                    
+
+                    app.model.scenarioHolder = scenario;
+                    window.appProxy = app;
+                    window.mapBrowserProxy = mapBrowser;
+
+                    var tagInput = appProxy.view.tagsInputs[0];
+                    var tags = appProxy.model.scenarioHolder.tags.split(',');
+                    for(var i = 0; i<tags.length; i++){
+                        tagInput.addTag(tags[i]);
+                    }
+
                 });
+            }    
+        });
 
-                
-                
-
-                app.model.scenarioHolder = scenario;
-                window.appProxy = app;
-                window.mapBrowserProxy = mapBrowser;
-
-                var tagInput = appProxy.view.tagsInputs[0];
-                var tags = appProxy.model.scenarioHolder.tags.split(',');
-                for(var i = 0; i<tags.length; i++){
-                    tagInput.addTag(tags[i]);
-                }
-
-            });
-        }
+        
 
         GameUtils.initializeRivetFormatters();
         
@@ -129,6 +133,7 @@
         rivets.bind(document.getElementById('app2'), app);
         rivets.bind(document.getElementById('app3'), app);
         rivets.bind(document.getElementById('app4'), app);
+        rivets.bind(document.getElementById('app5'), app);
 
         rivets.bind(document.getElementById('browser-app'), mapBrowser);
 
@@ -376,7 +381,7 @@
 
     </div>    
     </section>
-    <nav class="navbar is-transparent is-fixed-top">
+    <nav id="app5" class="navbar is-transparent is-fixed-top">
         <div class="navbar-brand">
             <a class="navbar-item" href="#">
               <img src="/assets/png/g6.png" alt="Hex - Empires at War" width="32" height="32">
@@ -394,7 +399,7 @@
 
             <div class="navbar-end">
                 <a class="navbar-item">
-                    <span id="user-name"></span>
+                    <span id="user-name">{model.user.email}</span>
                 </a>
               <div class="navbar-item">
                 <div class="field is-grouped">                  
@@ -427,16 +432,7 @@
   };
   firebase.initializeApp(config);
 
-  firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    console.log("Logged",user);
-    var userLogin = user.email;
-    d3.select('#user-name').html(userLogin);
-  } else {
-    // No user is signed in.
-    console.log("Not logged");
-  }
-});
+
 </script>
 </body>
 </html>

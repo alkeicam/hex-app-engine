@@ -51,6 +51,8 @@
     
 
     <script type="module">
+        // console.log = function() {};
+
         import {MapEditor} from './js/libs/map-editor.js'  
         import {App} from  './js/libs/App.js'  
 
@@ -58,6 +60,7 @@
         var tagsInputs = bulmaExtensions.bulmaTagsinput.attach();
 
         var app = new App();
+        app.initialized();
 
         d3.select('#sign-out').on('click', function(){
             app.userSignOut();
@@ -161,6 +164,13 @@
                                 <span rv-if="userscenario.isPublic | eq 1" class="tag is-warning"><i class="fas fa-star"></i>This scenario is Public !</span>
                                 <span rv-if="userscenario.isPublic | eq -1" class="tag is-info"><i class="fas fa-star"></i>Under review</span>
 
+                                <a class="button is-success is-small" rv-href="userscenario.scenarioId | variableBuilder '/Play.html?scenarioId=@value'">
+                                    <span class="icon">
+                                        <i class="far fa-play-circle"></i>
+                                    </span>
+                                    <span>Play</span>
+                                </a>
+                                
                             </td>
                         </tr>
                     </tbody>

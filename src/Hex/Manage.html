@@ -48,6 +48,7 @@
     
 
     <script type="module">
+        // console.log = function() {};
         import {MapEditor} from './js/libs/map-editor.js'  
         import {App} from  './js/libs/App.js'  
 
@@ -62,6 +63,9 @@
 
 
         rivets.bind(document.getElementById('app'), app);
+
+        app.initialized();
+
 
 
     </script>
@@ -248,16 +252,7 @@
   };
   firebase.initializeApp(config);
 
-  firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    console.log("Logged",user);
-    var userLogin = user.email;
-    d3.select('#user-name').html(userLogin);
-  } else {
-    // No user is signed in.
-    console.log("Not logged");
-  }
-});
+
 </script>
 </body>
 </html>
