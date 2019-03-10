@@ -15,13 +15,15 @@
     <!-- // IOS webapp icons // -->
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
-    <script src="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.js"></script>
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.css" />
+    <link rel="stylesheet" href="css/bulma-extensions.min.css"/>
+    
 
+    
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-    
-    
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.js"></script>
     <script src="js/libs/jquery-3.3.1.min.js"></script>
+    <script src="js/libs/rivet.js"></script>
     <script src="js/libs/gameutils.js"></script>
      <script src="https://d3js.org/d3.v4.min.js"></script>
     
@@ -29,55 +31,95 @@
 
     <script type="module">
         import {App} from './js/libs/App.js' 
+        import {LatinSentences} from './js/libs/latin-sentences.js' 
+        import {JoinController} from "./js/libs/JoinController.js";
         var app = new App();
+        
+        var joinController = new JoinController({appInstance: app});
+        GameUtils.initializeRivetFormatters();
 
-        d3.select('#register').on('click', function(){
-            app.userJoin();
-        });
+        rivets.bind(document.getElementById('joinController'), joinController);  
+        window.joinControllerProxy = joinController;
+        
     </script>
 </head>
-<body> 
+<body id="joinController"> 
     <section class="section">
     <div class="container is-fluid">
         <div class="columns is-centered">
-            <div class="column is-one-quarter">
+            <div class="column is-one-quarter">                    
+                    <div class="field">
+                        <label class="label">Empire name</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input rv-class-is-danger="model.validation.userEmpire.name | eq 0" rv-class-is-success="model.validation.userEmpire.name | eq 1" id="empireName" class="input" placeholder="Name your empire" rv-value="model.userEmpire.name">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-flag"></i>
+                            </span>
+                            <span rv-if="model.validation.userEmpire.name | eq 0" id="empire-name-invalid" class="icon is-small is-right ">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                            <span rv-if="model.validation.userEmpire.name | eq 1" id="empire-name-valid" class="icon is-small is-right ">
+                              <i class="fas fa-check"></i>
+                            </span>
+                        </div>
+                        <p rv-if="model.validation.userEmpire.name | eq 0" id="empire-name-invalid-2" class="help is-danger ">Empire name must contain at least 6 characters</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">Battle Cry</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input id="battleCry" class="input upperFirstLetter" placeholder="i.e. Audaces fortuna iuvat" rv-value="model.userEmpire.battleCry" rv-class-is-danger="model.validation.userEmpire.battleCry | eq 0" rv-class-is-success="model.validation.userEmpire.battleCry | eq 1">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-chess-rook"></i>
+                            </span>
+                            <span rv-if="model.validation.userEmpire.battleCry | eq 0" id="battle-cry-invalid-1" class="icon is-small is-right ">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                            <span rv-if="model.validation.userEmpire.battleCry | eq 1" id="battle-cry-valid" class="icon is-small is-right">
+                              <i class="fas fa-check"></i>
+                            </span>
+                        </div>
+                        <p rv-if="model.validation.userEmpire.battleCry | eq 0" id="battle-cry-invalid-2" class="help is-danger ">Battle cry must contain at least 2 characters</p>
+                    </div>
+                    <div class="is-divider" data-content="Your Account"></div>
                 <div class="field">
                     <label class="label">Email</label>
                     <div class="control has-icons-left has-icons-right">
-                        <input id="email" class="input" type="email" placeholder="Email input" >
+                        <input id="email" class="input" type="email" placeholder="Email input" rv-value="model.user.email" rv-class-is-danger="model.validation.user.email | eq 0" rv-class-is-success="model.validation.user.email | eq 1">
                         <span class="icon is-small is-left">
                             <i class="fas fa-envelope"></i>
                         </span>
-                        <span id="email-invalid-1" class="icon is-small is-right is-hidden">
+                        <span rv-if="model.validation.user.email | eq 0" id="email-invalid-1" class="icon is-small is-right ">
                             <i class="fas fa-exclamation-triangle"></i>
                         </span>
-                        <span id="email-valid" class="icon is-small is-right is-hidden">
+                        <span rv-if="model.validation.user.email | eq 1" id="email-valid" class="icon is-small is-right">
                           <i class="fas fa-check"></i>
                         </span>
                     </div>
-                    <p id="email-invalid-2" class="help is-danger is-hidden">This email is invalid</p>
+                    <p rv-if="model.validation.user.email | eq 0" id="email-invalid-2" class="help is-danger ">This email is invalid or already used</p>
                 </div>
                 <div class="field">
                     <label class="label">Password</label>
                     <p class="control has-icons-left">
-                        <input id="pass" class="input" type="password" placeholder="Password">
+                        <input id="pass" class="input" type="password" placeholder="Password" rv-value="model.user.password">
                         <span class="icon is-small is-left">
                             <i class="fas fa-lock"></i>
                         </span>
                     </p>
                 </div>
+                
+                
                 <div class="field">
                     <div class="control">
                         <label class="checkbox">
-                          <input id="consent" type="checkbox">
+                          <input id="consent" type="checkbox" rv-value="model.user.consent">
                           I agree to the <a href="#">terms and conditions</a>
                         </label>
                     </div>
-                    <p id="consents-invalid" class="help is-danger is-hidden">Please accept terms and conditions</p>
+                    <p rv-if="model.validation.user.consent | eq 0" id="consents-invalid" class="help is-danger">Please accept terms and conditions</p>
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
-                        <button id="register" class="button is-link">Submit</button>
+                        <button id="register" class="button is-link" onclick="joinControllerProxy.handleClickJoin()">Submit</button>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>  <html class="ie ie6 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 7]>     <html class="ie ie7 lte9 lte8 lte7 no-js"> <![endif]-->
+<!--[if IE 8]>     <html class="ie ie8 lte9 lte8 no-js">      <![endif]-->
+<!--[if IE 9]>     <html class="ie ie9 lte9 no-js">           <![endif]-->
+<!--[if gt IE 9]>  <html class="no-js">                       <![endif]-->
+<!--[if !IE]><!--> <html class="no-js">                       <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Welcome</title>
+
+    <!-- // IOS webapp icons // -->
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <link rel="stylesheet" href="css/ui.css"/>
+    <link rel="stylesheet" href="css/map.css"/>    
+    
+    
+    <link rel="stylesheet" href="css/bulma-extensions.min.css"/>
+
+    
+
+    
+    
+
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    
+    
+<!--     <script type="module" src="js/libs/BattleOutcome.js"></script>
+    <script type="module" src="js/libs/Hex.js"></script>
+    <script type="module" src="js/libs/Unit.js"></script>
+ -->    
+    <script src="js/libs/jquery-3.3.1.min.js"></script>
+    <script src="js/libs/rivet.js"></script>
+    <!-- <script src="js/libs/jquery-ui-1.10.4.min.js"></script> -->
+    <script src="js/libs/gameutils.js"></script>
+    <!-- <script src="js/drag/TweenMax.min.js"></script> -->
+    <!-- <script src="js/drag/utils/Draggable.min.js"></script> -->
+    <!-- <script src="js/libs/svg.min.js"></script>
+     <script src="js/libs/svg.draggable.min.js"></script> -->
+     <!-- <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+     <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+     <script src="https://d3js.org/d3-drag.v1.min.js"></script> -->
+     <script src="https://d3js.org/d3.v4.min.js"></script>
+     <!-- <script src="js/libs/saveSvgAsPng.js"></script> -->
+
+     <script type="text/javascript" src="js/libs/bulma-extensions.min.js"></script>
+
+     <!-- <script
+ charset="UTF-8"
+ src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/go.min.js"></script> -->
+         
+
+    <script type="module">
+        // console.log = function() {};
+        
+        import {App} from  './js/libs/App.js'  
+        
+        var app = new App();
+
+
+        
+        d3.select('#sign-out').on('click', function(){
+            app.userSignOut();
+        });
+
+        app.initialized().then(function(){
+          window.appProxy = app;
+        });        
+
+        GameUtils.initializeRivetFormatters();
+   
+
+        rivets.bind(document.getElementById('app'), app);          
+
+        
+             
+    </script>
+
+     
+</head>
+<body  class="has-navbar-fixed-top"> 
+    <section class="section">
+    <div class="container is-fluid">
+        <div class="notification is-primary is-hidden operation-success">          
+          Operation performed successfully.
+        </div>
+        <div class="notification is-danger is-hidden operation-failure">          
+          Something went wrong.
+        </div>        
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <a href="Play.html">
+              <div class="tile is-child box" >
+                <p class="title">Go for battle!</p>
+                <figure class="image is-640x400">
+                  <img src="/assets/png/battle-small.png">
+                </figure>
+                <p class="title is-5">Dare to win</p>
+                <p>Select among many scenarios and pick your opponent for an epic battle.</p>
+              </div>
+            </a>
+          </div>
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+        </div>   <!-- end tiles -->
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+          <div class="tile is-parent is-6">
+            <div class="tile is-child">
+              <p class="title is-3">Contribute and manage</p>
+              <p class="subtitle is-5">You can help to make this game event better. Create historic battle scenarios, compose maps of famous locations.</p>              
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+        </div>   <!-- end tiles -->   
+
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <a href="#">
+              <div class="tile is-child box">
+                <p class="title is-5"><i class="fas fa-flag"></i> Your empire</p>
+                <figure class="image is-2by1">
+                  <img src="/assets/png/empire-small.png">
+                </figure>
+                <p>Manage and organise your empire.</p><p>Discover new technologies and build solid economy to hold your military forces.</p>
+              </div>
+            </a>
+          </div>
+          <div class="tile is-parent">
+            <a href="#">
+              <div class="tile is-child box">
+                <p class="title is-5"><i class="fas fa-chess-rook"></i> Your forces</p>
+                <figure class="image is-2by1">
+                  <img src="/assets/png/troops-small.png">
+                </figure>
+                <p>Review your military forces.</p><p>Conscript new units to build invincible army.</p>
+              </div>
+            </a>
+          </div>
+          <div class="tile is-parent">
+            <a href="Scenarios.html">
+              <div class="tile is-child box" >
+                <p class="title is-5"><i class="fas fa-book"></i> Scenarios</p>
+                <figure class="image is-2by1">
+                  <img src="/assets/png/scenario-small.jpg">
+                </figure>
+                <p>Create epic battle scenarios that can be played by you, your friends and other players.</p>
+              </div>
+            </a>
+          </div>          
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+        </div>   <!-- end tiles -->
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <a href="Manage.html">
+              <div class="tile is-child box">
+                <p class="title is-5"><i class="fas fa-globe-americas"></i></i> Maps</p>
+                <figure class="image is-2by1">
+                  <img src="/assets/png/maps-small.jpg">
+                </figure>
+                <p>Create vivid and thriving maps.</p>
+                <p>You may create either real and historic locations or wholly fantastic new lands.</p>
+              </div>
+            </a>
+          </div>
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <div class="tile is-child">              
+            </div>
+          </div>
+        </div>   <!-- end tiles -->
+    </div>    
+    </section>
+    <nav id="app" class="navbar is-transparent is-fixed-top">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="#">
+              <img src="/assets/png/g6.png" alt="Hex - Empires at War" width="32" height="32">
+            </a>           
+        </div>
+          <div id="navbarExampleTransparentExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item is-active" href="#">Home</a>
+                <a class="navbar-item" href="Manage.html">Maps</a>
+                <a class="navbar-item"  href="Scenarios.html">Scenarios</a>              
+            </div>
+
+            <div class="navbar-end">
+                <a class="navbar-item">
+                    <span id="user-name">{model.user.email}</span>
+                </a>
+              <div class="navbar-item">
+                <div class="field is-grouped">                  
+                  <p class="control">
+                    <a id="sign-out" class="button is-primary">
+                      <span class="icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                      </span>
+                      <span>Sign out</span>
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        
+
+<script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAloFJtk8JOkIpWMoVVnk8cCgq9KHQKNWU",
+    authDomain: "hexapp-f82d4.firebaseapp.com",
+    databaseURL: "https://hexapp-f82d4.firebaseio.com",
+    projectId: "hexapp-f82d4",
+    storageBucket: "hexapp-f82d4.appspot.com",
+    messagingSenderId: "148861884860"
+  };
+  firebase.initializeApp(config);
+
+  // firebase.auth().onAuthStateChanged(function(user) {
+  // if (user) {
+  //   console.log("Logged",user);
+  //   var userLogin = user.email;
+  //   d3.select('#user-name').html(userLogin);
+  // } else {
+  //   // No user is signed in.
+  //   console.log("Not logged");
+  // }
+// });
+</script>
+</body>
+</html>

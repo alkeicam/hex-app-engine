@@ -29,6 +29,12 @@ GameUtils.load = function(id){
     return JSON.parse(window.localStorage.getItem(id));
 };
 
+GameUtils.initializeRivetBinders = function () {
+    rivets.binders['conditionalClass-*'] = function (el, value) {
+        el.style.setProperty(this.args[0], value);
+    };
+};
+
 GameUtils.initializeRivetFormatters = function(){
     rivets.formatters.fromTimestamp = function(value){
             var theDate = new Date(value);
@@ -120,6 +126,70 @@ GameUtils.initializeRivetFormatters = function(){
                 return 0;
             return value.length;                    
         }
+
+        rivets.formatters.sizeGte = function(value, arg){            
+            if(!value)
+                return false;
+            if(!value.length)
+                return false;
+            return value.length >= arg;                    
+        }
+
+        rivets.formatters.sizeLt = function(value, arg){            
+            if(!value)
+                return false;
+            if(!value.length)
+                return false;
+            return value.length < arg;                    
+        }
+
+        rivets.formatters.sizeLte = function(value, arg){            
+            if(!value)
+                return false;
+            if(!value.length)
+                return false;
+            return value.length <= arg;                    
+        }
+
+        rivets.formatters.gt = function(value, arg){            
+            if(!value)
+                return false;                            
+            return value > arg;                    
+        }
+
+        rivets.formatters.gte = function(value, arg){            
+            if(!value)
+                return false;                            
+            return value >= arg;                    
+        }
+
+        rivets.formatters.lt = function(value, arg){            
+            if(!value)
+                return false;                            
+            return value < arg;                    
+        }
+        rivets.formatters.lte = function(value, arg){            
+            if(!value)
+                return false;                            
+            return value <= arg;                    
+        }
+
+        rivets.formatters.betweenLo = function(value, arg1, arg2){            
+            if(!value)
+                return false;                            
+            return value > arg1 && value <= arg2;                    
+        }
+
+        rivets.formatters.itemAt = function(value, index){            
+            if(!(value && value instanceof Array))
+                return null; 
+            return value[index || 0];                    
+        }
+
+        rivets.formatters.addNumber = function(value, arg){            
+            return value + arg;                  
+        }
+
 };
 
 GameUtils.downloadObjectAsJSON = function(targetObject, fileName){    

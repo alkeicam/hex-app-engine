@@ -17,12 +17,15 @@ App.prototype = {
 
   model: {    
     user: {},
+    userData: {},// additional data of the logged in user
+    empire: {}, //currently logged in user empire
+
     maps: [],
     scenarios: [],
     scenarioHolder: {},  // stores scenario object during create and scenario configuration    
     isDeploymentConfigured: false,
-    userMarkedAsInactive: false,
-
+    isVictoryConditionsConfigured: false,
+    userMarkedAsInactive: false
   },
   view: {
     tagsInputs: {}
@@ -30,7 +33,7 @@ App.prototype = {
 
   timeout: 5000,
   //inactivityTimeMs: 5*60000, // 15 minutes
-  inactivityTimeMs: 30000, // 15 seconds
+  inactivityTimeMs: 60000, // 60 seconds
   
 
   initialized: function(){
@@ -41,46 +44,56 @@ App.prototype = {
           if (user) {
             that.model.user = user;                 
 
-            // that.loadUserMaps().then(function(mapsArray){
-            //   if(mapsArray.length > 0){            
-            //     that.model.maps.length = 0;
-            //     that.model.maps.push(...mapsArray)
-            //   }else{
-            //     that.model.maps.length = 0;   
-            //     that.model.maps = [];
-            //   }
-
-            // });
-
             that.observeUserMaps();
             that.observeUserScenarios();
 
-            // that.loadUserScenarios().then(function(scenariosArray){
-            //   if(scenariosArray.length > 0){            
-            //     that.model.scenarios.length = 0;
-            //     that.model.scenarios.push(...scenariosArray)
-            //   }else{
-            //     that.model.scenarios.length = 0;   
-            //     that.model.scenarios = [];
-            //   }
-
-            // });
-
-            // load public maps
+            that.loadUserEntitySingle('userEmpire').then(function(resultArray){
+              var sth = resultArray[0];
+              that.model.empire = resultArray[0];
+            });
 
 
-          } else {
+            // add user to the list of active users
+            //that.saveAvailableUser(user);
+
+            // // set inactivity timer
+            // that.detectInactivity();
+            firebase.database().ref('.info/connected').on('value', function (snapshot) {
+              // If we're not currently connected, don't do anything.
+              if (snapshot.val() == false) {
+                return;
+              };
+
+              // If we are currently connected, then use the 'onDisconnect()'
+              // method to add a set which will only trigger once this
+              // client has disconnected by closing the app,
+              // losing internet, or any other means.
+              //userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase)
+              firebase.database().ref('/usersAvailable/' + user.uid).onDisconnect().set(null)
+              .then(function () {
+                // The promise returned from .onDisconnect().set() will
+                // resolve as soon as the server acknowledges the onDisconnect()
+                // request, NOT once we've actually disconnected:
+                // https://firebase.google.com/docs/reference/js/firebase.database.OnDisconnect
+
+                // We can now safely set ourselves as 'online' knowing that the
+                // server will mark us as offline once we lose connection.
+                that.saveAvailableUser(user);
+                //userStatusDatabaseRef.set(isOnlineForDatabase);
+              });
+            });
+            
+
+
+        } else {
             that.model.user = {};
             that.model.maps = [];
             that.model.scenarios = [];
             that.model.scenarioHolder = {};
-          }
+            window.location.replace("/login.html");
+        }
 
-          // add user to the list of active users
-          that.saveAvailableUser(user);
-
-          // set inactivity timer
-          that.detectInactivity();
+        
           
 
           resolve();
@@ -119,7 +132,12 @@ App.prototype = {
 
   markCurrentUserInactive: function(internal){
     console.log('User marked as inactive');
-    var that = internal ? this:window.appProxy;
+    var that = null;
+    if(!internal)
+      that = window.appProxy;
+    else
+      that = this;
+     //= internal !=null ? this:window.appProxy;
 
     if(!that.model.userMarkedAsInactive){
       var user = that.backendGetLoggedUser();
@@ -130,103 +148,34 @@ App.prototype = {
     }    
   },
 
-  // initialize: function(){
-  //   var that = this;
-  //   firebase.auth().onAuthStateChanged(function(user) {
-  //     if (user) {
-  //       that.model.user = user;        
+  //this.model.user.email, this.model.userEmpire.name, this.model.userEmpire.battleCry
+  userJoin: function(email, password, empireName, empireBattleCry) {
+    var that = this;
+
+    return new Promise(function(resolve, reject){
+      firebase.auth().createUserWithEmailAndPassword(email, password).then(function (user) {
+        that.backendSaveUserEntity('userEmpire', user.user.uid, {
+          i: that.backendGenerateUUID(),
+          bc: empireBattleCry,
+          n: empireName,
+          bw: 0,
+          bl:0,
+          r:0
+        }).then(function(){
+          resolve();        
+          window.location.replace("/");
+        })
         
-  //       that.observeUserMaps();
-  //       // that.loadUserMaps().then(function(mapsArray){
-  //       //   if(mapsArray.length > 0){            
-  //       //     that.model.maps.length = 0;
-  //       //     that.model.maps.push(...mapsArray)
-  //       //   }else{
-  //       //     that.model.maps.length = 0;   
-  //       //     that.model.maps = [];
-  //       //   }
-
-  //       // });
-
-
-  //       that.loadUserScenarios().then(function(scenariosArray){
-  //         if(scenariosArray.length > 0){            
-  //           that.model.scenarios.length = 0;
-  //           that.model.scenarios.push(...scenariosArray)
-  //         }else{
-  //           that.model.scenarios.length = 0;   
-  //           that.model.scenarios = [];
-  //         }
-
-  //       });
-
-  //       // load public maps
-
-
-  //     } else {
-  //       that.model.user = {};
-  //       that.model.maps = [];
-  //       that.model.scenarios = [];
-  //       that.model.scenarioHolder = {};
-  //     }
-
-  //     // add user to the list of active users
-  //     that.saveAvailableUser(user);
-
-  //   });
-  // },
-
-
-
-
-  userJoin: function() {
-    var email = d3.select('#email');
-    var pass = d3.select('#pass');
-    var consents = d3.select('#consent');
-
-    var emailValue = email.property("value");
-    var passValue = pass.property("value");
-
-    var consentsAgreed = consents.property('checked');
-
-    var valid = true;
-
-    if(!this.validateEmail( emailValue )){
-      d3.select('#email-invalid-1').classed('is-hidden',null);
-      d3.select('#email-invalid-2').classed('is-hidden',null);
-      d3.select('#email-valid').classed('is-hidden', true);
-      d3.select('#email').classed('is-danger', true);
-      d3.select('#email').classed('is-success',null);
-      valid = valid && false;
-    }else{
-      d3.select('#email-invalid-1').classed('is-hidden', true);
-      d3.select('#email-invalid-2').classed('is-hidden', true);
-      d3.select('#email-valid').classed('is-hidden',null);
-      d3.select('#email').classed('is-danger',null);
-      d3.select('#email').classed('is-success', true);      
-      valid = valid && true;
-    }
-
-    if(!consentsAgreed){
-      d3.select('#consents-invalid').classed('is-hidden',null);
-      valid = valid && false;
-    }else{
-      d3.select('#consents-invalid').classed('is-hidden',true);
-      valid = valid && true;
-    }
-    
-    if(valid){
-      firebase.auth().createUserWithEmailAndPassword(emailValue, passValue).then(function(user){
-        console.log(user);
-        window.location.replace("MapEditor.html");
-      }).catch(function(error) {
+  
+      }).catch(function (error) {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
-        // ...
-        console.log(error);
+        reject(error);
       });
-    }
+    });
+    
+    
   },
 
   userSignOut: function(){
@@ -246,7 +195,7 @@ App.prototype = {
       var entityRef = firebase.database().ref('/'+entityName+'/' + that.model.user.uid).orderByChild(orderBy);
 
       entityRef.on('value', function(snapshot) {        
-        if(snapshot.val()){          
+        if(snapshot.val()){       
           snapshot.forEach(function(child) {            
             resultArray.push(child.val());              
           });                      
@@ -256,6 +205,25 @@ App.prototype = {
       });
     });
   },
+
+  loadUserEntitySingle: function(entityName, orderByField){
+    var resultArray = [];
+    var that = this;
+    var orderBy = orderByField || 'modifiedSort';
+
+    return new Promise(function(resolve, reject){
+      var entityRef = firebase.database().ref('/'+entityName+'/' + that.model.user.uid).orderByChild(orderBy);
+
+      entityRef.on('value', function(snapshot) {        
+        if(snapshot.val()){       
+          resultArray.push(snapshot.val());                                            
+        }else{}
+        console.log(resultArray);
+        return resolve(resultArray);                      
+      });
+    });
+  },
+
 
   observeUserEntity: function(entityName, orderByField, targetModelFieldName){
     
@@ -276,9 +244,57 @@ App.prototype = {
     });    
   },
 
+  observeUserPendingInvitation: function(handler){
+    
+    this.observeUserEntityWithHandler('userInvitations/pending',null,handler);
+  },
+
+
+  observeUserEntityWithHandler: function(entityName, orderByField, handler){
+    
+    var that = this;
+    var orderBy = orderByField || 'modifiedSort';
+    
+    var entityRef = firebase.database().ref('/'+entityName+'/' + that.model.user.uid).orderByChild(orderBy);
+
+    entityRef.on('value', function(snapshot) {        
+      var resultArray = [];
+      if(snapshot.val()){          
+        snapshot.forEach(function(child) {            
+          resultArray.push(child.val());              
+        });                      
+      }else{}
+      
+      handler.hFunction.apply(handler.hObject,[resultArray]);      
+    });    
+  },
+
   observeAvailableUsers: function(handler){
     var that = this;
     var availableUsersRef = firebase.database().ref('/usersAvailable').limitToLast(10);
+
+    availableUsersRef.on('value', function(snapshot) {
+      var resultArray = [];
+
+      if(snapshot.val()){          
+          snapshot.forEach(function(child) {   
+            var user = child.val();
+            // when user is the current user then skip as we add only "other" users
+            if(user.uid != that.model.user.uid)
+              resultArray.push(child.val());              
+          });                      
+        }else{}      
+
+      // will hold array of users available  
+      
+      handler.hFunction.apply(handler.hObject,[resultArray]);      
+      
+    });
+  },
+
+  observeUserPlayInvitations: function(handler){
+    var that = this;
+    var userPlayInvitationsRef = firebase.database().ref('/usersInvitations').limitToLast(10);
 
     availableUsersRef.on('value', function(snapshot) {
       var resultArray = [];
@@ -865,6 +881,16 @@ App.prototype = {
 
   backendSaveUserScenario: function(scenario){
     firebase.database().ref('/userScenario/' + scenario.userId+"/"+scenario.scenarioId).set(scenario);
+  },
+
+  backendSaveUserEntity: function(entityName, userId, entity){
+    var entityPath = '/'+entityName+'/' + userId ;
+    return new Promise(function(resolve, reject){
+      firebase.database().ref(entityPath).set(entity,function(error){
+        resolve();
+      });
+    });
+    
   },
 
   backendSaveMap: function(map){
